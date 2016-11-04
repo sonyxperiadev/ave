@@ -1,0 +1,130 @@
+Version 22
+==========
+
+* Remove redundant start of ADB server
+    :Tree: ave/broker
+    :Commit: 834dd0634f16f30f7c3eae4f0b2348283bae5363
+
+* Formatted all documentation as reStructuredText
+    :Tree: ave/gerrit
+    :Commit: 4590ea631c775bb5ac4bbd2da1a8bd9a13bb5356
+
+* Fix documentation errors
+    :Tree: ave/gerrit
+    :Commit: 3796f988bd353b3f60d6221c452396c372fe15dd
+
+* Fix quote_message() to also escape backslashes
+    :Tree: ave/gerrit
+    :Commit: 2a2c34cbd19fc5393324ce3a4e8ae045c36f7582
+
+* Add a method to set an arbitrary label and score on a change
+    :Tree: ave/gerrit
+    :Commit: 63d1a4220d5dba3104d7a419b6e346bc87299538
+
+* Bugfix: Did not pass path to ave.gerrit.config.load()
+    :Tree: ave/gerrit
+    :Commit: 3d9484f89834eb30542a09c3309c3af4e1a3d193
+
+* Fix a few warnings raised in Eclipse
+    :Tree: ave/gerrit
+    :Commit: 9486f728ce28ccfd2723e49ef3a8decc628a38bc
+
+* Fix comparisons to None
+    :Tree: ave/gerrit
+    :Commit: 9a56a28803b3fcc1169124f846fab0743f76d6f9
+
+* Fix wrong exception message on invalid change values
+    :Tree: ave/gerrit
+    :Commit: c8ac2ef78582ae3c544bc940300b725e047e42ee
+
+* Add convenience method to set code review score
+    :Tree: ave/gerrit
+    :Commit: 8dbc3a07e96b86007be71588c1669ae68ede7445
+
+* Better exception message on invalid verify score
+    :Tree: ave/gerrit
+    :Commit: 9f153c991c26f197ec2df1dd115989acf7b89eb0
+
+* Don't validate range of score value in set_label()
+    :Tree: ave/gerrit
+    :Commit: f18217db2e66c8d2018bbd32450932fc4ef4751c
+
+* Add convenience method to set "Qualified" score
+    :Tree: ave/gerrit
+    :Commit: f96815dec06f58d0018951e72468c38fb150be73
+
+* Add method to set multiple labels on a change
+    :Tree: ave/gerrit
+    :Commit: 8695579a25676571b8cb9aec213aae88c5a01b1c
+
+* Self tests and bug fixes
+    :Tree: ave/gerrit
+    :Commit: 54908b445574168b52c4e432231831c403dc8813
+
+* Remove PCC Dialog
+    :Tree: ave/gort
+    :Commit: 85a4ac13bced37a9e9029dc3c1644af5e031aa04
+
+* SMS support
+    :Tree: ave/gort
+    :Commit: 7732210ce7b472b0ea255fd62510040b0d46f7e5
+
+* Support for periodic insert to MediaStore
+    :Tree: ave/gort
+    :Commit: e9081a65536ae43f5966361911c35660e6e60083
+
+* Immersive fullscreen handling
+    :Tree: ave/gort
+    :Commit: 93e6618e482f473ae949273f7e3a21c5b0762505
+
+* Enable Immersive FS did not work correct
+    :Tree: ave/gort
+    :Commit: 9ec557daa979980bb574fd9fd16b095f50e6f626
+
+* Add new action to enable/disable charge state dialog
+    :Tree: ave/gort
+    :Commit: 6ef9a7e3017ec1f482927d5078afaf276a578ac2
+
+* Firefox telephony support
+    :Tree: ave/handset
+    :Commit: be381ffe727c6f95b6bead7e70f43c71305dd0e5
+
+* Retry if we fail to read a thermal sensor value
+    :Tree: ave/handset
+    :Commit: a617587d0006169d60c7c0899525db1b77fb6733
+
+* Firefox OS lockscreen fix
+    :Tree: ave/handset
+    :Commit: 181a6bfaf15af91bf2ab8d4c2d71b97836e2dc6b
+
+* Firefox OS wait for element display
+    :Tree: ave/handset
+    :Commit: 2a34feb28d8b6830f4e023267240a91fe4d7b6a5
+
+* Improved port forwarding over ADB
+    :Tree: ave/handset
+    :Commit: 1282fe75ef0eb5cad2932fa9acc90a0efe3981c1
+
+* Control of ADB server via upstart
+    :Tree: ave/handset
+    :Commit: f6bb5357a3c417fb4a5966a8d1c3137b31aefad0
+
+* Apply workaround for ADB bug 6558362
+    :Tree: ave/handset
+    :Commit: ac30f49a7b50e2fc56566d70713e19b774bdfeed
+
+* Bugfix: Added missing dependency to GCC
+    :Tree: ave/mysql
+    :Commit: ac7abcacc583e6ec444406e19471938cf44db243
+
+* Added "coverage" attribute for individual jobs
+    :Tree: ave/vcsjob
+    :Commit: 4d87b92d2ba5aed6d4e165d7dc6f692ea46ed1d8
+
+* Updated decibel reporting to handle the new decibel return format
+    :Tree: ave/workspace
+    :Commit: f17a5d8b022373fcd64ac7c9f9dc2d5ca67344e1
+
+* Bugfix: Decibel XML generator for Marionette
+    :Tree: ave/workspace
+    :Commit: 766f594998cbd72c5326c551b1a3762f63bce0c2

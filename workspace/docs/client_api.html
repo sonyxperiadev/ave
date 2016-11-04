@@ -1,0 +1,910 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Client API &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../../index.html" />
+    <link rel="up" title="Workspaces" href="index.html" />
+    <link rel="next" title="System API" href="system_api.html" />
+    <link rel="prev" title="Workspaces" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="system_api.html" title="System API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Workspaces"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Workspaces</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="client-api">
+<span id="workspace-client-api"></span><h1>Client API<a class="headerlink" href="#client-api" title="Permalink to this headline">¶</a></h1>
+<p>Allocate workspaces through the broker, possibly with more attributes set in
+the allocation profile. Note that any wanted external tool must be requested in
+the allocation profile:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">ave.broker</span> <span class="kn">import</span> <span class="n">Broker</span>
+
+<span class="n">broker</span> <span class="o">=</span> <span class="n">Broker</span><span class="p">()</span>
+<span class="n">workspace</span> <span class="o">=</span> <span class="n">broker</span><span class="o">.</span><span class="n">get</span><span class="p">({</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;workspace&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>The profile details are used by the broker to find a lab machine that supports
+various lab features that may not be globally available. E.g. access to a WLAN
+that implements a specific encryption standard. This is currently not used much
+but the functionality is there. Contact the AVE governance board if you want to
+make use of the feature.</p>
+<div class="section" id="git">
+<h2>Git<a class="headerlink" href="#git" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="method">
+<dt id="download_git">
+<tt class="descname">download_git</tt><big>(</big><em>src</em>, <em>refspec</em>, <em>dst=None</em>, <em>timeout=0</em>, <em>depth=1</em><big>)</big><a class="headerlink" href="#download_git" title="Permalink to this definition">¶</a></dt>
+<dd><p>Synchronize a destination tree with a source tree, then check out the
+commit designated by &#8216;refspec&#8217;. It is safe to use this method to
+repeatedly synchronize a source into the same destination, using
+different reference specifications each time.</p>
+<dl class="docutils">
+<dt>Execution details:</dt>
+<dd><ul class="first last simple">
+<li>If <em>dst</em> is <em>None</em> or an empty directory: Clone the git, fetch (if
+needed) and check out the commit.</li>
+<li>If &#8216;dst&#8217; is a non-empty git tree: Fetch or pull the refspec (if
+needed), then check out the commit.</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>src</strong> &#8211; The source git. May be a local git tree or a remote git URL.</li>
+<li><strong>refspec</strong> &#8211; The refspec to check out. Must be a branch name or an SHA1
+commit id.</li>
+<li><strong>dst</strong> &#8211; The destination directory. May be an None, an empty or
+non-existing directory or a non-dirty git tree. If <em>None</em>,
+destination is <tt class="docutils literal"><span class="pre">git/&lt;basename</span> <span class="pre">of</span> <span class="pre">src</span></tt> under the workspace base
+directory.</li>
+<li><strong>timeout</strong> &#8211; Seconds before time out.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Depth :</th><td class="field-body"><p class="first">Create a shallow clone with a history truncated to the specified
+number of revisions.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The destination path.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>Timeout</strong> &#8211; If the call took longer than &#8216;timeout&#8217; seconds.</li>
+<li><strong>Exception</strong> &#8211; If the destination tree is dirty or another error
+occured.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="has_git">
+<tt class="descname">has_git</tt><big>(</big><em>path</em>, <em>refspec</em><big>)</big><a class="headerlink" href="#has_git" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the directory on &#8216;path&#8217; is a git tree that has the commit
+specified by &#8216;refspec&#8217;.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The identity of the tree itself is not checked in any way
+(unless <em>refspec</em> is unique enough to establish the identity of the
+tree).</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> &#8211; The path of the directory to check.</li>
+<li><strong>refspec</strong> &#8211; The refspec of interest.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>True</em> or <em>False</em>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="delete_git">
+<tt class="descname">delete_git</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#delete_git" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a git tree.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; The path to the git tree. Must be below the root directory
+of the workspace. May be relative or absolute.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If an error occured.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="make_git">
+<tt class="descname">make_git</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#make_git" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an empty git tree on &#8216;path&#8217;. The directory will be created
+as needed. The directory must be located below the base directory
+of the workspace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; The path where the git is created.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Full path to the created git.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">If an error occured.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="jenkins">
+<h2>Jenkins<a class="headerlink" href="#jenkins" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="method">
+<dt id="download_jenkins">
+<tt class="descname">download_jenkins</tt><big>(</big><em>job_id</em>, <em>build_id=None</em>, <em>artifacts=None</em>, <em>dst=None</em>, <em>timeout=0</em>, <em>base=None</em><big>)</big><a class="headerlink" href="#download_jenkins" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download artifacts from a Jenkins job into the workspace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>job_id</strong> &#8211; The Jenkins job ID to download from.</li>
+<li><strong>build_id</strong> &#8211; May be used to select a specific build. If None, the last
+successful build will be downloaded.</li>
+<li><strong>artifacts</strong> &#8211; May be used to select specific artifacts to download.
+If <em>None</em>, all found artifacts will be downloaded. Must be a list
+of strings or <em>None</em>.</li>
+<li><strong>dst</strong> &#8211; The download destination directory. If <em>None</em>, destination is
+&lt;workspace path&gt;/jenkins/&lt;job_id&gt;/&lt;build_id&gt;.</li>
+<li><strong>timeout</strong> &#8211; Seconds before time out.</li>
+<li><strong>base</strong> &#8211; May be used to specify the Jenkins URL. If None, the URL will
+be loaded from the workspace configuration file.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The full destination path.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>Timeout</strong> &#8211; If such occured.</li>
+<li><strong>Exception</strong> &#8211; On other errors.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="zip-file">
+<h2>Zip File<a class="headerlink" href="#zip-file" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="method">
+<dt id="validate_zip_file">
+<tt class="descname">validate_zip_file</tt><big>(</big><em>filename</em>, <em>crc_check=False</em><big>)</big><a class="headerlink" href="#validate_zip_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validates if zip file is corrupt or not.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> &#8211; The zip file name.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Crc_check :</th><td class="field-body">Switch whether crc check shall be performed, Default to <tt class="docutils literal"><span class="pre">False</span></tt>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True or False.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="zip">
+<tt class="descname">zip</tt><big>(</big><em>path</em>, <em>dst=None</em><big>)</big><a class="headerlink" href="#zip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creat a zip archive.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> &#8211; The dir or file used for zip. It can be a string path or a list of string path.</li>
+<li><strong>dst</strong> &#8211; If set, zip archive name is dst, else creat a default automatically.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Zip archive name path.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="unzip">
+<tt class="descname">unzip</tt><big>(</big><em>self</em>, <em>zip_file</em>, <em>path=None</em>, <em>pwd=None</em><big>)</big><a class="headerlink" href="#unzip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unzip a zipfile  to a dirrectory.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>zip_file</strong> &#8211; The name of zip file for unzip.</li>
+<li><strong>path</strong> &#8211; Path specifies a different directory to extract to.</li>
+<li><strong>pwd</strong> &#8211; Pwd is the password used for encrypted files.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Unzip directory path.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="flocker">
+<h2>Flocker<a class="headerlink" href="#flocker" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="method">
+<dt id="flocker_push_file">
+<tt class="descname">flocker_push_file</tt><big>(</big><em>src</em>, <em>dst=None</em>, <em>key=None</em><big>)</big><a class="headerlink" href="#flocker_push_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Upload a file to Flocker. An existing session may be targeted by setting
+<cite>key</cite>. This should only be used when uploading from multiple workspaces
+that are used from the same job.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>src</strong> &#8211; Path to the file to upload. The path must point inside the
+root directory of the workspace.</li>
+<li><strong>dst</strong> &#8211; Path to use on the remote server. It may include forward
+slashes to create a directory hiearchy. If <cite>dst</cite> is not set, the
+basename of the uploaded file will be used.</li>
+<li><strong>key</strong> &#8211; A valid session key (a string). If not set, the key will be
+either generated automatically (to start a new session) or set to
+the key for a session that is already created for this workspace.
+Normally <cite>key</cite> is never set, unless the user has created multiple
+workspaces from the same job.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A dictionary containing some metadata about the server-side
+session.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <cite>key</cite> field in the returned metadata may be used as the
+value of <cite>key</cite> in calls to <em>flocker_push_file()</em> and
+<em>flocker_push_string()</em>.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="flocker_initial">
+<tt class="descname">flocker_initial</tt><big>(</big><em>existing_key=None</em>, <em>custom_key=None</em><big>)</big><a class="headerlink" href="#flocker_initial" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>existing_key</strong> &#8211; A valid session key to reuse the session.</li>
+<li><strong>custom_key</strong> &#8211; A friendly name (a string). If this parameter is set,
+the session will hold the session key in the form of
+<cite>&lt;friendly-name&gt;_&lt;hash id&gt;</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Users cannot set <cite>existing_key</cite> and <cite>custom_key</cite> at the
+same time.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="flocker_push_string">
+<tt class="descname">flocker_push_string</tt><big>(</big><em>string</em>, <em>dst</em>, <em>key=None</em><big>)</big><a class="headerlink" href="#flocker_push_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Upload a string to Flocker and store it in a file. An existing session
+may be targeted by setting <cite>key</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>string</strong> &#8211; A message to store on the server.</li>
+<li><strong>dst</strong> &#8211; Path to use on the remote server. It may include forward
+slashes to create a directory hiearchy.</li>
+<li><strong>key</strong> &#8211; A valid session key (a string). If not set, the key will be
+either generated automatically (to start a new session) or set to
+the key for a session that is already created for this workspace.
+Normally <cite>key</cite> is never set, unless the user has created multiple
+workspaces from the same job.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A dictionary containing some metadata about the server-side
+session.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <cite>key</cite> field in the returned metadata may be used as the
+value of <cite>key</cite> in calls to <em>flocker_push_file()</em> and
+<em>flocker_push_string()</em>.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="flocker_set_metadata">
+<tt class="descname">flocker_set_metadata</tt><big>(</big><em>key=None</em>, <em>contact=None</em>, <em>asset=None</em>, <em>comment=None</em><big>)</big><a class="headerlink" href="#flocker_set_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set extended metadata attributes on the server session.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> &#8211; A valid session key (a string). If not set, the key will be
+either generated automatically (to start a new session) or set to
+the key for a session that is already created for this workspace.
+Normally <cite>key</cite> is never set, unless the user has created multiple
+workspaces from the same job.</li>
+<li><strong>contact</strong> &#8211; A string containing contact information. E.g. an email
+address.</li>
+<li><strong>asset</strong> &#8211; A string containing a resource locator. E.g. a tag with
+context dependent semantics, a URL, or some other globally unique
+identifier.</li>
+<li><strong>comment</strong> &#8211; A free form message string.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The updated session metadata.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <cite>key</cite> field in the returned metadata may be used as the
+value of <cite>key</cite> in calls to <em>flocker_push_file()</em> and
+<em>flocker_push_string()</em>.</p>
+</div>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="profiling">
+<h2>Profiling<a class="headerlink" href="#profiling" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="method">
+<dt id="convert_hprof">
+<tt class="descname">convert_hprof</tt><big>(</big><em>infile</em>, <em>outfile</em><big>)</big><a class="headerlink" href="#convert_hprof" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a HPROF file generated with Handset.dumpheap( native=False ) to
+a standard format so the file can viewed in a common profiling tool.
+This method uses hprof-conv.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is NOT applicable on native heaps.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>infile</strong> &#8211; Full path to the file to convert.</li>
+<li><strong>outfile</strong> &#8211; Full path where the converted file will be saved.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises Excpetion:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">If an error occured.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="temporary-files">
+<h2>Temporary Files<a class="headerlink" href="#temporary-files" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="method">
+<dt id="make_tempdir">
+<tt class="descname">make_tempdir</tt><big>(</big><big>)</big><a class="headerlink" href="#make_tempdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a directory with a randomized name within the workspace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The path to the created directory.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="make_tempfile">
+<tt class="descname">make_tempfile</tt><big>(</big><em>path=None</em><big>)</big><a class="headerlink" href="#make_tempfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a tempfile.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; If path is set the tempfile will be created at path, else it
+will be created in the workspace root directory.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The path to the created file.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="write_tempfile">
+<tt class="descname">write_tempfile</tt><big>(</big><em>sequence</em>, <em>encoding='uft-8'</em><big>)</big><a class="headerlink" href="#write_tempfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a temp file in workspace and write a sequence of strings to it.
+The sequence can be any iterable object producing strings, typically a
+list of strings.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sequence</strong> &#8211; an iterable sequence of strings.</li>
+<li><strong>encoding</strong> &#8211; default encoding is utf-8</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The path to the created file.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first last">If it was not possible to write the file.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="promote">
+<tt class="descname">promote</tt><big>(</big><em>source_path</em>, <em>target</em>, <em>server='flocker'</em><big>)</big><a class="headerlink" href="#promote" title="Permalink to this definition">¶</a></dt>
+<dd><p>Promotes a file by making it traceable, this needs to be done
+to tmp-files that are generated by workspace.makefile() as they
+are not pushable to the handset. Traceability is secured by
+pushing the file to flocker and returning the metadata as well as
+making a symlink to the promoted file named as the target</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>source_path</strong> &#8211; full path to the source file.</li>
+<li><strong>target</strong> &#8211; path inside the ws to the target file.</li>
+<li><strong>server</strong> &#8211; server, optional, defaults to flocker.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the result of the file storage operation.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="file-manipulation">
+<h2>File Manipulation<a class="headerlink" href="#file-manipulation" title="Permalink to this headline">¶</a></h2>
+<p>Generic file manipulation and AVE&#8217;s golden cage model do not mix easily. The
+methods listed here are designed to satisfy specific needs that many test jobs
+do have and that do not break the model. To request new methods, please send an
+email to the AVE governance board or to SWD Tools SEMC.</p>
+<blockquote>
+<div><dl class="method">
+<dt id="get_checksum">
+<tt class="descname">get_checksum</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#get_checksum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get checksum of the file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; The file to check.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Checksum value of the file.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">If it was not possible to get the checksum.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cat">
+<tt class="descname">cat</tt><big>(</big><em>path</em>, <em>encoding=None</em>, <em>errors=None</em><big>)</big><a class="headerlink" href="#cat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the content of the file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> &#8211; The file to read.</li>
+<li><strong>encoding</strong> &#8211; name of unicode encoding,
+see python __builtin__.unicode for further information.</li>
+<li><strong>errors</strong> &#8211; <p>specify encoding error handling for invalid characters,
+see python __builtin__.unicode for further information.
+Valid values:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&#39;strict&#39;</span><span class="p">,</span> <span class="s">&#39;ignore&#39;</span><span class="p">,</span> <span class="s">&#39;replace&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the content of the file.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first last">If it was not possible to read the file.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ls">
+<tt class="descname">ls</tt><big>(</big><em>path</em>, <em>globstr='*'</em><big>)</big><a class="headerlink" href="#ls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of paths matching a pathname pattern.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> &#8211; String containing a path specification.</li>
+<li><strong>globstr</strong> &#8211; String containing a pattern with shell-style wildcards.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises Excpetion:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">If an error occured.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="path_exists">
+<tt class="descname">path_exists</tt><big>(</big><em>path</em>, <em>file_type=None</em><big>)</big><a class="headerlink" href="#path_exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if path exists in workspace. Optional: check file type of path.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> &#8211; Path on handset to check.</li>
+<li><strong>file_type</strong> &#8211; <p>If given, verify that the file type of path is
+file_type. Valid values:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&#39;symlink&#39;</span><span class="p">,</span> <span class="s">&#39;directory&#39;</span><span class="p">,</span> <span class="s">&#39;file&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><em>True</em> if path exists (and file type is file_type, if that
+parameter was given), else False.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first last">If an error occurs.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="apk-inspection">
+<h2>APK Inspection<a class="headerlink" href="#apk-inspection" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="method">
+<dt id="get_package_name">
+<tt class="descname">get_package_name</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#get_package_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the package name from the apk (using aapt).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; The path to the apk.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The package name.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">If failed to get package name or an error occured.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="get_apk_version">
+<tt class="descname">get_apk_version</tt><big>(</big><em>apk_path</em><big>)</big><a class="headerlink" href="#get_apk_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the version code of the apk file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>apk_path</strong> &#8211; The apk file to check.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Version code of the apk file.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">If it was not possible to get the version code.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="miscellaneous">
+<h2>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="method">
+<dt id="get_profile">
+<tt class="descname">get_profile</tt><big>(</big><big>)</big><a class="headerlink" href="#get_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the profile of the workspace. This dictionary should be used
+by test jobs to look up properties of the workspace.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="get_path">
+<tt class="descname">get_path</tt><big>(</big><big>)</big><a class="headerlink" href="#get_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the base directory of this workspace.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="get_wifi_ssid">
+<tt class="descname">get_wifi_ssid</tt><big>(</big><big>)</big><a class="headerlink" href="#get_wifi_ssid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get wifi ssid from workspace profile.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="get_wifi_pw">
+<tt class="descname">get_wifi_pw</tt><big>(</big><big>)</big><a class="headerlink" href="#get_wifi_pw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get wifi password from workspace profile.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="delete">
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="headerlink" href="#delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the directory that holds the workspace&#8217;s persistent storage.
+The workspace is no longer usable afterwards.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">If an error occured.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="external-tools">
+<h2>External Tools<a class="headerlink" href="#external-tools" title="Permalink to this headline">¶</a></h2>
+<p>Workspaces can be used to call external tools. The list of tools that can be
+called is controlled by a white-list which is configured by the lab owner.</p>
+<p>The support for external tools is an explicit loophole to escapce AVE&#8217;s golden
+cage model. This is sometimes needed in special lab environments. Jobs that use
+such exceptions will not run in DUST which does not white-list any extra tools.</p>
+<blockquote>
+<div><dl class="method">
+<dt id="has_tool">
+<tt class="descname">has_tool</tt><big>(</big><em>tool</em><big>)</big><a class="headerlink" href="#has_tool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether the given tool is listed in the workspace&#8217;s configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tool</strong> &#8211; The tool of interest.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>True</em> or <em>False</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="run">
+<tt class="descname">run</tt><big>(</big><em>cmd</em>, <em>timeout=0</em><big>)</big><a class="headerlink" href="#run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a command line tool on the host of the workspace.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The tool must be listed in the workspace&#8217;s configuration
+file (.ave/config/workspace.json).</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cmd</strong> &#8211; The command line to execute. May be a string or a list of
+strings.</li>
+<li><strong>timeout</strong> &#8211; Seconds before a time out.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>A 3-tuple with: (exit code, output, &#8216;&#8217;)</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">error messages will end up in &#8220;output&#8221;.</p>
+</div>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>Timeout</strong> &#8211; If such occured.</li>
+<li><strong>Exception</strong> &#8211; If the tool is not available in this workspace,
+execution failed or another error occured.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Client API</a><ul>
+<li><a class="reference internal" href="#git">Git</a></li>
+<li><a class="reference internal" href="#jenkins">Jenkins</a></li>
+<li><a class="reference internal" href="#zip-file">Zip File</a></li>
+<li><a class="reference internal" href="#flocker">Flocker</a></li>
+<li><a class="reference internal" href="#profiling">Profiling</a></li>
+<li><a class="reference internal" href="#temporary-files">Temporary Files</a></li>
+<li><a class="reference internal" href="#file-manipulation">File Manipulation</a></li>
+<li><a class="reference internal" href="#apk-inspection">APK Inspection</a></li>
+<li><a class="reference internal" href="#miscellaneous">Miscellaneous</a></li>
+<li><a class="reference internal" href="#external-tools">External Tools</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Workspaces</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="system_api.html"
+                        title="next chapter">System API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/workspace/docs/client_api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="system_api.html" title="System API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Workspaces"
+             >previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" >Workspaces</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,557 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Networked Allocation &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../../index.html" />
+    <link rel="up" title="Broker" href="system.html" />
+    <link rel="next" title="Relay Server" href="../../relay/docs/system.html" />
+    <link rel="prev" title="Restart" href="restart.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../relay/docs/system.html" title="Relay Server"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="restart.html" title="Restart"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="../../system/index.html" >System Documentation</a> &raquo;</li>
+          <li><a href="system.html" accesskey="U">Broker</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="networked-allocation">
+<span id="broker-network-allocation"></span><h1>Networked Allocation<a class="headerlink" href="#networked-allocation" title="Permalink to this headline">¶</a></h1>
+<p>This document describes how the broker supports sharing of resources within a
+network of brokers, and how allocation against this combined pool work.</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The support for multiple brokers is divided into two separate solutions that
+may be combined to form a network:</p>
+<ul class="simple">
+<li><strong>Forwarding:</strong> A broker that is unable to satisfy a resource request locally
+may forward the request to another broker.</li>
+<li><strong>Sharing:</strong> A broker may dedicate all of its resources to a master broker.
+The master may then perform allocation on the assumption that it has perfect
+information about the sharing broker&#8217;s resources.</li>
+</ul>
+<div class="figure align-center">
+<img alt="../../_images/sharing1.jpg" src="../../_images/sharing1.jpg" />
+</div>
+<p><em>Blue lines indicate sharing. Orange lines indicate forwarding. Clients may
+forward to any selected broker in the network. Network loops are not permitted.</em></p>
+</div>
+<div class="section" id="terminology">
+<h2>Terminology<a class="headerlink" href="#terminology" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>Allocator:</strong> An implementation detail of the broker. Allocators keep track
+of allocations per client and per broker.</li>
+<li><strong>Client:</strong> Any program using a <tt class="docutils literal"><span class="pre">RemoteBroker</span></tt> instance to connect to a
+broker.</li>
+<li><strong>Leaf:</strong> A broker that performs a local allocation. The broker may also have
+slaves, but at the moment of allocation is is considered a leaf in a series
+of connected brokers.</li>
+<li><strong>Master:</strong> A broker that is being shared to by other brokers.</li>
+<li><strong>RemoteBroker:</strong> An implementation detail of the broker. Clients use this
+class to connect to the broker process.</li>
+<li><strong>Session:</strong> A separate process created by a broker to handle interaction
+with resources allocated by a client.</li>
+<li><strong>Slave:</strong> A broker that shares to another broker.</li>
+<li><strong>Upstream:</strong> A master broker may be a slave to yet another master broker.
+The &#8220;other&#8221; master broker is considered to be &#8220;upstream&#8221;.</li>
+</ul>
+<p>Note that a broker can be <em>master</em> and <em>slave</em> at the same time in setups where
+sharing is done in multiple steps. E.g. the middle broker in the illustration in
+the <em>Overview</em>.</p>
+</div>
+<div class="section" id="scenarios">
+<h2>Scenarios<a class="headerlink" href="#scenarios" title="Permalink to this headline">¶</a></h2>
+<p>A series of execution traces of increasing complexity are presented in this
+section. Race conditions between competing clients are not accounted for in
+detail but are implicitly covered by the failure scenarios. Race conditions
+are covered in more details under <em>Notes on Concurrency</em>.</p>
+<p>For ease of comparison with networked scenarios, the scenarios for local
+allocation are included.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Some functions are partially implemented on the client side. This is
+sometimes needed to implement good error handling on the client side, or to
+hide complexity that the client program should normally not care about. In
+particular note the differences between <tt class="docutils literal"><span class="pre">Broker.get()</span></tt> (server side) and
+<tt class="docutils literal"><span class="pre">RemoteBroker.get()</span></tt> (client side).</p>
+</div>
+<div class="section" id="local-success">
+<h3>Local Success<a class="headerlink" href="#local-success" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">Client creates a <tt class="docutils literal"><span class="pre">RemoteBroker</span></tt> instance and connects to the local broker
+by executing e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">ave.broker</span> <span class="kn">import</span> <span class="n">Broker</span>
+<span class="n">b</span>   <span class="o">=</span> <span class="n">Broker</span><span class="p">()</span>
+<span class="n">h</span><span class="p">,</span><span class="n">w</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">get</span><span class="p">({</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">},</span> <span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;workspace&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+<p><em>Note that the</em> <tt class="docutils literal"><span class="pre">import</span></tt> <em>statement actually imports</em> <tt class="docutils literal"><span class="pre">RemoteBroker</span></tt>
+<em>and that this is hidden from the client, which normally does not need to
+care about the distinction.</em></p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">RemoteBroker.get()</span></tt> creates an RPC message with the allocation request
+and sends it to the server, then waits for a response.</p>
+</li>
+<li><p class="first">The server creates a session for the client if it didn&#8217;t already have one.
+See the source code implementations of <tt class="docutils literal"><span class="pre">Broker.new_connection()</span></tt> and
+<tt class="docutils literal"><span class="pre">Broker.new_session()</span></tt>. A randomized authentication key is generated that
+is needed to connect to the session.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">Broker.get()</span></tt> validates the requested profiles and fills in default
+attributes for certain equipment types unless the client explicitly asked
+for &#8220;odd&#8221; profiles (e.g. an offline handset).</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">Broker.get()</span></tt> calls <tt class="docutils literal"><span class="pre">LocalAllocator.get_resources()</span></tt> (the allocator
+for local equipment always sorts before allocators for sharing brokers).
+This will only succeed if all profiles can be satisfied. The example above
+includes a workspace, which is created after &#8220;real&#8221; equipment has been
+allocated. Each allocated profile is added to the session by a call to
+<tt class="docutils literal"><span class="pre">Session.add_resource()</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">Session.add_resource()</span></tt> creates an instance of the &#8220;real&#8221; equipment
+support class. Until this point the broker has only dealt in profiles. The
+creation is deferred to the session to avoid stalls in the broker main loop
+in case the equipment support is buggy or performs long running operations
+in its constructor (please don&#8217;t do that).</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">Broker.get()</span></tt> sends the allocation details to its master if it is set up
+for sharing. This is done from a separate process to avoid stalling the main
+loop if the master broker is slow to respond. It then returns the allocated
+profiles in an RPC response message to the client.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">RemoteBroker.get_resources_raw()</span></tt> receives the allocated profiles and
+creates <tt class="docutils literal"><span class="pre">self.session</span> <span class="pre">=</span> <span class="pre">RemoteSession</span></tt> to represent the session that the
+broker has created. It then uses it to finish the allocation by demanding
+that the session confirms the allocations.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">Session.get_resources()</span></tt> can confirm the allocations immediately because
+they were made locally. It returns it&#8217;s own network address (hostname and
+port number) and the profiles to the client.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">RemoteBroker.get()</span></tt> creates a <tt class="docutils literal"><span class="pre">Remote&lt;ResourceType&gt;</span></tt> instance for each
+allocated profile. These know the network address of each resource and
+implement the client side of AVE&#8217;s RPC model, to support method calls made
+by the client. The resource objects are returned to the program that
+implements the client.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="local-failure">
+<h3>Local Failure<a class="headerlink" href="#local-failure" title="Permalink to this headline">¶</a></h3>
+<p>Steps 1-4 are the same as for a successful local allocation.</p>
+<ol class="arabic simple" start="5">
+<li><tt class="docutils literal"><span class="pre">LocalAllocator.get_resources()</span></tt> raises either <tt class="docutils literal"><span class="pre">Busy</span></tt> (if all matching
+resources are already allocated) or <tt class="docutils literal"><span class="pre">NoSuch</span></tt> if no resource at all matches
+a requested profile.</li>
+<li><tt class="docutils literal"><span class="pre">Broker.get()</span></tt> has no more allocators to try the allocation (no other
+broker is sharing with it). It reclaims all previous allocations made by
+the client (by closing its session) and raises the allocator&#8217;s exception
+to the client.</li>
+<li><tt class="docutils literal"><span class="pre">RemoteBroker.get_resources_raw()</span></tt> recreates the exception type and raises
+it to the caller (the client program).</li>
+<li>Any further calls through the <tt class="docutils literal"><span class="pre">RemoteBroker</span></tt> instance will raise &#8220;session
+closed&#8221; exceptions because the client&#8217;s session has been destroyed. This
+forces the client to start over.</li>
+</ol>
+</div>
+<div class="section" id="forward-success">
+<h3>Forward Success<a class="headerlink" href="#forward-success" title="Permalink to this headline">¶</a></h3>
+<p>Forward allocation always starts with a failed local one. Steps 1-5 are the same
+as for a failed local allocation.</p>
+<ol class="arabic simple" start="6">
+<li><tt class="docutils literal"><span class="pre">Broker.get()</span></tt> has no more allocators to try. However it has a forwarding
+rule in its configuration. It tentatively adds the requested profiles to
+the session as a &#8220;deferred allocation&#8221;. It then returns the profiles and
+the session&#8217;s network address to the client.</li>
+<li>The session does not try to satisfy the deferred allocation immediately.
+Instead it waits for the client to connect.</li>
+<li>Exactly the same as for a successful local allocation.</li>
+<li><tt class="docutils literal"><span class="pre">Session.get_resources()</span></tt> cannot confirm the allocations immediately (they
+have not even been attempted yet). It creates a <tt class="docutils literal"><span class="pre">RemoteBroker</span></tt> instance
+against the broker mentioned in the forwarding rule and acts as a client on
+behalf of the real client: It calls <tt class="docutils literal"><span class="pre">RemoteBroker.get_resources_raw()</span></tt>
+with the requested profiles. This triggers an allocation attempt on another
+broker (may be local, forward or share as described in this document).
+Resource profiles and session details are eventually returned. Meanwhile the
+real client is blocking.</li>
+<li>The session adds the allocated profiles to its internal state and remembers
+which remote broker performed the allocation. The <tt class="docutils literal"><span class="pre">RemoteBroker</span></tt> instance
+must be kept for the duration of the session since destroying it will cause
+a resource reclamation in the broker that actually allocated the resource.</li>
+<li>Exactly like step 10 for local success, but the network addresses for the
+resources will point to another machine.</li>
+</ol>
+</div>
+<div class="section" id="forward-failure">
+<h3>Forward Failure<a class="headerlink" href="#forward-failure" title="Permalink to this headline">¶</a></h3>
+<p>Steps 1-8 are the same as for a successful forward allocation.</p>
+<ol class="arabic simple" start="9">
+<li>The session&#8217;s call to <tt class="docutils literal"><span class="pre">RemoteBroker.get_resources_raw()</span></tt> fails and the
+session merely re-raises the exception to the client. It then shuts itself
+down.</li>
+<li>The broker main loop detects that the session terminated and reclaims all
+resources held by the session.</li>
+<li>Any remote brokers that had already allocated resources for the client&#8217;s
+session when the last allocation failed will notice that the session drops
+its client (as it shuts itself down). This causes them to reclaim <em>their</em>
+resources and terminate sessions.</li>
+</ol>
+<p>Final steps are the same as 7-8 for local failed allocations.</p>
+</div>
+<div class="section" id="share-success">
+<h3>Share Success<a class="headerlink" href="#share-success" title="Permalink to this headline">¶</a></h3>
+<p>Share allocations always starts with a failed one. Steps 1-5 are the same as for
+a failed local allocation.</p>
+<ol class="arabic simple" start="6">
+<li><tt class="docutils literal"><span class="pre">Broker.get()</span></tt> retries the allocators for all the slaves that are sharing
+with it. It keeps track of the &#8220;best&#8221; error seen among the allocators.</li>
+<li><tt class="docutils literal"><span class="pre">ShareAllocator.get_resources()</span></tt> assumes that equipment and allocation
+information that was received from a slave is correct and performs the
+allocation almost exactly like <tt class="docutils literal"><span class="pre">LocalAllocator.get_resources()</span></tt>: It does
+not create workspaces and it ends by raising <tt class="docutils literal"><span class="pre">Shared</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">Broker.get()</span></tt> sees a <tt class="docutils literal"><span class="pre">Shared</span></tt> exception, which is better than <tt class="docutils literal"><span class="pre">Busy</span></tt>
+and <tt class="docutils literal"><span class="pre">NoSuch</span></tt>. It means the allocation should succeed if it is retried at
+the broker that is associated with the allocator.</li>
+<li><tt class="docutils literal"><span class="pre">Broker.get()</span></tt> tentatively adds the requested profiles to the session as
+a deferred allocation. It then breaks the allocator loop and returns the
+profiles and the session&#8217;s network address to the client.</li>
+</ol>
+<p>Final steps are the same as steps 7-11 for successful forward allocations.</p>
+</div>
+<div class="section" id="share-failure">
+<h3>Share Failure<a class="headerlink" href="#share-failure" title="Permalink to this headline">¶</a></h3>
+<p>Steps 1-5 are the same as for a failed local allocation.</p>
+<ol class="arabic simple" start="6">
+<li><tt class="docutils literal"><span class="pre">Broker.get()</span></tt> has no more allocators to try. It also has no forwarding
+rule (support for concurrent sharing and forwarding is not implemented). It
+now<ul>
+<li>reclaims all previous local allocations made by the client,</li>
+<li>&#8220;reclaims&#8221; share allocations by completely deleting the resources from
+its internal state, (See the <em>Notes on Concurrency</em>)</li>
+<li>closes the client&#8217;s session, and</li>
+<li>raises the best allocation exception it has seen to the client (<tt class="docutils literal"><span class="pre">Busy</span></tt>
+or <tt class="docutils literal"><span class="pre">NoSuch</span></tt>).</li>
+</ul>
+</li>
+<li><tt class="docutils literal"><span class="pre">RemoteBroker.get_resources_raw()</span></tt> recreates the exception type and raises
+it to the caller (the client program).</li>
+<li>Any further calls through the <tt class="docutils literal"><span class="pre">RemoteBroker</span></tt> instance will raise &#8220;session
+closed&#8221; exceptions because the client&#8217;s session has been destroyed. This
+forces the client to start over.</li>
+<li>If the session had successfully allocated resources at other brokers (see
+step 9-10 for successful forward allocation), those brokers will now notice
+client disconnections and close their sessions.</li>
+</ol>
+</div>
+<div class="section" id="notes-on-workspaces">
+<h3>Notes on Workspaces<a class="headerlink" href="#notes-on-workspaces" title="Permalink to this headline">¶</a></h3>
+<p>Unlike &#8220;real&#8221; equipment, workspaces can be created almost without limit, so a
+broker can simply make one if the allocation request matches the profile seen
+in <tt class="docutils literal"><span class="pre">.ave/config/workspace.json</span></tt>. There are also some special considerations
+for sharing brokers:</p>
+<ul class="simple">
+<li>Any created workspace must be published to the master so that a client can
+allocate the same workspace multiple times. This can be used by the client
+to force multiple allocations to the same broker, which is actually needed
+sometimes.</li>
+<li>The base profile determined by <tt class="docutils literal"><span class="pre">.ave/config/workspace.json</span></tt> is published
+together with real equipment profiles to a master so that the master broker
+can know if an allocation attempt will be successful on the share.</li>
+<li>Workspaces are deleted from the file system when the session that holds the
+<tt class="docutils literal"><span class="pre">Workspace</span></tt> object is shut down. I.e. the broker does not support post
+mortem analysis of content in workspaces. Clients should upload important
+files to <em>Flocker</em> before disconnecting from the broker.</li>
+</ul>
+</div>
+<div class="section" id="notes-on-concurrency">
+<h3>Notes on Concurrency<a class="headerlink" href="#notes-on-concurrency" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">The rationale for many of the design decisions described in this document
+is to avoid stalling the broker&#8217;s main loop. The only call clients can make
+to the broker&#8217;s main loop is <tt class="docutils literal"><span class="pre">get()</span></tt>. Everything else is handled in an out-of-band manner by the client&#8217;s session. To the client it&#8217;s all the same.
+Impossible requests eventually time out or result in some other error
+condition, but the broker is free to handle other requests while this is
+happening. All administrative methods implemented on the broker&#8217;s main loop
+have predictable (very short) completion times.</p>
+</li>
+<li><p class="first">The broker implements a decentralized model. As can be seen in this document,
+this yields a complicated design compared to a centralized model. The reason
+to go with decentralization is primarily to gain flexibility. Anyone can set
+up a lab without lots of organizational synchronization. It also means that
+existing labs can be brought together later, under a common master. Firewalls
+permitting, it is possible for two fully separate companies to share equipment
+with each other.</p>
+</li>
+<li><p class="first">When a share allocation is successful, the changes in allocation tables are
+not immediately dumped and sent to an upstream master. This is not needed
+because</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>The upstream master has already tentatively booked the allocation as
+successful (if the attempt came from that master).</li>
+<li>The leaf broker will dump and send its allocation tables when its local
+allocation succeeds. This information is recursively resent by sharing
+brokers upstream.</li>
+</ol>
+</div></blockquote>
+</li>
+<li><p class="first">It is possible for a master to be presented with conflicting allocation state
+for a slave. This may be the case if the slave reclaims resources before the
+master has even noticed that the client has disconnected. In such cases the
+master must choose to believe that the slave&#8217;s resources are still allocated.</p>
+</li>
+<li><p class="first">When allocating through a chain of brokers, the return path of the request
+from the leaf does not pass through the intermediate <em>brokers</em> but is passed
+entirely through the involved <em>sessions</em> at each broker. Once the RPC keys
+from the leaf are delivered to the client, further calls to the resources go
+straight to the session that actually holds the resources.</p>
+</li>
+<li><p class="first">Shares that disconnect from a master broker have their allocators deleted
+automatically. No state is kept. <em>This does not affect sessions!</em> The master
+can no longer assert the existence of the equipment in the slave but it need
+not bother because any problem will be handled by the master&#8217;s session. At
+the same time, the slave does not disconnect clients that allocated through
+the master. Instead it allows sessions to complete. Because the client has a
+direct connection to its session on the slave, it does not notice that the
+slave disconnected from the master. The purpose of this feature is to let
+lab owners disconnect slaves for planned downtime without affecting running
+tests. When the last client has disconnected, the slave can be shut down.</p>
+</li>
+<li><p class="first">When resources from a slave are reclaimed by a master, the master does not
+mark the resources as available. Instead it deletes all knowledge about the
+resources. This is needed for two reasons:</p>
+<ol class="arabic simple">
+<li>The slave may no longer be sharing. See previous note.</li>
+<li>The next master allocation might pick the reclaimed resource. If the slave
+has been slow to reclaim the previous client&#8217;s allocations, this might lead
+to an (avoidable) failure when the master&#8217;s new session tries to confirm
+the second allocation.</li>
+</ol>
+<p>The notification mechanism eventually propagates the state changes in the leaf
+so that the master may allocate from the slave again.</p>
+</li>
+<li><p class="first">Notifying a master about resources and allocations must not be able to stall
+the slave&#8217;s main loop. E.g. if the master is slow to respond. To avoid stalls
+all outgoing notifications are handled by a separate process implemented in
+the <tt class="docutils literal"><span class="pre">Notifier</span></tt> class. Calls to the notifier are done with the <tt class="docutils literal"><span class="pre">__async__</span></tt>
+flag to make sure the broker does not even wait for the message to reach the
+notifier.</p>
+</li>
+<li><p class="first">As discussed, a broker detects the disconnect of a client (which may be a
+session acting on behalf of a client). But the session also detects if the
+session created by the remote broker disconnects and, if so, shuts itself
+down. This is needed to propagate reclamation across the network.</p>
+</li>
+<li><p class="first">The rationale to close sessions on the first failed allocation attempt is
+motivated by this deadlock situation:</p>
+<ol class="arabic simple">
+<li>Client A successfully allocates the first handset.</li>
+<li>Client B successfully allocates the second handset.</li>
+<li>Client A fails a second allocation attempt for a companion handset.</li>
+<li>Client B fails a second allocation attempt for a companion handset.</li>
+</ol>
+<div class="figure align-center">
+<img alt="../../_images/deadlock.jpg" src="../../_images/deadlock.jpg" />
+</div>
+<p>If there are no more handsets in the network and clients are allowed to retry
+secondary allocations while keeping successful ones, it should be obvious that
+both clients in the example will loop forever.</p>
+</li>
+<li><p class="first">When resources are freed, it takes some time for a share to re-add them to
+a master. Two jobs that execute right after each other, against the master,
+may not be able to get the exact same resource without delaying the second
+job a little.</p>
+</li>
+<li><p class="first">Clients may request directly from a slave, without going through a master.
+The slave will inform the master about changes in allocations, but before
+this happens a client on the master may try to allocate the <em>same</em> equipment.
+The master still thinks the resource is available in the slave and hands off
+the request to a session. The session then fails the allocation because the
+first client has already allocated the resource (at just the wrong moment).
+Fixing this problem is not desirable (the system would have to be centralized)
+and is not feasible (read up on message passing theory if you do not believe
+this). It is better to follow the convention that clients should reschedule
+their execution on the assumption that all needed resources eventually become
+available. This works because, in practice, the clients are are queued up by
+schedulers and those queues have finite lengths.</p>
+</li>
+<li><p class="first">A client that first allocates a resource, then yields it and immediately
+tries to allocate it again is likely to fail the second allocation. This may
+happen because it can take some time (fractions of seconds) for the equipment
+to be noted as available by the broker. Clients should follow the convention
+of performing all resource allocations as early as possible, before starting
+any costly work.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="miscellaneous-notes">
+<h3>Miscellaneous Notes<a class="headerlink" href="#miscellaneous-notes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Broker</span></tt> RPC methods that provide control over sharing are protected with
+the <tt class="docutils literal"><span class="pre">share</span></tt> key from <tt class="docutils literal"><span class="pre">.ave/config/authkeys.json</span></tt>. This is intended to
+protect a master against accidental sharing from nodes that are not under
+proper control by a lab owner. I.e. the share must know the password set on
+the master to be able to share equipment. As noted elsewhere, <em>the authkeys
+mechanism is not a security feature</em>.</li>
+<li>The system of tracking the TCP connections between brokers and clients may
+result in high numbers of open, but mostly silent, client connections if the
+broker network is large. This is a necessary evil to be able to track the
+liveness of all peers involved in a session but is not expected to cause any
+performance issues. A regular Linux server box should be able to handle at
+least 100&#8216;000 open but silent TCP connections without much of a performance
+impact. This is very likely far more than will ever be needed by a real world
+broker network. Real world performance monitoring will have to conclude if
+this is a reasonable approach. Otherwise the number of connections can be
+reduced by shortcutting the connections between involved peers to exclude
+brokers that mediated a request but did not provide any actual resources.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="known-limitations">
+<h2>Known Limitations<a class="headerlink" href="#known-limitations" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Forwarded requests are not tagged with their originating broker. Two brokers
+that are set up to forward to each other may cause infinite request loops.
+Obviously this hole needs to be closed.</li>
+<li>The protection against resource deadlock, as described in <em>Notes on
+Concurrency</em>, can be bypassed by two cooperating clients. Because the same
+program can create multiple <tt class="docutils literal"><span class="pre">RemoteBroker</span></tt> instances, an unlimited number
+of clients created by the same program can be used to starve the system of
+all resources. Note that the only full protection against this is to require
+real user authentication <em>and</em> limit client connections per user to one (1).
+This is too severe for practical purposes where e.g. a scheduler must be
+able to run many jobs concurrently, using the same user credentials for all
+jobs. However, it is probably a good idea if opening internal labs to the
+public...</li>
+<li>The RPC <tt class="docutils literal"><span class="pre">__async__</span></tt> flag has limited effect if the underlying connection
+has not been created yet. This should be fixed in <tt class="docutils literal"><span class="pre">semctools/ave/common</span></tt>,
+the broker implementation must be careful to always initiate outgoing client
+connections in time limited manners.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Networked Allocation</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#terminology">Terminology</a></li>
+<li><a class="reference internal" href="#scenarios">Scenarios</a><ul>
+<li><a class="reference internal" href="#local-success">Local Success</a></li>
+<li><a class="reference internal" href="#local-failure">Local Failure</a></li>
+<li><a class="reference internal" href="#forward-success">Forward Success</a></li>
+<li><a class="reference internal" href="#forward-failure">Forward Failure</a></li>
+<li><a class="reference internal" href="#share-success">Share Success</a></li>
+<li><a class="reference internal" href="#share-failure">Share Failure</a></li>
+<li><a class="reference internal" href="#notes-on-workspaces">Notes on Workspaces</a></li>
+<li><a class="reference internal" href="#notes-on-concurrency">Notes on Concurrency</a></li>
+<li><a class="reference internal" href="#miscellaneous-notes">Miscellaneous Notes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#known-limitations">Known Limitations</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="restart.html"
+                        title="previous chapter">Restart</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../../relay/docs/system.html"
+                        title="next chapter">Relay Server</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/broker/docs/allocation.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../relay/docs/system.html" title="Relay Server"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="restart.html" title="Restart"
+             >previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="../../system/index.html" >System Documentation</a> &raquo;</li>
+          <li><a href="system.html" >Broker</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

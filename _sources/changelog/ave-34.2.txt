@@ -1,0 +1,33 @@
+Version 34.2
+============
+
+* AVE-199 Add method to remove simlock
+    :Tree: semctools/ave/handset
+    :Commit: 76ca4ef50f9ca2dff80ba40b3d9b2ffcaef6c025
+
+* AVE-199 Add a template for removing simlock fgc file
+    :Tree: semctools/ave/flash
+    :Commit: 11b41cf70d2df694cde727b2a439adaac0b5d3a4
+
+* AVE-224 Support multiple handset logging in AVE-utils
+    :Tree: semctools/ave/utils
+    :Commit: ad0c7fa5da559d077d5bfad64f37ec60c6cb1b89
+
+* ave-297 enable or disable usb mode chooser window
+    :Tree: semctools/ave/handset
+    :Commit: 13f2d9394f2013f6d9fc4244faa104759c1173bb
+
+* AVE-292 Add retries for create logger in TestJob
+    :Tree: semctools/ave/utils
+    :Commit: 281b22a7482e85391f47850d3006cccebbb3eb23
+
+* AVE-317 Changes for consumer hero suzu
+    :Tree: semctools/ave/handset
+    :Commit: fcb4f6c8b51a5358669708b44aaa8bb886622339
+
+* Ave-328 wait_thermal_state cool down Suzu timeout
+    :Tree: semctools/ave/handset
+    :Commit: 735649b90659368196025eb51131830203948062
+
+
+

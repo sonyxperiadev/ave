@@ -1,0 +1,46 @@
+Version 35.0
+============
+* AVE-331 Flocker
+    :Tree: semctools/ave/workspace
+    :Commit: 1ea783524ba97cdef6576216ef576615a5bce63d
+
+* AVE-237 Support for composition slaves
+    :Tree: semctools/ave/workspace
+    :Commit: 23937d809bd270b93832d3c962d69916aa719224
+
+* AVE-265 Bugfix for broker crashed
+    :Tree: semctools/ave/common
+    :Commit: 74c91615527ff32dccaf5c3cac95f26672190a8d
+
+* AVE-316 Changes for disable/enable dm-verity
+    :Tree: semctools/ave/handset
+    :Commit: c25ad2c838cac7b2ccc5517f95d4f27a99ab93c0
+
+* AVE-326 Support the latest adb offered in platform-tools 23.1.0
+    :Tree: semctools/ave/handset
+    :Commit: f832eb9e1262c0de81500a8079fae429aeed8e93
+
+* AVE-330 Support shinano 1.0 Products, Change minSDKVersion to 18 for gort-main project
+    :Tree: semctools/ave/gort
+    :Commit: 5107795c51a5c656a4c076f53dafef8c54ccabf4
+
+* AVE-229 Bugfix for WaveFile compile error, Delete the file WaveFile.py as can not find any use of it.
+    :Tree: semctools/ave/toto
+    :Commit: 4de5ebc6c470b4739f8bab69b2c90cd06ef8f52e
+
+* AVE-320 Bugfix for handset.ls and handset.remove_crash
+    :Tree: semctools/ave/handset
+    :Commit: 4d969edcee3c101d4b8ac715ef55c559014f4fd1
+
+* AVE-332 cannot parse report in exception, add slove about the exception information
+    :Tree: semctools/ave/workspace
+    :Commit: 9368c5df7c48a1b1f9925ad0ee52711793ab9d8e
+
+* Add default thermal config for Tone 2.0
+    :Tree: semctools/ave/handset
+    :Commit: aa7bc4ff9f97dde07893cd0bbac8d99479fffa1a
+
+* PLF tests improved printouts
+    :Tree: semctools/ave/handset
+    :Commit: 9f75301b703c62c2b129e5939e7ce3912afa52e5
+

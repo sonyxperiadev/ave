@@ -1,0 +1,206 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ADB Behavior &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../index.html" />
+    <link rel="up" title="Frequently Asked Questions" href="index.html" />
+    <link rel="next" title="Create Code Coverage Report" href="code_coverage.html" />
+    <link rel="prev" title="Frequently Asked Questions" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="code_coverage.html" title="Create Code Coverage Report"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Frequently Asked Questions"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Frequently Asked Questions</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="adb-behavior">
+<span id="adb-server-behavior"></span><h1>ADB Behavior<a class="headerlink" href="#adb-behavior" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="problem-description">
+<h2>Problem Description<a class="headerlink" href="#problem-description" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>The ADB client kills the server and starts a new one when it detects a
+version mismatch. Usually this is not needed because ADB is backward
+compatible and does not change much between Google releases.</li>
+<li>Users will (without knowing it) mix ADB versions. The typical scenario is
+manual use of a private version of ADB client in the terminal while AVE is
+using the version shipped by SWD Tools. The manual use kills the ADB server
+and thus all ongoing sessions.</li>
+<li>Handsets cannot be claimed by ADB server after a PC reboot due to permission
+problems if the server is started &#8220;too early&#8221; (whatever that means). Having
+a proper <tt class="docutils literal"><span class="pre">udev</span></tt> rule doesn&#8217;t help.</li>
+<li>The ADB server&#8217;s ability to claim the device (on USB level) after it has
+rebooted is higher when running the server as root. This is probably a
+variation of the problem with PC reboot.</li>
+<li>The ADB server does not daemonize correctly. If the server was started by
+the client, then the server may die immediately when the client returns.
+This causes a persistent error condition where all uses of the ADB client
+cause a server restart. If you were trying to use ADB socket forwarding, or
+waiting for a long-running shell command to complete, then this will be very
+noticable.</li>
+</ul>
+<p>All of these can be addressed by running the ADB server as root. But that has
+its own problems:</p>
+<p><em>If you really have to run a private version of ADB, all uses of the client
+will fail because the client can no longer kill the ADB server run by AVE.</em></p>
+</div>
+<div class="section" id="what-ave-does">
+<h2>What AVE Does<a class="headerlink" href="#what-ave-does" title="Permalink to this headline">¶</a></h2>
+<p>The ADB server is controlled by AVE through the program <tt class="docutils literal"><span class="pre">ave-adb-server</span></tt>.
+This wrapper is started by <tt class="docutils literal"><span class="pre">init</span></tt> and runs as root. It is configured to
+immediately kill off other ADB servers and start a new one if its own should
+terminate.</p>
+<p>So, the owner of an AVE installation will find it difficult to stop the AVE
+controlled ADB server with <tt class="docutils literal"><span class="pre">adb</span> <span class="pre">kill-server</span></tt>. Of course, the client will try
+to do that for you if it detects a version mismatch. Then the error will look
+like this:</p>
+<div class="highlight-python"><pre>adb server is out of date.  killing...
+cannot bind 'tcp:5037'
+ADB server didn't ACK
+* failed to start daemon *</pre>
+</div>
+</div>
+<div class="section" id="solution-well-sort-of">
+<h2>Solution (well, sort of...)<a class="headerlink" href="#solution-well-sort-of" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Stop the wrapper: <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">ave-adb-server</span> <span class="pre">--stop</span></tt></li>
+<li>Stop the broker: <tt class="docutils literal"><span class="pre">ave-broker</span> <span class="pre">--stop</span></tt></li>
+</ul>
+<p>Stopping the broker is necessary because it continously polls connected devices
+with <tt class="docutils literal"><span class="pre">/usr/bin/adb</span></tt>. If no server is running when this happens, a new one is
+automatically started by the ADB client itself. This will conflict with any
+attempt to run a private version of ADB.</p>
+<p>If you stop the wrapper but not the broker, you will see a message like this
+one before your command is evaluated:</p>
+<div class="highlight-python"><pre>adb server is out of date.  killing...</pre>
+</div>
+</div>
+<div class="section" id="closing-remarks">
+<h2>Closing Remarks<a class="headerlink" href="#closing-remarks" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Unfortunately there is no way to tell the client to not start a server if
+none was running. That would have made the problem a bit smaller as it would
+have given the user more control in the first place.</li>
+<li>There is also no way to tell the client to ignore version differences. That
+would also have helped.</li>
+<li>The stability problems listed under the problem description are sort of OK
+if you only make manual use of ADB with a very limited number of handsets.
+In larger setups with automation, this just doesn&#8217;t work.</li>
+<li>Regrettably the only currently known workaround is to run the ADB server as
+root. If there is a better way, please let us know!</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ADB Behavior</a><ul>
+<li><a class="reference internal" href="#problem-description">Problem Description</a></li>
+<li><a class="reference internal" href="#what-ave-does">What AVE Does</a></li>
+<li><a class="reference internal" href="#solution-well-sort-of">Solution (well, sort of...)</a></li>
+<li><a class="reference internal" href="#closing-remarks">Closing Remarks</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Frequently Asked Questions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="code_coverage.html"
+                        title="next chapter">Create Code Coverage Report</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/faq/adb.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="code_coverage.html" title="Create Code Coverage Report"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Frequently Asked Questions"
+             >previous</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" >Frequently Asked Questions</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

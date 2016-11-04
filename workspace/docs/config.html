@@ -1,0 +1,201 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Configuration Files &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../../index.html" />
+    <link rel="up" title="Workspaces" href="index.html" />
+    <link rel="next" title="Common Subsystems" href="../../common/docs/api.html" />
+    <link rel="prev" title="System API" href="system_api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../common/docs/api.html" title="Common Subsystems"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="system_api.html" title="System API"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Workspaces</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="configuration-files">
+<h1>Configuration Files<a class="headerlink" href="#configuration-files" title="Permalink to this headline">¶</a></h1>
+<p>This document is intended only for lab owners. Broker clients cannot change the
+settings of allocated workspaces.</p>
+<p>All settings are controlled by the file <tt class="docutils literal"><span class="pre">.ave/config/workspace.json</span></tt>. It
+contains a JSON dictionary with various entries and sub-sections.</p>
+<p>A broker restart is required for changes to take effect.</p>
+<div class="section" id="root-directory">
+<h2>Root Directory<a class="headerlink" href="#root-directory" title="Permalink to this headline">¶</a></h2>
+<p>Work spaces are created in a common root directory. This directory can be set
+to any path where the broker has full file system permissions. Default value:</p>
+<div class="highlight-python"><pre>"root": "~/.ave"</pre>
+</div>
+<p>I.e. if <tt class="docutils literal"><span class="pre">/etc/ave/user</span></tt> specifies the home directory <tt class="docutils literal"><span class="pre">/var/tmp</span></tt>, then all
+workspaces will be created under <tt class="docutils literal"><span class="pre">/var/tmp/.ave</span></tt>.</p>
+</div>
+<div class="section" id="lab-identity">
+<h2>Lab Identity<a class="headerlink" href="#lab-identity" title="Permalink to this headline">¶</a></h2>
+<p>Like handsets, workspaces have &#8220;pretty&#8221; values. These may be used by lab owners
+to group several hosts into logical units. E.g. all hosts in the same lab may
+have the same &#8220;pretty&#8221; value in their workspace configurations. This may then
+be used by test jobs that must be allocated to a specific lab. Example:</p>
+<div class="highlight-python"><pre>"pretty": "type-approval-japan"</pre>
+</div>
+<p>The default value is the hostname of the machine and is set during installation
+of AVE. E.g. &#8220;seldlx12345.corpusers.net&#8221;.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">It is not recommended for test jobs to set the &#8220;pretty&#8221; entry in
+workspace allocations. This will cause the job to fail if executed in an
+environment where the lab is not available, or if the lab is not shared to
+the allocating broker.</p>
+</div>
+</div>
+<div class="section" id="flocker">
+<h2>Flocker<a class="headerlink" href="#flocker" title="Permalink to this headline">¶</a></h2>
+<p>The hostname and port the global Flocker service. Clients will not be able to
+use the Flocker API&#8217;s if this entry is not set to correct values. The default
+entry:</p>
+<div class="highlight-python"><pre>"flocker": {
+    "host": "ave.sonyericsson.net",
+    "port": 4003
+}</pre>
+</div>
+</div>
+<div class="section" id="external-tools">
+<h2>External Tools<a class="headerlink" href="#external-tools" title="Permalink to this headline">¶</a></h2>
+<p>Clients can use workspaces to call external tools that have been white-listed
+in the &#8220;tools&#8221; entry. Example:</p>
+<div class="highlight-python"><pre>"tools": {
+    "aapt": "/opt/ave/bin/aapt",
+    "adb": "/usr/bin/adb",
+    "hprof-conv": "/opt/ave/bin/hprof-conv"
+}</pre>
+</div>
+</div>
+<div class="section" id="jenkins">
+<h2>Jenkins<a class="headerlink" href="#jenkins" title="Permalink to this headline">¶</a></h2>
+<p>The default Jenkins host used by <tt class="docutils literal"><span class="pre">Workspace.download_jenkins()</span></tt> is set by the
+&#8220;jenkins&#8221; entry. If the <em>base</em> parameter is not set in the call, then its value
+is taken from this entry. This the default setting:</p>
+<div class="highlight-python"><pre>"jenkins": "http://"</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This setting is legacy functionality and has limited practical value.
+Test jobs should use the <em>base</em> parameter to pass on configuration data that
+was provided by a scheduler.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Configuration Files</a><ul>
+<li><a class="reference internal" href="#root-directory">Root Directory</a></li>
+<li><a class="reference internal" href="#lab-identity">Lab Identity</a></li>
+<li><a class="reference internal" href="#flocker">Flocker</a></li>
+<li><a class="reference internal" href="#external-tools">External Tools</a></li>
+<li><a class="reference internal" href="#jenkins">Jenkins</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="system_api.html"
+                        title="previous chapter">System API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../../common/docs/api.html"
+                        title="next chapter">Common Subsystems</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/workspace/docs/config.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../common/docs/api.html" title="Common Subsystems"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="system_api.html" title="System API"
+             >previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" >Workspaces</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,93 @@
+Version 26
+==========
+* Improve AndroidHandset.install_gort
+    :Tree: ave/handset
+    :Commit: 87a37bde9fb7f0b9f4367260c9fc42874d6b52e2
+
+* Make Gort task execute synchronized
+    :Tree: ave/handset
+    :Commit: 93fd456de7844b174cc29b8c0dafceeb3d3685e4
+
+* Update the name of flag flie
+    :Tree: ave/gort
+    :Commit: 962348baef0d551615d1f48b3df10aeef9451955
+
+* Port galatea to UATF
+    :Tree: ave/handset
+    :Commit: 3ac07dab3c0317ed3ce512811f24625193934c43
+
+* Update t8 because of the change of screen display
+    :Tree: ave/galatea
+    :Commit: 00665d739d9512a7ea3ab5acac0cb12521c80d01
+
+* Port Galatea to UATF's solution
+    :Tree: ave/galatea
+    :Commit: a71ba1c4d46c3bcef3ce74af1c5054a6bd3be59d
+
+* Introducing full allocation info on share allocators
+    :Tree: ave/broker
+    :Commit: 022e82162da8b67cccf46f1599a3b961d46c1e38
+
+* Removed code coverage collection in tests
+    :Tree: ave/broker
+    :Commit: b0ea15f3846322e92fd9250788883e4909532abf
+
+* Refactored allocators a bit, and other little cleanups
+    :Tree: ave/broker
+    :Commit: 8fc384ccc74886603628cde9b19df857b1fcf389
+
+* Adding suport for Jenkins auth configuration in jenkins.json
+    :Tree: ave/common
+    :Commit: b92474d60d1070e570a24950e1fa5e75d4b9320c
+
+* Add workspace API to generate code coverage report
+    :Tree: ave/workspace
+    :Commit: 7b8c3f6df2d9dd43fc73c9e0e5e54b9f27d23236
+
+* Add Workspace.get_apk_version
+    :Tree: ave/workspace
+    :Commit: Add Workspace.get_apk_version
+
+* Implementing functionality needed for pre access cookies.
+    :Tree: ave/workspace
+    :Commit: a4af4985da4a99c7ffc449c1d9fa8496ef34ec3b
+
+* Adding download_binary deprecating fetch_binary
+    :Tree: ave/utils
+    :Commit: 4845665f8d4d55b9bb39d0fda666794e40471374
+
+* Bugfix of fetch_binary
+    :Tree: ave/utils
+    :Commit: 041897dc58cf3fbac1ae84e925e0ab2a3299158a
+
+* Bug fix: validate whether gtest is actually executed.
+    :Tree: ave/handset
+    :Commit: bb28e1f6c15653f6da05016a5a6d1f7307543a0a
+
+* Update Galatea related methods
+    :Tree: ave/handset
+    :Commit: 2e61a619d23bdb3b7dd3cd771feab0c0b968c7bb
+
+* Update t8 because of the change of screen display
+    :Tree: ave/handset
+    :Commit: 1dc1d522c4c2b2641fe35c058f4cd45c59cb35e1
+
+* Add and update Pretty in Lister
+    :Tree: ave/handset
+    :Commit: c9bd80b6569d0fba8d87b91a592290cfe3f5180a
+
+* Jenkins tests failed because job no longer exists
+    :Tree: ave/workspace
+    :Commit: 33953de2038695f0bda8e89f59d7c237226717e5
+
+* Tired of seeing tests fail because Goobug 'dev' doesn't work
+    :Tree: ave/workspace
+    :Commit: 326a9f2e3d28bfd1e526a9862bcc58185b99923c
+
+* sysmon_thermal: Handle the new v_thermX definition format
+    :Tree: ave/handset
+    :Commit: 4384a1393102a6cc7ae3e057ed8b61dae56a90d4
+
+* Fix bug no power_state update on master
+    :Tree: ave/broker
+    :Commit: eabd1299880e68910885cf6e41d8c71c41ba4748

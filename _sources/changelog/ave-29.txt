@@ -1,0 +1,70 @@
+Version 29
+==========
+* Convenience CLI to list equipment
+    :Tree: semctools/ave/broker
+    :Commit: b417ac1a12bd2fbeb9d863b8569d14d591303135
+
+* WIFI Operator
+    :Tree: semctools/ave/gort
+    :Commit: 50f0837179d3563f128fe30281c4b5d0db844605
+
+* Methods Used to Operate WIFI
+    :Tree: semctools/ave/handset
+    :Commit: c59d83a8f776d63e19f9bf38a5bf43b1c71d02b6
+
+* Improve clear_logcat to run with args
+    :Tree: semctools/ave/handset
+    :Commit: 0cd54b11ba6bbd60f122fae8afb84d3075bafa85
+
+* Add AndroidHandset.set_brightness
+    :Tree: semctools/ave/handset
+    :Commit: 07c2663b80ae19c8b43c7814588dba4407f7bf0b
+
+* Add a parameter 'bg' to adb_handset.shell()
+    :Tree: semctools/ave/handset
+    :Commit: cc03a955a109440429d42fb4214d829426c0542e
+
+* Disable/enable idd agent
+    :Tree: semctools/ave/handset
+    :Commit: ece5d32e95442e3bea82d77dfb72ed59322e91a2
+
+* Bug fix: Stop listers on restart
+    :Tree: semctools/ave/broker
+    :Commit: e4e1930d0ff26b6262003f96a49ab0b10aeaa441
+
+* Bug fix: Did not restart notifier
+    :Tree: semctools/ave/broker
+    :Commit: 6109b8f8f7f5ae9aef3c7b990b17fc0699508e33
+
+* Bug fix: Migration from multiprocessing not complete
+    :Tree: semctools/ave/gerrit
+    :Commit: fd1a6c1ad1482f55481e6646bf9ae74fc900dc59
+
+* Fix undefined variables in test cases
+    :Tree: semctools/ave/handset
+    :Commit: c22c59e45595e323f9b87ebf25b730603f5457a5
+
+* bump version number and add pretty names for new prototype
+    :Tree: semctools/ave/handset
+    :Commit: 475dfaf18769402498d4758e4704670f339b3b02
+
+* Fix bug in profile_to_board_group
+    :Tree: semctools/ave/relay
+    :Commit: 0e9c31a77e5de88dfd9a503832d21b9d6aafe58a
+
+* Lab suite and improved robustness
+    :Tree: semctools/ave/positioning
+    :Commit: 4c1c223a655de26027ff13bb2bf1f744713405b4
+
+* Verify Keyguard Enable/disable
+    :Tree: semctools/ave/handset
+    :Commit: 038b43422ea46d80f32a943d46b63bf789797e92
+
+* Bugfix: Offline handsets do not have "platform" in profile
+    :Tree: semctools/ave/handset
+    :Commit: 50e41a6cf8766595b5f79056172a3006a182eca3
+
+* Rewrite CALL related methods in Gort
+    :Tree: semctools/ave/gort
+    :Commit: d75ff5eb1b496c6cdf34594a3a66632d87cafb75
+

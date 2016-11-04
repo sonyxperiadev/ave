@@ -1,0 +1,231 @@
+Version 27
+==========
+
+* Do not use multiprocessing module
+    :Tree: ave/broker
+    :Commit: b561f0063f0db795318835b9c21c1af17524dfcf
+
+* Do not use multiprocessing module
+    :Tree: ave/handset
+    :Commit: 04710eee677f48c8b113ef3dbec625d42a21d5c0
+
+* Do not use multiprocessing module
+    :Tree: ave/workspace
+    :Commit: 3b512624d859dbe8751964bdcc4c77ff371c21f7
+
+* Do not use multiprocessing module
+    :Tree: ave/common
+    :Commit: 77f0cfd51cb2783d8a8e8c2bc6e8f5699d978048
+
+* Do not use multiprocessing module
+    :Tree: ave/flash
+    :Commit: 46d9685004427b210426f64d69c5565643fae835
+
+* Do not use multiprocessing module
+    :Tree: ave/flocker
+    :Commit: 2f083dce2d904240c110ff0a7cbf0b8da8bfc6f5
+
+* Do not use multiprocessing module
+    :Tree: ave/gerrit
+    :Commit: 8f67d91310907fceb9728a5cf999e9e8a434be19
+
+* Added Broker integration to Wlan
+    :Tree: ave/broker
+    :Commit: a63a21ec7fc378678428abef25922405a2b478b0
+
+* Adding allocator parameter to list_equipment
+    :Tree: ave/broker
+    :Commit: f8880fc9d5dc01c05bc5ec656129859d703671ad
+
+* Add CALLS on tmc network items in .vcsjob
+    :Tree: ave/handset
+    :Commit: 96aad2f955736c4b4616b700caf97a2ca9e894ab
+
+* Changes for pre access c2d
+    :Tree: ave/workspace
+    :Commit: 135e4d771efd5ef87c56165fec0a86824a5e7aa6
+
+* Add Workspace.get_checksum
+    :Tree: ave/workspace
+    :Commit: b97a211c7fda8ef925ff9d01c737753fa6057f24
+
+* Add Workspace.cat to read file in workspace
+    :Tree: ave/workspace
+    :Commit: bbef7e99ef87a2ffc4c2c924c3e929f28ca91183
+
+* Avoid redundant installation of galatea by version comparing
+    :Tree: ave/handset
+    :Commit: 7becb043185bdfcf3b84f3b3140a174fa915c015
+
+* Update Pretty List and Verion number
+    :Tree: ave/handset
+    :Commit: 12324740bcb7cbd208ab7f5f07af3b2964e320ad
+
+* Control would crash on invalid message header
+    :Tree: ave/common
+    :Commit: 62eed5465cd7cd1522d7b1fe3ec418de054f81a0
+
+* Sub-process Will Not Exit If Exception Occured In 'Target' Method
+    :Tree: ave/common
+    :Commit: ca3a78a7c66f84fedaa7018b28dcb60ac1838138
+
+* Do not break resource limits
+    :Tree: ave/flocker
+    :Commit: a38da609c952bdd510d9c0f3493725c29796cbce
+
+* Updated documentation of download_binary
+    :Tree: ave/utils
+    :Commit: bd44bc5ef441caae226e1a46602ac174967db312
+
+* Added build parameters to JenkinsBuild
+    :Tree: ave/workspace
+    :Commit: 4c72fd887e7485a445b024bb56e5885b36e95a57
+
+* Adding support for secure adb, and distributing userdebug key
+    :Tree: ave/handset
+    :Commit: ebee0112dec8991aac052657aa99f80f9c17b392
+
+* Added logging parameter to Broker init method
+    :Tree: ave/broker
+    :Commit: 9d381183c87d711c67b8b57c6808576e53128579
+
+* Bugfixes from DUST beta test of AVE 27
+    :Tree: ave/common
+    :Commit: aa47969df6da37b5aca520d467bf850bdad5c839
+
+* Fix misspelled variable name
+    :Tree: ave/common
+    :Commit: d4d1e8389ada77dff08c4af4f4afb83eb7d53d5c
+
+* Do not use multiprocessing module
+    :Tree: semctools/ave/broker
+    :Commit: b561f0063f0db795318835b9c21c1af17524dfcf  
+
+* Do not use multiprocessing module
+    :Tree: semctools/ave/handset
+    :Commit: 04710eee677f48c8b113ef3dbec625d42a21d5c0 
+
+* Do not use multiprocessing module
+    :Tree: semctools/ave/workspace
+    :Commit: 3b512624d859dbe8751964bdcc4c77ff371c21f7 
+
+* Do not use multiprocessing module
+    :Tree: semctools/ave/common
+    :Commit: 77f0cfd51cb2783d8a8e8c2bc6e8f5699d978048 
+
+* Do not use multiprocessing module
+    :Tree: semctools/ave/flash
+    :Commit: 46d9685004427b210426f64d69c5565643fae835 
+
+* Do not use multiprocessing module
+    :Tree: semctools/ave/flocker
+    :Commit: 2f083dce2d904240c110ff0a7cbf0b8da8bfc6f5 
+
+* Do not use multiprocessing module
+    :Tree: semctools/ave/gerrit
+    :Commit: 8f67d91310907fceb9728a5cf999e9e8a434be19 
+
+* Added Broker integration to Wlan
+    :Tree: semctools/ave/broker
+    :Commit: a63a21ec7fc378678428abef25922405a2b478b0 
+
+* Adding allocator parameter to list_equipment.
+    :Tree: semctools/ave/broker
+    :Commit: f8880fc9d5dc01c05bc5ec656129859d703671ad 
+
+* Add CALLS on tmc network items in .vcsjob
+    :Tree: semctools/ave/handset
+    :Commit: 96aad2f955736c4b4616b700caf97a2ca9e894ab 
+
+* Changes for pre access c2d
+    :Tree: semctools/ave/workspace
+    :Commit: 135e4d771efd5ef87c56165fec0a86824a5e7aa6 
+
+* Add Workspace.get_checksum
+    :Tree: semctools/ave/workspace
+    :Commit: b97a211c7fda8ef925ff9d01c737753fa6057f24 
+
+* Add Workspace.cat to read file in workspace
+    :Tree: semctools/ave/workspace
+    :Commit: bbef7e99ef87a2ffc4c2c924c3e929f28ca91183 
+
+* Updated documentation of download_binary.
+    :Tree: semctools/ave/utils
+    :Commit: bd44bc5ef441caae226e1a46602ac174967db312 
+
+* Added build parameters to JenkinsBuild.
+    :Tree: semctools/ave/workspace
+    :Commit: 4c72fd887e7485a445b024bb56e5885b36e95a57 
+
+* Adding support for secure adb, and distributing userdebug key.
+    :Tree: semctools/ave/handset
+    :Commit: ebee0112dec8991aac052657aa99f80f9c17b392 
+
+* Added logging parameter to Broker init method
+    :Tree: semctools/ave/broker
+    :Commit: 9d381183c87d711c67b8b57c6808576e53128579 
+
+* Sleep 3 seconds to wait for the required log
+    :Tree: semctools/ave/handset
+    :Commit: 4944730f7ff2ebde812c0472b0fc45d788b23e38 
+
+* Avoid redundant installation of galatea by version comparing
+    :Tree: semctools/ave/handset
+    :Commit: 7becb043185bdfcf3b84f3b3140a174fa915c015 
+
+* Improve test cases for AndroidHandset.install_gort
+    :Tree: semctools/ave/handset
+    :Commit: ceb6fa462b1192f95d3a16f5ed0b901329e0cf3f 
+
+* Update Pretty List and Verion number
+    :Tree: semctools/ave/handset
+    :Commit: 12324740bcb7cbd208ab7f5f07af3b2964e320ad 
+
+* Improve Jenkins test 15 - Access protected Jenkins without auth.
+    :Tree: semctools/ave/workspace
+    :Commit: cb22fb4703119d07fa7319130cb494d3c1416a0f 
+
+* Control would crash on invalid message header
+    :Tree: semctools/ave/common
+    :Commit: 62eed5465cd7cd1522d7b1fe3ec418de054f81a0 
+
+* Sub-process Will Not Exit If Exception Occured In 'Target' Method
+    :Tree: semctools/ave/common
+    :Commit: ca3a78a7c66f84fedaa7018b28dcb60ac1838138 
+
+* Do not break resource limits
+    :Tree: semctools/ave/flocker
+    :Commit: a38da609c952bdd510d9c0f3493725c29796cbce 
+
+* Bugfixes from DUST beta test of AVE 27
+    :Tree: semctools/ave/common
+    :Commit: aa47969df6da37b5aca520d467bf850bdad5c839 
+
+* Fix misspelled variable name.
+    :Tree: semctools/ave/common
+    :Commit: d4d1e8389ada77dff08c4af4f4afb83eb7d53d5c 
+
+* Fixed AdbHandset.cat(), and added AndroidHandset kernel logging
+    :Tree: semctools/ave/handset
+    :Commit: 718e08ec4056cf4d095a0f7523345e45fcc25435 
+
+* Avoid crashing handset on incomplete bring-up
+    :Tree: semctools/ave/handset
+    :Commit: c9fc5dbee752444edaefe0028178fe2fcf01672f 
+
+* Bugfix: Notifier compatibility AVE 26 & AVE 27
+    :Tree: semctools/ave/broker
+    :Commit: 8c4cb83513cd28e5e05a3e9dd4e520461b9b9567 
+
+* Bug fix: read by lines to avoid splitting a gort event into two reads
+    :Tree: semctools/ave/handset
+    :Commit: 5a09abb4ee1c45a25216a3ceaffc39eb0e27f109 
+
+* Add test cases and vcsjob for l release
+    :Tree: semctools/ave/galatea
+    :Commit: c03f41f34a55228c22c70802b96131ebb7d7fae1 
+
+* Make Gort Compatible with Android L
+    :Tree: semctools/ave/gort
+    :Commit: 7efa12932273cbc99f6ba35dca8440e69756026f 
+

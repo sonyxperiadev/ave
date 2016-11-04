@@ -1,0 +1,10 @@
+buildscript {
+    repositories {
+        maven {
+            url 'http://buildrepo.sonyericsson.net/gradle-build-libs'
+        }
+    }
+    dependencies {
+        classpath 'com.sonymobile:sonyandroid:1.2.2.1'
+    }
+}

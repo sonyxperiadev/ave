@@ -1,0 +1,989 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ADB Handset &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../../index.html" />
+    <link rel="up" title="Handset" href="index.html" />
+    <link rel="next" title="Android Handset" href="android_api.html" />
+    <link rel="prev" title="Handset Profile" href="profile_api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="android_api.html" title="Android Handset"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="profile_api.html" title="Handset Profile"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Handset</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="adb-handset">
+<h1>ADB Handset<a class="headerlink" href="#adb-handset" title="Permalink to this headline">¶</a></h1>
+<p>Although handset objects can be created explicitly, you should always allocate
+handsets through the broker instead (possibly with more attributes set in the
+allocation profile):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">ave.broker</span> <span class="kn">import</span> <span class="n">Broker</span>
+
+<span class="n">broker</span> <span class="o">=</span> <span class="n">Broker</span><span class="p">()</span>
+<span class="n">handset</span> <span class="o">=</span> <span class="n">broker</span><span class="o">.</span><span class="n">get</span><span class="p">({</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">,</span> <span class="s">&#39;platform&#39;</span><span class="p">:</span><span class="s">&#39;adb&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>The returned handset implements the API that is documented here.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Many functions require super user privileges and will not work
+before a <tt class="docutils literal"><span class="pre">root()</span></tt> call has been made.</p>
+</div>
+<dl class="class">
+<dt id="ave.handset.adb_handset.AdbHandset">
+<em class="property">class </em><tt class="descclassname">ave.handset.adb_handset.</tt><tt class="descname">AdbHandset</tt><big>(</big><em>profile</em><big>)</big><a class="headerlink" href="#ave.handset.adb_handset.AdbHandset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for handsets supporting the ADB protocol.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>profile</strong> &#8211; <p>A <tt class="docutils literal"><span class="pre">HandsetProfile</span></tt> instance that must contain at least
+the following members:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&#39;type&#39;</span>    <span class="p">:</span> <span class="s">&#39;handset&#39;</span><span class="p">,</span>
+    <span class="s">&#39;platform&#39;</span><span class="p">:</span> <span class="s">&#39;adb&#39;</span><span class="p">,</span>
+    <span class="s">&#39;serial&#39;</span>  <span class="p">:</span> <span class="s">&#39;xxx&#39;</span> <span class="c"># the serial number of the handset</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><strong>profile</strong> &#8211; A dictionary containing at least the <tt class="docutils literal"><span class="pre">&quot;type&quot;:&quot;handset&quot;</span></tt> and
+<tt class="docutils literal"><span class="pre">&quot;platform&quot;:&quot;adb&quot;</span></tt> entries.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">An <tt class="docutils literal"><span class="pre">AndroidHandset</span></tt> instance.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="ave.handset.adb_handset.AdbHandset.get_profile">
+<tt class="descname">get_profile</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.handset.adb_handset.AdbHandset.get_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the profile that the handset was allocated against. This method is
+intended for AVE internal usage and not recommended for regular users.
+This profile is not updated when the handset&#8217;s state changes,
+e.g. rebooting does not affect this profile&#8217;s power_state value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A dictionary.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.handset.adb_handset.AdbHandset.get_workstation">
+<tt class="descname">get_workstation</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.handset.adb_handset.AdbHandset.get_workstation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the workstation to which the handset is connected.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the handset&#8217;s workstation name</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If an error occurs.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="port-forwarding">
+<h2>Port Forwarding<a class="headerlink" href="#port-forwarding" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="method">
+<dt id="open_forwarded_port">
+<tt class="descname">open_forwarded_port</tt><big>(</big><em>remote</em><big>)</big><a class="headerlink" href="#open_forwarded_port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up an ADB port forwarding rule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>remote</strong> &#8211; An ADB port forwarding expression. E.g. <tt class="docutils literal"><span class="pre">&quot;tcp:2001&quot;</span></tt>
+would create a rule that forwards connections to TCP port 2001 on
+the handset. See ADB documentation for details.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An identifying token that may be used as input to functions
+that manipulate or query the state of the forwarded port. The token
+is formatted as <tt class="docutils literal"><span class="pre">&quot;tcp:&lt;int&gt;&quot;</span></tt> where &lt;int&gt; is the randomized port
+number used on the PC to forward connections.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="close_forwarded_port">
+<tt class="descname">close_forwarded_port</tt><big>(</big><em>entry</em><big>)</big><a class="headerlink" href="#close_forwarded_port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tear down an ADB port forwarding rule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>entry</strong> &#8211; A token returned by <tt class="docutils literal"><span class="pre">open_forwarded_port()</span></tt>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="list_forwarded_ports">
+<tt class="descname">list_forwarded_ports</tt><big>(</big><em>all_adb=False</em><big>)</big><a class="headerlink" href="#list_forwarded_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all port forwarding rules.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>all_adb</strong> &#8211; If set, return all forwarding rules for <cite>all</cite> handsets.
+Default behavior is to only list rules for the current handset.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="power-states">
+<h2>Power States<a class="headerlink" href="#power-states" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="method">
+<dt id="has_adb">
+<tt class="descname">has_adb</tt><big>(</big><big>)</big><a class="headerlink" href="#has_adb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the handset is reachable via <tt class="docutils literal"><span class="pre">adb</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>True</em> or <em>False</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="boot_completed">
+<tt class="descname">boot_completed</tt><big>(</big><big>)</big><a class="headerlink" href="#boot_completed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if handset property sys.boot_completed has been set to &#8220;1&#8221;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>True</em> or <em>False</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="get_power_state">
+<tt class="descname">get_power_state</tt><big>(</big><big>)</big><a class="headerlink" href="#get_power_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the handset&#8217;s current power state.</p>
+<p>Reachable power states:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&#39;offline&#39;</span><span class="p">,</span>         <span class="c"># the handset is turned off or not connected</span>
+<span class="s">&#39;service&#39;</span><span class="p">,</span>         <span class="c"># the handset is in service mode</span>
+<span class="s">&#39;enumeration&#39;</span><span class="p">,</span>     <span class="c"># the handset&#39;s USB is set up and ready</span>
+<span class="s">&#39;adb&#39;</span><span class="p">,</span>             <span class="c"># the handset is available via adb</span>
+<span class="s">&#39;boot_completed&#39;</span>   <span class="c"># the sys.boot_completed property is set to &quot;1&quot;</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The current power state.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wait_power_state">
+<tt class="descname">wait_power_state</tt><big>(</big><em>states</em>, <em>timeout=0</em><big>)</big><a class="headerlink" href="#wait_power_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait for the handset to reach a desired power state.</p>
+<p>Reachable power states:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&#39;offline&#39;</span><span class="p">,</span>         <span class="c"># the handset is turned off or not connected</span>
+<span class="s">&#39;service&#39;</span><span class="p">,</span>         <span class="c"># the handset is in service mode</span>
+<span class="s">&#39;enumeration&#39;</span><span class="p">,</span>     <span class="c"># the handset&#39;s USB is set up and ready</span>
+<span class="s">&#39;adb&#39;</span><span class="p">,</span>             <span class="c"># the handset is available via adb</span>
+<span class="s">&#39;boot_completed&#39;</span>   <span class="c"># the sys.boot_completed property is set to &quot;1&quot;</span>
+</pre></div>
+</div>
+<p>On a normal boot of a handset it will go through the power states in
+the following order:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">offline</span> <span class="o">&gt;</span> <span class="n">enumeration</span> <span class="o">&gt;</span> <span class="n">adb</span> <span class="o">&gt;</span> <span class="n">boot_completed</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>states</strong> &#8211; A string or a list of strings, where the string(s) can be
+any of the reachable states listed above.</li>
+<li><strong>timeout</strong> &#8211; If timeout &gt; 0, seconds before time out.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The reached power state.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first last">If an error occurs.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="reboot">
+<tt class="descname">reboot</tt><big>(</big><em>timeout=30</em><big>)</big><a class="headerlink" href="#reboot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reboot the handset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>timeout</strong> &#8211; Number of seconds to wait for the handset to go offline.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>Timeout</strong> &#8211; If such occurs.</li>
+<li><strong>Exception</strong> &#8211; If an error occurs.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="adb-intrinsics">
+<h2>ADB Intrinsics<a class="headerlink" href="#adb-intrinsics" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="method">
+<dt id="root">
+<tt class="descname">root</tt><big>(</big><big>)</big><a class="headerlink" href="#root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restart <tt class="docutils literal"><span class="pre">adbd</span></tt> as root.</p>
+<p>The call will block until the device is available again.
+:raises Exception: If an error occurs.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="remount">
+<tt class="descname">remount</tt><big>(</big><big>)</big><a class="headerlink" href="#remount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remount the handset&#8217;s system partition as writable.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The output of the remount command.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If an error occurs.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="file-system-functionality">
+<h2>File System Functionality<a class="headerlink" href="#file-system-functionality" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="method">
+<dt id="ls">
+<tt class="descname">ls</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#ls" title="Permalink to this definition">¶</a></dt>
+<dd><p>List files in path on handset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Args path:</th><td class="field-body">The path to list files in.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list of files.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">If an error occurs.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cat">
+<tt class="descname">cat</tt><big>(</big><em>target</em><big>)</big><a class="headerlink" href="#cat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the content of the file <em>target</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>target</strong> &#8211; The file to read.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The content of the target file as a string.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">If an error occurs.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rm">
+<tt class="descname">rm</tt><big>(</big><em>target</em>, <em>recursive=False</em><big>)</big><a class="headerlink" href="#rm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove file or directory from the handset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>target</strong> &#8211; The file or directory to remove.</li>
+<li><strong>recursive</strong> &#8211; If <em>True</em> files will be removed recursively, else not.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">If an error occurs.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mv">
+<tt class="descname">mv</tt><big>(</big><em>src</em>, <em>dst</em><big>)</big><a class="headerlink" href="#mv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move file(s) on the handset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>src</strong> &#8211; Source path.</li>
+<li><strong>dst</strong> &#8211; Destination path.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">If an error occurs.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mkdir">
+<tt class="descname">mkdir</tt><big>(</big><em>target</em>, <em>parents=False</em><big>)</big><a class="headerlink" href="#mkdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create directory on handset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>target</strong> &#8211; The directory to create.</li>
+<li><strong>parents</strong> &#8211; If True create parent directories as needed and don&#8217;t
+raise an exception if target already exists.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">If an error occurs or the directory already exists.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="chmod">
+<tt class="descname">chmod</tt><big>(</big><em>permissions</em>, <em>target</em><big>)</big><a class="headerlink" href="#chmod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change permissions of a file on the handset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>permissions</strong> &#8211; Permissions to set on the file (e.g. &#8220;777&#8221;).</li>
+<li><strong>target</strong> &#8211; The file to change permissions on.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">If an error occurs.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="path_exists">
+<tt class="descname">path_exists</tt><big>(</big><em>path</em>, <em>file_type=None</em><big>)</big><a class="headerlink" href="#path_exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if path exists on handset. Optional: check file type of path.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> &#8211; Path on handset to check.</li>
+<li><strong>file_type</strong> &#8211; <p>If given, verify that the file type of path is
+file_type. Valid values:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&#39;symlink&#39;</span><span class="p">,</span> <span class="s">&#39;directory&#39;</span><span class="p">,</span> <span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="s">&#39;executable&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><em>True</em> if path exists (and file type is file_type, if that
+parameter was given), else False.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first last">If an error occurs.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="push">
+<tt class="descname">push</tt><big>(</big><em>src</em>, <em>dst</em>, <em>timeout=0</em><big>)</big><a class="headerlink" href="#push" title="Permalink to this definition">¶</a></dt>
+<dd><p>Push file to the handset via adb.if the pushed source filename starts
+with &#8216;tmp&#8217; then the method raises an exception: temp-files generated
+by the workspace are not possible to track after the test execution
+and thus the possibility to push these files to the handset has been
+restricted. In order to push a generated file, it must first be
+secured that the file can be resurrected during post mortem analysis.
+AVE offers two ways to do this: Either during write_tempfile() or
+with the specific workspace method promote(). Please refer to the
+API description for details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>src</strong> &#8211; The path on host to the source file.</li>
+<li><strong>dst</strong> &#8211; The destination on the handset.</li>
+<li><strong>timeout</strong> &#8211; Seconds before time out.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The execution output.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>Timeout</strong> &#8211; If such occurs.</li>
+<li><strong>Exception</strong> &#8211; If other error occurs.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pull">
+<tt class="descname">pull</tt><big>(</big><em>src</em>, <em>dst</em>, <em>timeout=0</em><big>)</big><a class="headerlink" href="#pull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pull file from the handset via adb.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>src</strong> &#8211; The source file(s) on the handset (wildcards allowed).</li>
+<li><strong>dst</strong> &#8211; The local destination path.</li>
+<li><strong>timeout</strong> &#8211; Seconds before time out.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The execution output.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>Timeout</strong> &#8211; If such occurs.</li>
+<li><strong>Exception</strong> &#8211; On other errors.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="take_screenshot">
+<tt class="descname">take_screenshot</tt><big>(</big><em>dst</em>, <em>timeout=20</em><big>)</big><a class="headerlink" href="#take_screenshot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take screenshot of the device via adb.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dst</strong> &#8211; The destination file of screenshot.</li>
+<li><strong>timeout</strong> &#8211; Seconds before time out.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The execution output.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>Timeout</strong> &#8211; If such occurs.</li>
+<li><strong>Exception</strong> &#8211; On other errors.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="is_mounted">
+<tt class="descname">is_mounted</tt><big>(</big><em>mount_point</em><big>)</big><a class="headerlink" href="#is_mounted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if mount_point is mounted.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mount_point</strong> &#8211; Mount point as a string.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>True</em> if mount_point is mounted, else <em>False</em>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">If an error occurs.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wait_mounted">
+<tt class="descname">wait_mounted</tt><big>(</big><em>sdcard</em>, <em>ext_card</em>, <em>timeout=30</em><big>)</big><a class="headerlink" href="#wait_mounted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait until sdcard and/or ext_card is mounted.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sdcard</strong> &#8211; If <em>True</em> wait for sdcard to be mounted.</li>
+<li><strong>ext_card</strong> &#8211; If <em>True</em> wait for ext_card to be mounted.</li>
+<li><strong>timeout</strong> &#8211; Seconds before time out.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises Timeout:</th><td class="field-body"><p class="first last">If such occured.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="wait_for_path">
+<tt class="descname">wait_for_path</tt><big>(</big><em>path</em>, <em>file_type=None</em>, <em>timeout=0</em><big>)</big><a class="headerlink" href="#wait_for_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait until path exists on handset. Optional: check file type of path.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> &#8211; Path on handset to check.</li>
+<li><strong>file_type</strong> &#8211; <p>If given, verify that the file type of path is
+file_type. Valid values:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&#39;symlink&#39;</span><span class="p">,</span> <span class="s">&#39;directory&#39;</span><span class="p">,</span> <span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="s">&#39;executable&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><strong>timeout</strong> &#8211; If timeout &gt; 0, seconds before time out.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">If an error occurs.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="processes">
+<h2>Processes<a class="headerlink" href="#processes" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="method">
+<dt id="shell">
+<tt class="descname">shell</tt><big>(</big><em>args</em>, <em>timeout=0</em>, <em>bg=False</em><big>)</big><a class="headerlink" href="#shell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute an adb shell command.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>args</strong> &#8211; A list or a string of arguments to be executed by adb shell</li>
+<li><strong>timeout</strong> &#8211; Timeout for the command. No timeout is set by default.</li>
+<li><strong>bg</strong> &#8211; specify the running mode, if True, run the command in background</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">if the cmd run in background the return values are the new process
+id and the file descriptor of the new process&#8217;s pseudoterminal,
+else is the Output from execution.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>Timeout</strong> &#8211; If such occured.</li>
+<li><strong>Exception</strong> &#8211; On other errors.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Detection of failure is hard with ADB because the exit code
+for an execution is not returned to the test host. <tt class="docutils literal"><span class="pre">shell()</span></tt> only
+checks for known error indications on stdout.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="kill_background_cmd">
+<tt class="descname">kill_background_cmd</tt><big>(</big><em>pid</em>, <em>fd</em><big>)</big><a class="headerlink" href="#kill_background_cmd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kill the cmd process now is running in background</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pid</strong> &#8211; The id of the background process</li>
+<li><strong>fd</strong> &#8211; The file descriptor of the process&#8217;s pseudoterminal</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>OSError</strong> &#8211; If cannot close fd</li>
+<li><strong>Exception</strong> &#8211; On other errors</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ps">
+<tt class="descname">ps</tt><big>(</big><em>name=None</em>, <em>exact=False</em><big>)</big><a class="headerlink" href="#ps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all current procceses&#8217; id and name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> &#8211; If given only return processes with matching name.</li>
+<li><strong>exact</strong> &#8211; If <em>True</em> only return processes with exact matching name.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with dicts, e.g [{&#8216;pid&#8217;:123,&#8217;name&#8217;:&#8217;pid_name&#8217;},..]</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first last">If an error occurs.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="properties">
+<h2>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><blockquote>
+<div><dl class="method">
+<dt id="set_property">
+<tt class="descname">set_property</tt><big>(</big><em>key</em>, <em>value</em><big>)</big><a class="headerlink" href="#set_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set property and verify value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> &#8211; The property name.</li>
+<li><strong>value</strong> &#8211; The new property value as a string.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">If property was not set successfully.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="get_property">
+<tt class="descname">get_property</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#get_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the value of the given property.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> &#8211; The property name.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The property&#8217;s value.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">If no value was found or an error occured.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="get_product_name">
+<tt class="descname">get_product_name</tt><big>(</big><big>)</big><a class="headerlink" href="#get_product_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the product name of the handset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The product name of the handset, or empty string if product
+name wasn&#8217;t found.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If an error occurs.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="get_build_label">
+<tt class="descname">get_build_label</tt><big>(</big><big>)</big><a class="headerlink" href="#get_build_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the build label of the software on the handset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The build label of the software on the handset.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If the build label was not fetched successfully.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="clear_property">
+<tt class="descname">clear_property</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#clear_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear the value for the given property.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> &#8211; The property name.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If failed to clear property or an error occured.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+<dl class="method">
+<dt id="get_sdk_version">
+<tt class="descname">get_sdk_version</tt><big>(</big><big>)</big><a class="headerlink" href="#get_sdk_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the SDK version of the running platform.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">An integer denoting the version. E.g. <tt class="docutils literal"><span class="pre">23</span></tt> for Android M</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="crash-handling">
+<h2>Crash Handling<a class="headerlink" href="#crash-handling" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="method">
+<dt id="run_bugreport">
+<tt class="descname">run_bugreport</tt><big>(</big><em>directory</em><big>)</big><a class="headerlink" href="#run_bugreport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute &#8216;bugreport&#8217; on handset. Create a file with the bugreport output
+in the given directory on the handset and return the file&#8217;s full path.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; An existing directory on the handset where the file will
+be written.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The full path on the handset to the created file.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">If an error occurs.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="force_dump">
+<tt class="descname">force_dump</tt><big>(</big><em>timeout=0</em><big>)</big><a class="headerlink" href="#force_dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Force the handset to dump.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>timeout</strong> &#8211; Secods before time out.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>Timeout</strong> &#8211; If such occured.</li>
+<li><strong>Exception</strong> &#8211; On other errors.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ADB Handset</a><ul>
+<li><a class="reference internal" href="#port-forwarding">Port Forwarding</a></li>
+<li><a class="reference internal" href="#power-states">Power States</a></li>
+<li><a class="reference internal" href="#adb-intrinsics">ADB Intrinsics</a></li>
+<li><a class="reference internal" href="#file-system-functionality">File System Functionality</a></li>
+<li><a class="reference internal" href="#processes">Processes</a></li>
+<li><a class="reference internal" href="#properties">Properties</a></li>
+<li><a class="reference internal" href="#crash-handling">Crash Handling</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="profile_api.html"
+                        title="previous chapter">Handset Profile</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="android_api.html"
+                        title="next chapter">Android Handset</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/handset/docs/adb_api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="android_api.html" title="Android Handset"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="profile_api.html" title="Handset Profile"
+             >previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" >Handset</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

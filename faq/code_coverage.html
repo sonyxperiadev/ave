@@ -1,0 +1,228 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Create Code Coverage Report &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../index.html" />
+    <link rel="up" title="Frequently Asked Questions" href="index.html" />
+    <link rel="next" title="Verifying Customized Products" href="customized_sw.html" />
+    <link rel="prev" title="ADB Behavior" href="adb.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="customized_sw.html" title="Verifying Customized Products"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="adb.html" title="ADB Behavior"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Frequently Asked Questions</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="create-code-coverage-report">
+<h1>Create Code Coverage Report<a class="headerlink" href="#create-code-coverage-report" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Code coverage is an important measurement of testing case quality, this document
+will guide you how to create coverage report for your apk package testing.</p>
+</div>
+<div class="section" id="steps-to-create-report">
+<h2>Steps to Create report<a class="headerlink" href="#steps-to-create-report" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="jenkins-build-job-setup">
+<h3>1. Jenkins Build Job Setup<a class="headerlink" href="#jenkins-build-job-setup" title="Permalink to this headline">¶</a></h3>
+<p>In this phase, we need to get instrumented APK and class coverage metadata
+files.</p>
+<ol class="loweralpha simple">
+<li>Compile the APK with semc-build.</li>
+</ol>
+<blockquote>
+<div><ul>
+<li><p class="first">Build using <em>Execute SEMC build-script</em> jenkins plugin, There is an input
+field in this plugin <em>Additional semc-build parameters</em>, if it not shown,
+click the button <em>Advanced...</em> to show it, then input the text
+<cite>-Demma-coverage-on=true</cite> into it.</p>
+</li>
+<li><p class="first">Build using <em>Execute shell</em> jenkins plugin, it should execute <em>semc-build</em>
+command like this:</p>
+<div class="highlight-python"><pre>semc-build ... -Demma-coverage-on=true ...</pre>
+</div>
+</li>
+</ul>
+</div></blockquote>
+<ol class="loweralpha" start="2">
+<li><p class="first">Archive the APK and coverage metadata files.</p>
+<p>Add the <em>Archive the artifacts</em> post-build action, in the <em>Files to archive</em>
+field, input something like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">reports</span><span class="o">/</span><span class="n">coverage</span><span class="o">/</span><span class="n">coverage</span><span class="o">.</span><span class="n">em</span><span class="p">,</span> <span class="n">semc</span><span class="o">-</span><span class="n">build</span><span class="o">-</span><span class="n">output</span><span class="o">/</span><span class="n">Foobar</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">Foobar</span><span class="o">.</span><span class="n">apk</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="run-test-cases-to-get-runtime-coverage-data">
+<h3>2. Run test cases to get runtime coverage data<a class="headerlink" href="#run-test-cases-to-get-runtime-coverage-data" title="Permalink to this headline">¶</a></h3>
+<p>In this phase, we will get runtime coverage data by running the test cases.</p>
+<ol class="loweralpha">
+<li><p class="first">Download APK from Jenkins job and install it to handset:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">path</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">download_jenkins</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">artifacts</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;Foobar.apk&#39;</span><span class="p">],</span> <span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Install the APK and run the tests with coverage turned on, this produces
+the coverage.ec file in the handset file system:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">handset</span><span class="o">.</span><span class="n">reinstall</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&#39;Foobar.apk&#39;</span><span class="p">))</span>
+<span class="n">handset</span><span class="o">.</span><span class="n">run_junit</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">test_options</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;coverage&#39;</span><span class="p">:</span><span class="s">&#39;true&#39;</span><span class="p">},</span> <span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="make-coverage-report">
+<h3>3. Make coverage report<a class="headerlink" href="#make-coverage-report" title="Permalink to this headline">¶</a></h3>
+<p>In this phase, we already have coverage metadata and runtime data, we can make
+the report file in HTML format.</p>
+<ol class="loweralpha">
+<li><p class="first">Download the coverage metadata from Jenkins job:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">em_path</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">download_jenkins</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">artifacts</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;coverage.em&#39;</span><span class="p">],</span> <span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Pull the coverage runtime data from handset. The path to <tt class="docutils literal"><span class="pre">coverage.ec</span></tt> is
+predictable. It will be based on the APK&#8217;s package name. E.g:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">handset</span><span class="o">.</span><span class="n">pull</span><span class="p">(</span><span class="s">&#39;/data/data/com.sonymobile.foobar/files/coverage.ec&#39;</span><span class="p">,</span> <span class="n">ec_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To produce a report that also contains line by line analysis (not just
+overall coverage stats), the source code to build APK is needed. If you
+do not need the line by line analysis, you can skip this step (set
+<tt class="docutils literal"><span class="pre">src_tree=None</span></tt>):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">src_tree</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">download_git</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Make the report:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">report</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">make_coverage_report</span><span class="p">(</span><span class="n">em_path</span><span class="p">,</span> <span class="n">ec_path</span><span class="p">,</span> <span class="n">src_tree</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Push the report to flocker for later analysis:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">workspace</span><span class="o">.</span><span class="n">flocker_push_file</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="n">coverage</span><span class="o">.</span><span class="n">tar</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Create Code Coverage Report</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#steps-to-create-report">Steps to Create report</a><ul>
+<li><a class="reference internal" href="#jenkins-build-job-setup">1. Jenkins Build Job Setup</a></li>
+<li><a class="reference internal" href="#run-test-cases-to-get-runtime-coverage-data">2. Run test cases to get runtime coverage data</a></li>
+<li><a class="reference internal" href="#make-coverage-report">3. Make coverage report</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="adb.html"
+                        title="previous chapter">ADB Behavior</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="customized_sw.html"
+                        title="next chapter">Verifying Customized Products</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/faq/code_coverage.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="customized_sw.html" title="Verifying Customized Products"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="adb.html" title="ADB Behavior"
+             >previous</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" >Frequently Asked Questions</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,374 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Relay Server &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../../index.html" />
+    <link rel="up" title="System Documentation" href="../../system/index.html" />
+    <link rel="next" title="Upstart Integration" href="../../system/upstart_integration.html" />
+    <link rel="prev" title="Networked Allocation" href="../../broker/docs/allocation.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../system/upstart_integration.html" title="Upstart Integration"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../../broker/docs/allocation.html" title="Networked Allocation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="../../system/index.html" accesskey="U">System Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="relay-server">
+<h1>Relay Server<a class="headerlink" href="#relay-server" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<div class="figure align-right">
+<img alt="../../_images/system.jpg" src="../../_images/system.jpg" />
+</div>
+<p>The relay server is implemented as a stand-alone subsystem whose life cycle is
+independent of the broker and its sessions. The basic concept is to map single
+boards to multiple virtual relays so that a single board may serve multiple test
+jobs concurrently.</p>
+<p>The schematic view to the right shows the most common steps that are involved in
+detection and allocation of relays. Colors are used to show which items belong
+to the same AVE component.</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Detect equipment</li>
+<li>Report a board profile to the relay server</li>
+<li>Create a representation of the equipment</li>
+<li>Claim the equipment</li>
+<li>Report virtualized relay profiles to the broker</li>
+<li>Client tries to allocate a relay</li>
+<li>Allocate one of the virtual relays and pass its profile to the client&#8217;s
+session.</li>
+<li>Create a resource representation from the allocated profile</li>
+<li>Ask session to manipulate a virtual relay circuit</li>
+<li>Tell the server to manipulate the corresponding physical relay circuit</li>
+</ol>
+</div></blockquote>
+</div>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>Broker support for detection, allocation and reclamation of the relay to
+sessions.</li>
+<li>Broker support for grouping of relay ports into virtual devices that can be
+paired with e.g. handsets.</li>
+<li>The broker must be able to reset the relay to a default state if it was
+allocated to a job which has subsequently lost control over it.</li>
+<li>All functions that exercise relays should operate on identities that can be
+guaranteed to never change in a given test lab.</li>
+<li>Static configuration files must be used to group relay circuits into logical
+units that can be paired with handsets.</li>
+<li>It must be possible to restart the system without affecting active clients.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="equipment-detection">
+<h2>Equipment Detection<a class="headerlink" href="#equipment-detection" title="Permalink to this headline">¶</a></h2>
+<p>Generally, detection cannot be based on dynamically created OS representations,
+such as device nodes or sysfs paths. These change when the equipment is plugged
+into a different USB port and may depend on order the OS enumerates equipment.
+Instead use a persistent property of the equipment itself. E.g. serial numbers.</p>
+<div class="section" id="devantech">
+<h3>Devantech<a class="headerlink" href="#devantech" title="Permalink to this headline">¶</a></h3>
+<p>Devantech relays have unique serial numbers and can be detected reliably with
+<tt class="docutils literal"><span class="pre">udev</span></tt> event handling. The device appears in the sysfs tree, which lets the
+system find the device node (<tt class="docutils literal"><span class="pre">/dev/ttyACM[0..7]</span></tt>) and open it.</p>
+</div>
+</div>
+<div class="section" id="equipment-allocation">
+<h2>Equipment Allocation<a class="headerlink" href="#equipment-allocation" title="Permalink to this headline">¶</a></h2>
+<p>Some observations:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Only one process on the host can claim any given board.</li>
+<li>Test jobs operate through sessions that are running as independent processes.
+This means the sessions must not claim the boards directly as that makes it
+impossible to share one board&#8217;s circuits among multiple test jobs. The
+sessions must instead use a multiplexing server.</li>
+</ul>
+</div></blockquote>
+<div class="section" id="virtualization">
+<h3>Virtualization<a class="headerlink" href="#virtualization" title="Permalink to this headline">¶</a></h3>
+<p>To share many board circuits among many sessions, allocation should be based on
+logical groupings of circuits. These groupings must have unique identifiers that
+persist over system restarts and power cycling of the physical relay boards.</p>
+<p>See the API documentation for example configuration of virtual relays.</p>
+</div>
+</div>
+<div class="section" id="equipment-reclamation">
+<h2>Equipment Reclamation<a class="headerlink" href="#equipment-reclamation" title="Permalink to this headline">¶</a></h2>
+<p>Because the sessions do not get direct control over physical boards, it is
+enough for the broker to reset allocated relays to their default states when a
+session terminates.</p>
+</div>
+<div class="section" id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h2>
+<p>All modules are found in the <tt class="docutils literal"><span class="pre">ave.relay</span></tt> Python name space.</p>
+<div class="section" id="board-board">
+<h3><tt class="docutils literal"><span class="pre">board.Board</span></tt><a class="headerlink" href="#board-board" title="Permalink to this headline">¶</a></h3>
+<p>A factory class that creates <tt class="docutils literal"><span class="pre">DevantechBoard</span></tt> instances.</p>
+<p>The server uses a board profile (provided by the equipment lister) to create
+board objects. The profile determines what the factory class produces. The
+configuration of the board is determinated by vendor-specific configuration
+files:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Devantech: <tt class="docutils literal"><span class="pre">.ave/config/devantech.json</span></tt></li>
+</ul>
+</div></blockquote>
+<p>See the API documentation for details about these files.</p>
+</div>
+<div class="section" id="config">
+<h3><tt class="docutils literal"><span class="pre">config</span></tt><a class="headerlink" href="#config" title="Permalink to this headline">¶</a></h3>
+<p>Helper functions that validate configuration files for the relay server and the
+board configurations. Used by <tt class="docutils literal"><span class="pre">server.RelayServer</span></tt>.</p>
+</div>
+<div class="section" id="daemon-relayserverdaemon">
+<h3><tt class="docutils literal"><span class="pre">daemon.RelayServerDaemon</span></tt><a class="headerlink" href="#daemon-relayserverdaemon" title="Permalink to this headline">¶</a></h3>
+<p>A class that performs daemonization of a relay server. Used by the CLI tool
+<tt class="docutils literal"><span class="pre">ave-relay</span></tt>.</p>
+<p>Creates log and PID files in <tt class="docutils literal"><span class="pre">/var/tmp/ave-relay.{log,pid}</span></tt>.</p>
+</div>
+<div class="section" id="devantech-devantechboard">
+<h3><tt class="docutils literal"><span class="pre">devantech.DevantechBoard</span></tt><a class="headerlink" href="#devantech-devantechboard" title="Permalink to this headline">¶</a></h3>
+<p>Class that represents a physical Devantech relay board. Attempts to load the
+file <tt class="docutils literal"><span class="pre">.ave/config/devantech.json</span></tt> on instantiation. If this is successful, it
+also claims the board by opening its device node. The class implements functions
+to set and reset physical circuits on the board. It also tracks the states of
+all circuits.</p>
+</div>
+<div class="section" id="exceptions-deviceoffline">
+<h3><tt class="docutils literal"><span class="pre">exceptions.DeviceOffline</span></tt><a class="headerlink" href="#exceptions-deviceoffline" title="Permalink to this headline">¶</a></h3>
+<p>Exception used internally in the server to handle situations where a board has
+gone offline since the last manipulation of the board.</p>
+</div>
+<div class="section" id="lister-boardlister">
+<h3><tt class="docutils literal"><span class="pre">lister.BoardLister</span></tt><a class="headerlink" href="#lister-boardlister" title="Permalink to this headline">¶</a></h3>
+<p>Uses <tt class="docutils literal"><span class="pre">libudev</span></tt> to list USB equipment with known vendor and product ID&#8217;s. When
+a board is plugged in (or listed at server startup) a profile of the board is
+generated and sent to the relay server. Example profile:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;product&quot;</span><span class="p">:</span> <span class="s">&quot;usb-rly16l&quot;</span><span class="p">,</span>
+    <span class="s">&quot;vendor&quot;</span><span class="p">:</span> <span class="s">&quot;devantech&quot;</span><span class="p">,</span>
+    <span class="s">&quot;power_state&quot;</span><span class="p">:</span> <span class="s">&quot;online&quot;</span><span class="p">,</span>
+    <span class="s">&quot;serial&quot;</span><span class="p">:</span> <span class="s">&quot;00014007&quot;</span><span class="p">,</span>
+    <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;board&quot;</span><span class="p">,</span>
+    <span class="s">&quot;sysfs_path&quot;</span><span class="p">:</span> <span class="s">&quot;/sys/devices/pci0000:00/0000:00:1d.7/usb2/2-4/2-4.1/2-4.1.4&quot;</span><span class="p">,</span>
+    <span class="s">&quot;device_node&quot;</span><span class="p">:</span> <span class="s">&quot;/dev/ttyACM0&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Internally, the lister maps the sysfs path to the profile. If the equipment is
+later disconnected, <tt class="docutils literal"><span class="pre">libudev</span></tt> only lists the sysfs path but we need the serial
+number when telling the server that a particular board went offline.</p>
+<p>Python 2 does not provide a standard library to interface with <tt class="docutils literal"><span class="pre">libudev</span></tt> so
+the <tt class="docutils literal"><span class="pre">ctypes</span></tt> module is used to load the native library directly.</p>
+</div>
+<div class="section" id="profile-boardprofile">
+<h3><tt class="docutils literal"><span class="pre">profile.BoardProfile</span></tt><a class="headerlink" href="#profile-boardprofile" title="Permalink to this headline">¶</a></h3>
+<p>Created by the lister and consumed by the server. Visible to administrative
+clients that call <tt class="docutils literal"><span class="pre">RelayServer.list_equipment()</span></tt>.</p>
+</div>
+<div class="section" id="profile-relayprofile">
+<h3><tt class="docutils literal"><span class="pre">profile.RelayProfile</span></tt><a class="headerlink" href="#profile-relayprofile" title="Permalink to this headline">¶</a></h3>
+<p>Created by the server and consumed by the broker. Matched against allocation
+attempts in the broker. Visible to the client after successful allocation.
+Visible to administrative clients that call <tt class="docutils literal"><span class="pre">RelayServer.list_virtual()</span></tt> or
+<tt class="docutils literal"><span class="pre">Broker.list_equipment({'type':'relay'})</span></tt>.</p>
+</div>
+<div class="section" id="reporter-reporter">
+<h3><tt class="docutils literal"><span class="pre">reporter.Reporter</span></tt><a class="headerlink" href="#reporter-reporter" title="Permalink to this headline">¶</a></h3>
+<p>A daemonizing process that is used to periodically report virtual relays to the
+broker. The reporting is performed in a separate process to make sure that e.g.
+network problems do not stall the relay server main loop. The daemonization
+frees the server main loop from explicitly waiting for the process to exit.</p>
+</div>
+<div class="section" id="resource-relay">
+<h3><tt class="docutils literal"><span class="pre">resource.Relay</span></tt><a class="headerlink" href="#resource-relay" title="Permalink to this headline">¶</a></h3>
+<p>The equipment class used by broker sessions. It is implemented as a subclass of
+<tt class="docutils literal"><span class="pre">RemoteRelayServer</span></tt> and uses the allocated relay profile to tell the relay
+server which virtual relay it wants to manipulate.</p>
+</div>
+<div class="section" id="server-relayserver">
+<h3><tt class="docutils literal"><span class="pre">server.RelayServer</span></tt><a class="headerlink" href="#server-relayserver" title="Permalink to this headline">¶</a></h3>
+<p>Inherits from <tt class="docutils literal"><span class="pre">ave.network.control.Control</span></tt>. Implements the server main loop.
+It starts the lister, turns board profiles into virtual relay profiles and
+periodically reports these to the broker.</p>
+</div>
+<div class="section" id="server-remoterelayserver">
+<h3><tt class="docutils literal"><span class="pre">server.RemoteRelayServer</span></tt><a class="headerlink" href="#server-remoterelayserver" title="Permalink to this headline">¶</a></h3>
+<p>Inherits from <tt class="docutils literal"><span class="pre">ave.network.control.RemoteControl</span></tt>. Administrative clients
+should use this class to connect and run functions on the server. Broker
+sessions should use <tt class="docutils literal"><span class="pre">resource.Relay</span></tt>. Other clients should not do any calls
+directly to the relay server (and will anyway not be able to do much without
+administrative privileges).</p>
+</div>
+<div class="section" id="bin-ave-relay">
+<h3><tt class="docutils literal"><span class="pre">bin/ave-relay</span></tt><a class="headerlink" href="#bin-ave-relay" title="Permalink to this headline">¶</a></h3>
+<p>Supports starting, restarting and stopping the relay server. Only implements
+command line parsing. The rest is implemented in <tt class="docutils literal"><span class="pre">RelayServerDaemon</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="restarting-the-server">
+<h2>Restarting the Server<a class="headerlink" href="#restarting-the-server" title="Permalink to this headline">¶</a></h2>
+<p>The server constructor function accepts a list of board profiles. When this is
+set, a detected board is not reset to its default state. Instead the server just
+inherits the board state passed to the constructor. Detected boards that do not
+appear in the list of inherited board profiles are reset.</p>
+<p>The server hands over execution to a new instance serializes its board states
+and stops listening for new connections. The serialized state will not include
+boards that have gone offline.</p>
+<p>Clients that are connected to the old instance will receive <tt class="docutils literal"><span class="pre">Restarting</span></tt>
+exceptions on their next attempt to manipulate a relay. This is caught by the
+<tt class="docutils literal"><span class="pre">Relay</span></tt> resource class which then connects to the new server instance and
+retries the manipulation. This hides server restarts from all non-administrative
+clients.</p>
+</div>
+<div class="section" id="configuration-files">
+<h2>Configuration Files<a class="headerlink" href="#configuration-files" title="Permalink to this headline">¶</a></h2>
+<p>The board-specific configuration files should not be changed while the server
+is running as this may create virtual relay configurations that overlap with
+the configurations that connected clients are already using.</p>
+<p>If an entirely new board is to be connected to the host, it is recommended to
+write its configuration file before connecting it (if the server is used in a
+live lab with active clients).</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Relay Server</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#equipment-detection">Equipment Detection</a><ul>
+<li><a class="reference internal" href="#devantech">Devantech</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#equipment-allocation">Equipment Allocation</a><ul>
+<li><a class="reference internal" href="#virtualization">Virtualization</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#equipment-reclamation">Equipment Reclamation</a></li>
+<li><a class="reference internal" href="#implementation">Implementation</a><ul>
+<li><a class="reference internal" href="#board-board"><tt class="docutils literal"><span class="pre">board.Board</span></tt></a></li>
+<li><a class="reference internal" href="#config"><tt class="docutils literal"><span class="pre">config</span></tt></a></li>
+<li><a class="reference internal" href="#daemon-relayserverdaemon"><tt class="docutils literal"><span class="pre">daemon.RelayServerDaemon</span></tt></a></li>
+<li><a class="reference internal" href="#devantech-devantechboard"><tt class="docutils literal"><span class="pre">devantech.DevantechBoard</span></tt></a></li>
+<li><a class="reference internal" href="#exceptions-deviceoffline"><tt class="docutils literal"><span class="pre">exceptions.DeviceOffline</span></tt></a></li>
+<li><a class="reference internal" href="#lister-boardlister"><tt class="docutils literal"><span class="pre">lister.BoardLister</span></tt></a></li>
+<li><a class="reference internal" href="#profile-boardprofile"><tt class="docutils literal"><span class="pre">profile.BoardProfile</span></tt></a></li>
+<li><a class="reference internal" href="#profile-relayprofile"><tt class="docutils literal"><span class="pre">profile.RelayProfile</span></tt></a></li>
+<li><a class="reference internal" href="#reporter-reporter"><tt class="docutils literal"><span class="pre">reporter.Reporter</span></tt></a></li>
+<li><a class="reference internal" href="#resource-relay"><tt class="docutils literal"><span class="pre">resource.Relay</span></tt></a></li>
+<li><a class="reference internal" href="#server-relayserver"><tt class="docutils literal"><span class="pre">server.RelayServer</span></tt></a></li>
+<li><a class="reference internal" href="#server-remoterelayserver"><tt class="docutils literal"><span class="pre">server.RemoteRelayServer</span></tt></a></li>
+<li><a class="reference internal" href="#bin-ave-relay"><tt class="docutils literal"><span class="pre">bin/ave-relay</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#restarting-the-server">Restarting the Server</a></li>
+<li><a class="reference internal" href="#configuration-files">Configuration Files</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../../broker/docs/allocation.html"
+                        title="previous chapter">Networked Allocation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../../system/upstart_integration.html"
+                        title="next chapter">Upstart Integration</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/relay/docs/system.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../system/upstart_integration.html" title="Upstart Integration"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../../broker/docs/allocation.html" title="Networked Allocation"
+             >previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="../../system/index.html" >System Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

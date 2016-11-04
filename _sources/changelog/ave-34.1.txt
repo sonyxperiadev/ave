@@ -1,0 +1,26 @@
+Version 34.1
+==========
+* ave-276 new script for goobug
+    :Tree: semctools/ave/workspace
+    :Commit: a10c3fed8b74320020c574771ada71dbb2bd1cd9
+
+* AVE-284 bugfix for disable/enable package in M
+    :Tree: semctools/ave/handset
+    :Commit: 9c21fda15377e5f989c694f90f4d8d06e45f17e7
+
+* AVE-275 Adapt vcsjob for multipel allocation
+    :Tree: semctools/ave/vcsjob
+    :Commit: e22fa17c883b36e2e6537aae02bf0a4ff876e7a2
+
+* AVE-287 Improvement for Thermal function
+    :Tree: semctools/ave/handset
+    :Commit: 43ace0746e7b8e5e97fa29e59b8b32fcd7a34155
+
+* ave-304 disable_data_disclaimer gives exceptions
+    :Tree: semctools/ave/handset
+    :Commit: 2d375f3b19feafa77f181f2dba3e2de8bea7743c
+
+* AVE-311 Add handset config for Suzu(Consumer hero) and Ukulele
+    :Tree: semctools/ave/handset
+    :Commit: 7b66890c368a6590e6466bd668d7bb6bd8b8becf
+

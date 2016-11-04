@@ -1,0 +1,255 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Logging &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../index.html" />
+    <link rel="up" title="System Documentation" href="index.html" />
+    <link rel="next" title="Broker" href="../broker/docs/system.html" />
+    <link rel="prev" title="Lab Owner’s Guide" href="lab_owner.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../broker/docs/system.html" title="Broker"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="lab_owner.html" title="Lab Owner’s Guide"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">System Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="logging">
+<h1>Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>A few different kinds of logging are used to serve different purposes:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Prints to <tt class="docutils literal"><span class="pre">stdout</span></tt> by test jobs. Used to provide progress indication with
+lots of semantics. Intended for post-mortem analysis by humans. Not intended
+for automated analysis.</li>
+<li>Prints to <tt class="docutils literal"><span class="pre">stderr</span></tt> by AVE daemons. Used to provide debugging information.
+Intended for post-mortem analysis by humans.</li>
+<li>Consolidation of log files and other test job artifacts. Used to store logs
+in a way that can be tied to a single run of a test job. Intended for
+post-mortem analysis by humans.</li>
+<li>Automatic emission of structured entries to a centralized store. Used to log
+resource utilization and system malfunctions and unexpected events in AVE
+itself. Intended for automated business intelligence analysis.</li>
+<li>Explicit emission of test results from test jobs. Used to store the pass/fail
+status of individual test cases. Intended for manual as well as automated
+analysis.</li>
+<li>Explicit emission of domain specific measurements from test jobs. Used to
+store e.g. performance data collected by test jobs. Intended for manual as
+well as automated analysis.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="stdout-prints-by-test-jobs">
+<h2><tt class="docutils literal"><span class="pre">stdout</span></tt> Prints by Test Jobs<a class="headerlink" href="#stdout-prints-by-test-jobs" title="Permalink to this headline">¶</a></h2>
+<p>Test jobs are executed by <tt class="docutils literal"><span class="pre">vcsjob</span></tt>, which is able to intercept all prints to
+<tt class="docutils literal"><span class="pre">stdout</span></tt> and <tt class="docutils literal"><span class="pre">stderr</span></tt>. A scheduler may redirect this output to a file. See
+<tt class="docutils literal"><span class="pre">vcsjob.execute_job(...,</span> <span class="pre">log_path=None,</span> <span class="pre">...)</span></tt>.</p>
+<p>The job itself has access to this file so that it may upload its own log to
+Flocker: <tt class="docutils literal"><span class="pre">vcsjob.get_log_path()</span></tt> returns the path that was selected by the
+scheduler, or raises an exception if not set.</p>
+</div>
+<div class="section" id="stderr-prints-by-daemons">
+<h2><tt class="docutils literal"><span class="pre">stderr</span></tt> Prints by Daemons<a class="headerlink" href="#stderr-prints-by-daemons" title="Permalink to this headline">¶</a></h2>
+<p>Daemons are initialized with writable file handles that replace <tt class="docutils literal"><span class="pre">stdout</span></tt> and
+<tt class="docutils literal"><span class="pre">stderr</span></tt> (the handles may point to the same file). Consequently all prints by
+the daemon, the Python interpreter and functions called by the daemon will end
+up in the log file(s).</p>
+<dl class="docutils">
+<dt>Left to do:</dt>
+<dd><ul class="first last simple">
+<li>Log files are currently created under <tt class="docutils literal"><span class="pre">/var/tmp</span></tt> and should move to
+<tt class="docutils literal"><span class="pre">.ave/logs</span></tt> in AVE&#8217;s home directory.</li>
+<li>Implement log file rotation or garbage collection against a maximum disk
+usage.</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="consolidation-of-job-logs">
+<h2>Consolidation of Job Logs<a class="headerlink" href="#consolidation-of-job-logs" title="Permalink to this headline">¶</a></h2>
+<p>API&#8217;s on the <tt class="docutils literal"><span class="pre">Workspace</span></tt> class may be used to push files and log entries to
+Flocker. Test jobs should use this to store artifacts that may be needed in
+post-mortem analysis.</p>
+<p>Flocker itself implements parallel uploads from multiple clients, configurable
+garbage collection and log rotation. The logs will eventually be purged as they
+are not considered business critical in the long term. It is enough if they are
+available for a &#8220;reasonable&#8221; amount of time after the test job has finished.</p>
+</div>
+<div class="section" id="structured-logging-to-panotti">
+<h2>Structured Logging to Panotti<a class="headerlink" href="#structured-logging-to-panotti" title="Permalink to this headline">¶</a></h2>
+<div class="figure align-right">
+<img alt="../_images/panotti.jpg" src="../_images/panotti.jpg" />
+</div>
+<p>Panotti is a mythical creature of antiquity with very large ears. Presumably it
+has excellent hearing and will faithfully record everything it hears.</p>
+<p>Schedulers may use <tt class="docutils literal"><span class="pre">vcsjob</span></tt> to set a globally unique ID on job executions:
+<tt class="docutils literal"><span class="pre">vcsjob.execute_job(...,</span> <span class="pre">guid=None,</span> <span class="pre">...)</span></tt>. If set, this GUID is picked up by
+the RPC marshalling mechanism (see <tt class="docutils literal"><span class="pre">ave.network.control.RemoteControl</span></tt>) and
+used to created JSON compatible log entries of all remote procedure calls that
+generate an exception.</p>
+<p>The GUID may also be read by the job, using <tt class="docutils literal"><span class="pre">vcsjob.get_guid()</span></tt>.</p>
+<p>The function <tt class="docutils literal"><span class="pre">ave.panotti.shout()</span></tt> is used to post a message to CouchDB. It
+will do nothing if no GUID is provided or the file <tt class="docutils literal"><span class="pre">.ave/config/panotti.json</span></tt>
+does not contain the configuration data needed to connect to the database.</p>
+<dl class="docutils">
+<dt>Left to do:</dt>
+<dd><ul class="first last simple">
+<li>Log daemon <tt class="docutils literal"><span class="pre">stderr</span></tt> prints to Panotti on hosts that enable this behavior.</li>
+<li>Trace <em>all</em> calls from test jobs to AVE  on hosts that enable this behavior.</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="test-results">
+<h2>Test Results<a class="headerlink" href="#test-results" title="Permalink to this headline">¶</a></h2>
+<p>Test results that fit the pass/fail/error model may be uploaded to deciBel with
+<tt class="docutils literal"><span class="pre">Workspace.report()</span></tt> if the result was generated with <tt class="docutils literal"><span class="pre">Handset.run_junit()</span></tt>
+or Handset.run_gtest()``. In other cases, the result may be built using calls
+to <tt class="docutils literal"><span class="pre">ave.report.decibel</span></tt> function and then posted directly to deciBel.</p>
+<dl class="docutils">
+<dt>Left to do:</dt>
+<dd><ul class="first last simple">
+<li>Document the <tt class="docutils literal"><span class="pre">ave.report.decibel</span></tt> module.</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="performance-results">
+<h2>Performance Results<a class="headerlink" href="#performance-results" title="Permalink to this headline">¶</a></h2>
+<p>Test results that fit a tabulated data model may be uploaded to MySQL.</p>
+<dl class="docutils">
+<dt>Left to do:</dt>
+<dd><ul class="first last simple">
+<li>Document the <tt class="docutils literal"><span class="pre">oursql</span></tt> module or refer the reader to existing documentation
+on the Internet.</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="scheduler-work-performed-on-a-jobs-behalf">
+<h2>Scheduler Work Performed on a Job’s Behalf<a class="headerlink" href="#scheduler-work-performed-on-a-jobs-behalf" title="Permalink to this headline">¶</a></h2>
+<p>Schedulers are expected to use GUID&#8217;s (as outlined above) to connect the logs
+of test jobs with the logs of preparatory work performed by the scheduler. E.g.
+if a scheduler has flashed a handset before the job allocates it, then the log
+from the flashing should be possible to find through the log for the test job.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Logging</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#stdout-prints-by-test-jobs"><tt class="docutils literal"><span class="pre">stdout</span></tt> Prints by Test Jobs</a></li>
+<li><a class="reference internal" href="#stderr-prints-by-daemons"><tt class="docutils literal"><span class="pre">stderr</span></tt> Prints by Daemons</a></li>
+<li><a class="reference internal" href="#consolidation-of-job-logs">Consolidation of Job Logs</a></li>
+<li><a class="reference internal" href="#structured-logging-to-panotti">Structured Logging to Panotti</a></li>
+<li><a class="reference internal" href="#test-results">Test Results</a></li>
+<li><a class="reference internal" href="#performance-results">Performance Results</a></li>
+<li><a class="reference internal" href="#scheduler-work-performed-on-a-jobs-behalf">Scheduler Work Performed on a Job’s Behalf</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="lab_owner.html"
+                        title="previous chapter">Lab Owner&#8217;s Guide</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../broker/docs/system.html"
+                        title="next chapter">Broker</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/system/logging.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../broker/docs/system.html" title="Broker"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="lab_owner.html" title="Lab Owner’s Guide"
+             >previous</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" >System Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

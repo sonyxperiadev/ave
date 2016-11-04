@@ -1,0 +1,248 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Equipment Stacking &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../../index.html" />
+    <link rel="up" title="Broker" href="system.html" />
+    <link rel="next" title="Restart" href="restart.html" />
+    <link rel="prev" title="Broker" href="system.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="restart.html" title="Restart"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="system.html" title="Broker"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="../../system/index.html" >System Documentation</a> &raquo;</li>
+          <li><a href="system.html" accesskey="U">Broker</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="equipment-stacking">
+<span id="broker-equipment-stacking"></span><h1>Equipment Stacking<a class="headerlink" href="#equipment-stacking" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>There must be some way to tell the broker that a certain handset is connected
+to a certain relay (to make up a common example) so that it does not allocate
+some <em>other</em> combination where the relay affects some other piece of equipment
+(that may already be allocated to some other test job).</p>
+<p>It is typically not possible for one piece of equipment to discover that it is
+connected to some other piece of equipment, so the generic solution has to be
+based on explicit configuration. This configuration is recorded by the lab owner
+in <tt class="docutils literal"><span class="pre">.ave/config/broker.json</span></tt>.</p>
+</div>
+<div class="section" id="terminology">
+<h2>Terminology<a class="headerlink" href="#terminology" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first"><strong>Stack:</strong> A stack is a configuration that describes the entanglement of
+multiple pieces of equipment.</p>
+</li>
+<li><p class="first"><strong>Entanglement:</strong> Entanglement is a static relationship between two or more
+pieces of equipment such that concurrent allocation of the equipment to
+different clients results in unusable configurations.</p>
+<p>Entanglement does not simply mean that manipulation of one resource may have
+side effects on another resource. E.g. it does not cover the relationship
+that is produced by telling one handset to call another.</p>
+</li>
+<li><p class="first"><strong>Collateral:</strong> A client may allocate equipment that is referenced from a
+stack and not claim the other equipment in the stack. The broker cannot
+allocate the extra equipment to other clients because of the assumption of
+entanglement. The broker is also not allowed to return references to equipment
+that the client did not explicitly request. This status of implicit allocation
+is called &#8220;collateral&#8221;. The broker tracks it for each explicit allocation to
+be able to free the related collateral when the allocated equipment is
+reclaimed from the client.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="equipment-detection">
+<h2>Equipment Detection<a class="headerlink" href="#equipment-detection" title="Permalink to this headline">¶</a></h2>
+<p>The stacking mechanism is not involved in equipment detection. It merely works
+with the identities provided to the broker by various equipment listers.</p>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>The broker reads a list of equipment stacks on startup. A restart is needed
+after changes to the list.</p>
+<p>Because some equipment may be combined in more than one way, it is OK to have
+the same equipment in multiple stacks. For instance, a WLAN dongle may work
+with more than one handset, but the dongle can only interact with one handset
+at a time. Consequently the dongle would show up in several stacks; one for
+each handset that may connected to it.</p>
+<p class="rubric">Format</p>
+<p>The file <tt class="docutils literal"><span class="pre">.ave/config/broker.json</span></tt> may contain a section called &#8220;stacks&#8221; which
+must be a list of lists of unique equipment profiles:</p>
+<div class="highlight-python"><pre>"stacks": [
+    [{"type":"handset","serial":"CB5A1QH2K2"},
+     {"type":"relay","uid":"00014007.a"}],
+    [{"type":"handset","serial":"CB5121X6KM"},
+     {"type":"relay","uid":"00014007.b"}]
+]</pre>
+</div>
+<p>Any number of profiles can be included in a single stack. Each profile must
+contain the <tt class="docutils literal"><span class="pre">type</span></tt> field and whatever field that uniquely identifies a single
+piece of equipment (<tt class="docutils literal"><span class="pre">serial</span></tt> for handsets, <tt class="docutils literal"><span class="pre">uid</span></tt> for most other types of
+equipment).</p>
+</div>
+<div class="section" id="client-usage">
+<h2>Client Usage<a class="headerlink" href="#client-usage" title="Permalink to this headline">¶</a></h2>
+<p>See broker API documentation.</p>
+</div>
+<div class="section" id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="allocators">
+<h3>Allocators<a class="headerlink" href="#allocators" title="Permalink to this headline">¶</a></h3>
+<p>Each allocator in the broker keeps its own list of stacks. For the local host,
+the list is read from <tt class="docutils literal"><span class="pre">.ave/config/broker.json</span></tt>. For remote sharing brokers,
+the list has been published by each broker, using <tt class="docutils literal"><span class="pre">Broker.set_stacks()</span></tt>.</p>
+<p>Referenced equipment may not be connected to the broker at all times, so the
+broker does not try to assert that stacked equipment actually exists. What <em>can</em>
+be done is to check that each profile contains a property that is guaranteed to
+be a unique identifier. This is done by creating a <tt class="docutils literal"><span class="pre">Profile</span></tt> instance from
+each profile (using a factory function that knows about all equipment types) and
+then calling <tt class="docutils literal"><span class="pre">hash(profile)</span></tt> which will raise an exception if the profile does
+not contain the uniquely identifying field.</p>
+</div>
+<div class="section" id="allocations">
+<h3>Allocations<a class="headerlink" href="#allocations" title="Permalink to this headline">¶</a></h3>
+<p>Each allocation is tracked by mapping the full profile of a resource to the
+following items:</p>
+<ul class="simple">
+<li>A session. This is mostly used to check for ownership of the allocation when
+a call is made to <tt class="docutils literal"><span class="pre">Broker.yield_resources()</span></tt>.</li>
+<li>A list of collateral. Several allocations may share the same collateral.
+(See the discussion about multiple stacks being allowed to reference the same
+equipment, above). Without the list, the broker would not be able to reclaim
+collateral for each yielded allocation.</li>
+</ul>
+<p>Rules for allocation:</p>
+<ul class="simple">
+<li>Equipment must not be allocated if it is included in a stack that contains
+equipment which has already been allocated. Two clients having control over
+different parts of a common stack is presumed to cause side effects between
+the clients.</li>
+<li>Equipment may be allocated even if the allocation will share collateral with
+another allocation. This should be safe because neither client will be able
+to interact with the collateral. Neither client should be able to detect if
+manipulations of their allocations have side effects on the collateral.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Equipment Stacking</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#terminology">Terminology</a></li>
+<li><a class="reference internal" href="#equipment-detection">Equipment Detection</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a></li>
+<li><a class="reference internal" href="#client-usage">Client Usage</a></li>
+<li><a class="reference internal" href="#implementation">Implementation</a><ul>
+<li><a class="reference internal" href="#allocators">Allocators</a></li>
+<li><a class="reference internal" href="#allocations">Allocations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="system.html"
+                        title="previous chapter">Broker</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="restart.html"
+                        title="next chapter">Restart</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/broker/docs/stacking.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="restart.html" title="Restart"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="system.html" title="Broker"
+             >previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="../../system/index.html" >System Documentation</a> &raquo;</li>
+          <li><a href="system.html" >Broker</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,42 @@
+Version 21
+==========
+
+* Control CWD when running external programs
+    :Tree: ave/common
+    :Commit: a8ea080c71ab2719c5c3f5b273ad54b7ad8f9198
+
+* Check output from remount to identify error condition
+    :Tree: ave/handset
+    :Commit: cdd5e1f07ad1d49be3d7f37669a236c8006fff9f
+
+* Stability improvement: Ignore "adb forward --list" errors
+    :Tree: ave/handset
+    :Commit: 3643a8571c71da6642701586687a6b2c344e8596
+
+* Thermal sensor functionality
+    :Tree: ave/handset
+    :Commit: a41ea9274dc5f38112eafb9d3884dcc1c957ce62
+
+* Support for ADB forwarding of socket connections
+    :Tree: ave/handset
+    :Commit: d6dec2c85c72d5e60671b13a94a0d5c703acdcbf
+
+* Firefox: Kill open apps
+    :Tree: ave/handset
+    :Commit: 67154b6aa31698ab6b8a603b275a33b917904138
+
+* Discriminate maki and anna from other handsets
+    :Tree: ave/common
+    :Commit: 104070d5210ca6218699cbb280799d70dc79de1e
+
+* Do not stop AVE installation if Quancom native build fails
+    :Tree: ave/quancom
+    :Commit: d298e79f1ce2fb28fb2fc07870c22c98d299edb9
+
+* Debian postinst prints compile messages on installation failure
+    :Tree: ave/quancom
+    :Commit: 78a122e817b7eb0c319a3e80e3f684f17eba7ab2
+
+* Enable DUST to harvest Decibel links into Panotti
+    :Tree: ave/workspace
+    :Commit: 1a207f58386bea997e9804a30ec5b40b46e1e540

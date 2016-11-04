@@ -1,0 +1,385 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Restart &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../../index.html" />
+    <link rel="up" title="Broker" href="system.html" />
+    <link rel="next" title="Networked Allocation" href="allocation.html" />
+    <link rel="prev" title="Equipment Stacking" href="stacking.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="allocation.html" title="Networked Allocation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="stacking.html" title="Equipment Stacking"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="../../system/index.html" >System Documentation</a> &raquo;</li>
+          <li><a href="system.html" accesskey="U">Broker</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="restart">
+<h1>Restart<a class="headerlink" href="#restart" title="Permalink to this headline">¶</a></h1>
+<p>This document describes in some detail how the broker restart is implemented.</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The lab owner calls <tt class="docutils literal"><span class="pre">ave-broker</span> <span class="pre">--restart</span></tt> to perform a restart. This spawns
+a new broker instance that will cooperate with the old instance until the old
+instance can be terminated:</p>
+<div class="figure align-center">
+<img alt="../../_images/restart1.jpg" src="../../_images/restart1.jpg" />
+</div>
+<ol class="arabic simple">
+<li>The executable <tt class="docutils literal"><span class="pre">ave-broker</span> <span class="pre">--restart</span></tt> looks for an already running broker
+and tells it to initiate a handover.</li>
+<li>The running instance returns a dump of its internal state. It no longer
+accepts new clients and no longer permits new allocations. Existing clients
+are <em>not</em> evicted.</li>
+<li>The executable starts the replacement broker using the exported state.</li>
+</ol>
+<div class="figure align-center">
+<img alt="../../_images/restart2.jpg" src="../../_images/restart2.jpg" />
+</div>
+<ol class="arabic simple" start="4">
+<li>The new instance uses TCP socket file descriptors passed in the dumped state
+to connect to the sessions it inherits from the old instance. Both instances
+can now track the liveness of a session through a single TCP connection held
+by both brokers (there is no traffic on this connection).</li>
+<li>The new instance starts accepting connections on the public port number and
+returns control to the executable which then exits.</li>
+</ol>
+<div class="figure align-center">
+<img alt="../../_images/restart3.jpg" src="../../_images/restart3.jpg" />
+</div>
+<ol class="arabic simple" start="6">
+<li>When an old session dies, the single TCP connection shared by both brokers
+is closed. This informs the new broker that it should reclaim the equipment
+that was originally allocated by the old broker. The old broker takes no
+action.</li>
+<li>Sessions for clients that connected after the restart are only visible to
+the new broker.</li>
+</ol>
+<div class="figure align-center">
+<img alt="../../_images/restart4.jpg" src="../../_images/restart4.jpg" />
+</div>
+<ol class="arabic simple" start="8">
+<li>Eventually the last session from the old broker terminates. The old broker
+is then also terminated.</li>
+</ol>
+<p class="rubric">Complications</p>
+<ul class="simple">
+<li>The old broker cannot allocate equipment efter the restart. If an old client
+tries to do so it will get a <tt class="docutils literal"><span class="pre">Restarting</span></tt> exception. Test jobs should make
+all of their allocations as early as possible to minimize lost effort in the
+rare case that they hit this race condition.</li>
+<li>If the old broker was sharing resources to a master broker, it will have to
+stop doing so and let the new broker start the sharing again.</li>
+<li>If the old broker was a master with connected shares, it will have to drop
+the shares and let them try to reconnect. The new broker will accept those
+connections.</li>
+<li>The new broker cannot <tt class="docutils literal"><span class="pre">os.wait()</span></tt> on the processes for old sessions when
+they are terminated. The old broker is the only process that can do so
+(without daemonizing the sessions).</li>
+</ul>
+<div class="section" id="terminology">
+<h3>Terminology<a class="headerlink" href="#terminology" title="Permalink to this headline">¶</a></h3>
+<p>The rest of the document will use these terms:</p>
+<ul class="simple">
+<li><strong>Handover:</strong> A service that was running normally but has entered the state
+where it no longer accepts new clients. It has handed over its internal
+state to its replacement.</li>
+<li><strong>Takeover:</strong> A service that has consumed the internal state of a handover
+and acts in the handover&#8217;s stead.</li>
+</ul>
+</div>
+<div class="section" id="implementation-details">
+<h3>Implementation Details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="broker-class">
+<h2><tt class="docutils literal"><span class="pre">Broker</span></tt> class<a class="headerlink" href="#broker-class" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">git:</th><td class="field-body">semctools/ave/broker</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">make_tempdir()</span></tt>: The handover and takeover need a safe place to create
+the UNIX domain socket used to transfer file descriptors.</li>
+<li><tt class="docutils literal"><span class="pre">adopt_sessions()</span></tt>: Used by the takeover to create <tt class="docutils literal"><span class="pre">AdoptedSession</span></tt>
+instances to represent sessions that still linger in a handover. The actual
+connection over the UNIX domain socket to the handover is made here.</li>
+<li><tt class="docutils literal"><span class="pre">drop_all_shares()</span></tt>: Only used by handover masters in a share/master
+relationship. The shares are disconnected on the assumption that they will
+try to reconnect until they succeed. When they do, they will be connected
+to the takeover, which then receives the shared resources.</li>
+<li><tt class="docutils literal"><span class="pre">serialize()</span></tt>: Creates a JSON encoded state representation of all sessions
+that have made local allocations. The takeover will consume this state to
+figure out which resources are allocated by lingering sessions in the
+handover.</li>
+<li><tt class="docutils literal"><span class="pre">begin_handover()</span></tt>: Causes a handover to stop listening for new connections,
+drop all shares (if any), stop sharing (if there is a master), refuse further
+allocation attempts in lingering sessions, and create a listening UNIX domain
+socket that a takeover will connect to (see <tt class="docutils literal"><span class="pre">adopt_sessions()</span></tt> above).</li>
+<li><tt class="docutils literal"><span class="pre">end_handover()</span></tt>: Waits for a takeover to connect to the UNIX domain socket,
+then uses an <tt class="docutils literal"><span class="pre">FdTx</span></tt> object to transfer file descriptors for the sessions&#8217;
+TCP connections to the takeover. Finally it either calls <tt class="docutils literal"><span class="pre">shutdown()</span></tt> (if
+no lingering sessions remain) or enters a state where the handover only waits
+for lingering sessions to terminate.</li>
+<li><tt class="docutils literal"><span class="pre">shutdown(details)</span></tt>: The <tt class="docutils literal"><span class="pre">details</span></tt> parameter may hold an exception that
+is passed to any connected clients as a sign-out message.</li>
+<li><tt class="docutils literal"><span class="pre">__init__(...,</span> <span class="pre">adoption,</span> <span class="pre">fdtx_path,</span> <span class="pre">...)</span></tt>: The <tt class="docutils literal"><span class="pre">adoption</span></tt> parameter is
+used to pass a handover&#8217;s serialized state to the takeover. <tt class="docutils literal"><span class="pre">fdtx_path</span></tt> is
+a file system path to a UNIX domain socket that will be used by the handover
+to pass file descriptors, using an <tt class="docutils literal"><span class="pre">FdTx</span></tt> object.</li>
+</ul>
+</div>
+<div class="section" id="restarting-class">
+<h2><tt class="docutils literal"><span class="pre">Restarting</span></tt> class<a class="headerlink" href="#restarting-class" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">git:</th><td class="field-body">semctools/ave/broker</td>
+</tr>
+</tbody>
+</table>
+<p>This exception is thrown at clients that have made at least one allocation
+against the original broker and then tries to make more allocations after a
+restart. This should be an extremely rare event if test jobs follow this coding
+guideline:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Make all allocations as early as possible.</li>
+</ul>
+</div></blockquote>
+<p>It can be handled by the client just like the <tt class="docutils literal"><span class="pre">Busy</span></tt> exception. I.e. simply
+rerun the test job.</p>
+</div>
+<div class="section" id="allocator-class">
+<h2><tt class="docutils literal"><span class="pre">Allocator</span></tt> class<a class="headerlink" href="#allocator-class" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">git:</th><td class="field-body">semctools/ave/broker</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">serialize()</span></tt>: Used by <tt class="docutils literal"><span class="pre">Broker.serialize()</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="adoptedsession-class">
+<h2><tt class="docutils literal"><span class="pre">AdoptedSession</span></tt> class<a class="headerlink" href="#adoptedsession-class" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">git:</th><td class="field-body">semctools/ave/broker</td>
+</tr>
+</tbody>
+</table>
+<p>This class is used by a takeover to track lingering sessions in a handover. The
+takeover indexes these sessions exactly like it indexes &#8220;real&#8221; sessions. This
+makes it possible for a takeover to become a handover for yet another takeover
+(if another restart happens before all lingering sessions have terminated). This
+is needed to keep sessions alive over multiple broker restarts.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">__init__(pid)</span></tt>: A takeover must know the PID of an adopted session to be
+able to terminate it forcefully.</li>
+<li><tt class="docutils literal"><span class="pre">terminate()</span></tt>: Send <tt class="docutils literal"><span class="pre">SIGTERM</span></tt> to the adopted session. Note that the
+takeover cannot call <tt class="docutils literal"><span class="pre">os.wait()</span></tt> on the PID and must assume that the
+handover does so (to avoid creating zombies).</li>
+</ul>
+</div>
+<div class="section" id="debian-package">
+<h2>Debian Package<a class="headerlink" href="#debian-package" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">git:</th><td class="field-body">semctools/ave/broker</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">postinst</span></tt>: Run <tt class="docutils literal"><span class="pre">ave-broker</span> <span class="pre">--restart</span></tt> if a broker was already running
+during package installation. Otherwise run <tt class="docutils literal"><span class="pre">ave-broker</span> <span class="pre">--start</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="control-class">
+<h2><tt class="docutils literal"><span class="pre">Control</span></tt> class<a class="headerlink" href="#control-class" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">git:</th><td class="field-body">semctools/ave/common</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">stop_listening()</span></tt>: Close the listening socket so that new clients cannot
+be admitted.</li>
+<li><tt class="docutils literal"><span class="pre">write_exit_message(connection,</span> <span class="pre">details)</span></tt>: Serializes an exception (the
+<tt class="docutils literal"><span class="pre">details</span></tt> parameter) and writes it on the passed connection. Only used
+during shutdown to pass a sign-out message to clients before disconnecting
+them.</li>
+</ul>
+</div>
+<div class="section" id="fdtx-class">
+<h2><tt class="docutils literal"><span class="pre">FdTx</span></tt> class<a class="headerlink" href="#fdtx-class" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">git:</th><td class="field-body">semctools/ave/common</td>
+</tr>
+</tbody>
+</table>
+<p>This class is used to transfer file descriptors from one process to another. It
+is built on a special feature of UNIX domain sockets that allows the sender to
+share the ownership of resources (e.g. file descriptors) with the receiver.</p>
+<p>There is no standard wrapper for this functionality in Python 2.6/2.7 (which AVE
+uses) so a small native library had to be created and then wrapped using the
+Python <tt class="docutils literal"><span class="pre">ctypes</span></tt> module. The native implementation is found in the directory
+<tt class="docutils literal"><span class="pre">src/libfdtx</span></tt>.</p>
+<p>See regular API documenation for further details.</p>
+<div class="section" id="future-work">
+<h3>Future Work<a class="headerlink" href="#future-work" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>It should be possible to use <tt class="docutils literal"><span class="pre">FdTx</span></tt> to transfer all client connections to
+the takeover, not just the session connections. The clients would then make
+all future RPC calls to the takeover, which would remove the limitation that
+old sessions cannot make new allocations. The main complication is that any
+partially received messages on the connections must also be passed to the
+takeover.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Restart</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a><ul>
+<li><a class="reference internal" href="#terminology">Terminology</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation Details</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#broker-class"><tt class="docutils literal"><span class="pre">Broker</span></tt> class</a></li>
+<li><a class="reference internal" href="#restarting-class"><tt class="docutils literal"><span class="pre">Restarting</span></tt> class</a></li>
+<li><a class="reference internal" href="#allocator-class"><tt class="docutils literal"><span class="pre">Allocator</span></tt> class</a></li>
+<li><a class="reference internal" href="#adoptedsession-class"><tt class="docutils literal"><span class="pre">AdoptedSession</span></tt> class</a></li>
+<li><a class="reference internal" href="#debian-package">Debian Package</a></li>
+<li><a class="reference internal" href="#control-class"><tt class="docutils literal"><span class="pre">Control</span></tt> class</a></li>
+<li><a class="reference internal" href="#fdtx-class"><tt class="docutils literal"><span class="pre">FdTx</span></tt> class</a><ul>
+<li><a class="reference internal" href="#future-work">Future Work</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="stacking.html"
+                        title="previous chapter">Equipment Stacking</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="allocation.html"
+                        title="next chapter">Networked Allocation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/broker/docs/restart.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="allocation.html" title="Networked Allocation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="stacking.html" title="Equipment Stacking"
+             >previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="../../system/index.html" >System Documentation</a> &raquo;</li>
+          <li><a href="system.html" >Broker</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

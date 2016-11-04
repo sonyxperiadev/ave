@@ -1,0 +1,598 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Resource Brokering &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../../index.html" />
+    <link rel="next" title="Handset" href="../../handset/docs/index.html" />
+    <link rel="prev" title="vcsjob: Version Controlled Test Jobs" href="../../vcsjob/docs/guide.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../handset/docs/index.html" title="Handset"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../../vcsjob/docs/guide.html" title="vcsjob: Version Controlled Test Jobs"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="resource-brokering">
+<h1>Resource Brokering<a class="headerlink" href="#resource-brokering" title="Permalink to this headline">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">module:</th><td class="field-body"><tt class="docutils literal"><span class="pre">ave-broker</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p>The broker is used to allocate resources: Handsets, workspaces, GPS simulators,
+programmable relays and more. It uses some simple rules for how to treat the
+client that performs the allocations, depending on what it tries to do. Knowing
+how the rules work is essential when working with AVE.</p>
+<div class="section" id="basic-rules-of-correct-usage">
+<h2>Basic Rules of Correct Usage<a class="headerlink" href="#basic-rules-of-correct-usage" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul>
+<li><p class="first">If the allocation attempt raises an exception, check its type. If the type
+is <tt class="docutils literal"><span class="pre">Busy</span></tt>, that means the wanted equipment exists but is allocated to
+someone else. Exit your program with status <tt class="docutils literal"><span class="pre">vcsjob.BUSY</span></tt> and let the
+scheduler that ran your program decide when to try it again:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">vcsjob</span>
+
+<span class="kn">from</span> <span class="nn">ave.broker</span>            <span class="kn">import</span> <span class="n">Broker</span>
+<span class="kn">from</span> <span class="nn">ave.broker.exceptions</span> <span class="kn">import</span> <span class="n">Busy</span>
+
+<span class="n">broker</span> <span class="o">=</span> <span class="n">Broker</span><span class="p">()</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">handset</span> <span class="o">=</span> <span class="n">broker</span><span class="o">.</span><span class="n">get</span><span class="p">({</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">,</span> <span class="s">&#39;pretty&#39;</span><span class="p">:</span><span class="s">&#39;yuga&#39;</span><span class="p">})</span>
+<span class="k">except</span> <span class="n">Busy</span><span class="p">:</span>
+    <span class="c"># tell the scheduler that the job should be retried sometime later:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">vcsjob</span><span class="o">.</span><span class="n">BUSY</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Client can allocate multiple resources in one call, and if the client
+needs some resources configured to work together, in a &#8216;stack&#8217;, the
+client should enclose these resources in a parentheses when invoking the
+&#8216;get&#8217; method:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># ensure workspace is allocated on the same host as the equipment,</span>
+<span class="c"># no need configure workspace in the stack, for workspace, this is a</span>
+<span class="c"># default behavior.</span>
+<span class="kn">from</span> <span class="nn">ave.broker</span> <span class="kn">import</span> <span class="n">Broker</span>
+<span class="n">broker</span> <span class="o">=</span> <span class="n">Broker</span><span class="p">()</span>
+<span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">broker</span><span class="o">.</span><span class="n">get</span><span class="p">(({</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">},</span> <span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;workspace&#39;</span><span class="p">}))</span>
+
+<span class="c"># in this case, the client intends to allocate a handset and a relay which</span>
+<span class="c"># were configured to work together in a &#39;stack&#39;.</span>
+<span class="kn">from</span> <span class="nn">ave.broker</span> <span class="kn">import</span> <span class="n">Broker</span>
+<span class="n">broker</span> <span class="o">=</span> <span class="n">Broker</span><span class="p">()</span>
+<span class="n">h</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">broker</span><span class="o">.</span><span class="n">get</span><span class="p">(({</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">},</span> <span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;relay&#39;</span><span class="p">},{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;workspace&#39;</span><span class="p">}))</span>
+
+<span class="c">#client allocates two handsets, but these two handsets may be located in different</span>
+<span class="c">#Host PC,</span>
+<span class="kn">from</span> <span class="nn">ave.broker</span> <span class="kn">import</span> <span class="n">Broker</span>
+<span class="n">broker</span> <span class="o">=</span> <span class="n">Broker</span><span class="p">()</span>
+<span class="n">h1</span><span class="p">,</span> <span class="n">h2</span> <span class="o">=</span> <span class="n">broker</span><span class="o">.</span><span class="n">get</span><span class="p">(({</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">},),</span> <span class="p">({</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">},))</span>
+<span class="c">#client allocate  two handsets, and these two handsets were configured</span>
+<span class="c">#to work together in  a &#39;stack&#39;</span>
+<span class="kn">from</span> <span class="nn">ave.broker</span> <span class="kn">import</span> <span class="n">Broker</span>
+<span class="n">broker</span> <span class="o">=</span> <span class="n">Broker</span><span class="p">()</span>
+<span class="n">h1</span><span class="p">,</span> <span class="n">h2</span> <span class="o">=</span> <span class="n">broker</span><span class="o">.</span><span class="n">get</span><span class="p">({</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">},</span> <span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">})</span>
+<span class="c"># or</span>
+<span class="n">h1</span><span class="p">,</span> <span class="n">h2</span> <span class="o">=</span> <span class="n">broker</span><span class="o">.</span><span class="n">get</span><span class="p">(({</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">},</span> <span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">}))</span>
+
+<span class="c"># in this case, client intends to allocate two handsets and one relay, and</span>
+<span class="c"># one of the handsets should work together with the relay.</span>
+<span class="kn">from</span> <span class="nn">ave.broker</span> <span class="kn">import</span> <span class="n">Broker</span>
+<span class="n">broker</span> <span class="o">=</span> <span class="n">Broker</span><span class="p">()</span>
+<span class="n">h1</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">h2</span> <span class="o">=</span> <span class="n">broker</span><span class="o">.</span><span class="n">get</span><span class="p">(({</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">},</span> <span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;relay&#39;</span><span class="p">}),</span> <span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">If the client disconnects from the broker, the broker will free all of the
+client&#8217;s resources, terminate its session and make the equipment available
+again. This means that the client does not need to yield resources. Simply
+terminate the program.</p>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="examples-of-incorrect-usage">
+<h2>Examples of Incorrect Usage<a class="headerlink" href="#examples-of-incorrect-usage" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul>
+<li><p class="first">Allocating a handset and a workspace separately can cause them to end up on
+different hosts. Interaction between them will then not work:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># handset.push() may raise an exception about the source file not existing</span>
+<span class="c"># in the file system, because the workspace downloaded it on a different</span>
+<span class="c"># host:</span>
+
+<span class="n">broker</span> <span class="o">=</span> <span class="n">Broker</span><span class="p">()</span>
+<span class="n">handset</span> <span class="o">=</span> <span class="n">broker</span><span class="o">.</span><span class="n">get</span><span class="p">({</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">})</span>
+<span class="n">workspace</span> <span class="o">=</span> <span class="n">broker</span><span class="o">.</span><span class="n">get</span><span class="p">({</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;workspace&#39;</span><span class="p">})</span>
+
+<span class="n">path</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">download_git</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">handset</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">path</span><span class="o">+</span><span class="s">&#39;/some_file&#39;</span><span class="p">,</span> <span class="s">&#39;/system/data&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The broker disconnects your client if an allocation fails for <em>any</em> reason.
+The rationale is that a misbehaving client should not be able to loop on the
+allocation request because that may lead to deadlocks between two clients
+that fight for the same set of resources:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">ave.broker</span>            <span class="kn">import</span> <span class="n">Broker</span>
+<span class="kn">from</span> <span class="nn">ave.broker.exceptions</span> <span class="kn">import</span> <span class="n">Busy</span>
+
+<span class="n">broker</span> <span class="o">=</span> <span class="n">Broker</span><span class="p">()</span>
+
+<span class="c"># THE FOLLOWING WILL NOT WORK. the broker disconnects the client on the</span>
+<span class="c"># first failed allocation attempt, after which broker.get() will raise a</span>
+<span class="c"># different exception, telling you that the client&#39;s session has been</span>
+<span class="c"># terminated.</span>
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">h1</span> <span class="o">=</span> <span class="n">broker</span><span class="o">.</span><span class="n">get</span><span class="p">({</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">,</span> <span class="s">&#39;pretty&#39;</span><span class="p">:</span><span class="s">&#39;yuga&#39;</span><span class="p">})</span>
+        <span class="n">h2</span> <span class="o">=</span> <span class="n">broker</span><span class="o">.</span><span class="n">get</span><span class="p">({</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">,</span> <span class="s">&#39;pretty&#39;</span><span class="p">:</span><span class="s">&#39;togari&#39;</span><span class="p">})</span>
+        <span class="k">break</span>
+    <span class="k">except</span> <span class="n">Busy</span><span class="p">:</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="c"># retry</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The client must keep a reference to its <tt class="docutils literal"><span class="pre">Broker</span></tt> instance to prevent the
+broker from disconnecting the client. Here is a common pitfall that will not
+work:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">ave.broker</span> <span class="kn">import</span> <span class="n">Broker</span>
+
+<span class="k">def</span> <span class="nf">allocate</span><span class="p">():</span>
+    <span class="n">broker</span> <span class="o">=</span> <span class="n">Broker</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">broker</span><span class="o">.</span><span class="n">get</span><span class="p">({</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">,</span> <span class="s">&#39;pretty&#39;</span><span class="p">:</span><span class="s">&#39;yuga&#39;</span><span class="p">})</span>
+    <span class="c"># broker object is garbage collected here</span>
+
+<span class="n">handset</span> <span class="o">=</span> <span class="n">allocate</span><span class="p">()</span>
+<span class="n">handset</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)</span> <span class="c"># will raise ConnectionRefused</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="api-for-regular-clients">
+<h2>API for Regular Clients<a class="headerlink" href="#api-for-regular-clients" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ave.broker.Broker">
+<em class="property">class </em><tt class="descclassname">ave.broker.</tt><tt class="descname">Broker</tt><a class="headerlink" href="#ave.broker.Broker" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="function">
+<dt id="ave.broker.Broker.get">
+<tt class="descname">get</tt><big>(</big><em>*profiles</em><big>)</big><a class="headerlink" href="#ave.broker.Broker.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allocate one or more resources based on profiles.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>profiles</strong> &#8211; One or more <tt class="docutils literal"><span class="pre">dict</span></tt> objects that encode resource
+profiles. All profiles must have the <tt class="docutils literal"><span class="pre">&quot;type&quot;</span></tt> field set.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The same number of resource objects as there were profiles
+in the request.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>Busy</strong> &#8211; If the request could not be satisfied because all matching
+equipment is currently allocated to some other client.</li>
+<li><strong>NoSuch</strong> &#8211; If the request could not be satisfied because no match
+is possible at all. I.e. the broker knows of no such equipment, busy
+or not.</li>
+<li><strong>Restarting</strong> &#8211; If the broker has restarted since the client
+connected to it. When restarting, the old broker instance remains
+running to keep track of all sessions it created, but is forbidden
+to allocate more equipment (because the replacement broker now has
+that privilege). A client that makes all of its allocation in the
+close succession is extremely unlikely to ever see this exception.</li>
+<li><strong>AveException</strong> &#8211; The parameters could not be validated. E.g. if a
+profile is malformed.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Example allocations:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">b</span> <span class="o">=</span> <span class="n">Broker</span><span class="p">()</span>
+
+<span class="c"># any android handset on the GTE network together with a workspace:</span>
+<span class="n">h</span><span class="p">,</span><span class="n">w</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">,</span> <span class="s">&#39;platform&#39;</span><span class="p">:</span><span class="s">&#39;android&#39;</span><span class="p">,</span> <span class="s">&#39;gsm.operator&#39;</span><span class="p">:</span><span class="s">&#39;GTE&#39;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;workspace&#39;</span><span class="p">}</span>
+<span class="p">)</span>
+
+<span class="c"># a Hayabusa handset running FirefoxOS of a specific label, together</span>
+<span class="c"># with a programmable relay that has been wired to cut the USB and</span>
+<span class="c"># battery connections of the handset, plus a workspace:</span>
+<span class="n">h</span><span class="p">,</span><span class="n">r</span><span class="p">,</span><span class="n">w</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">,</span>
+        <span class="s">&#39;platform&#39;</span><span class="p">:</span><span class="s">&#39;firefox&#39;</span><span class="p">,</span>
+        <span class="s">&#39;sw.label&#39;</span><span class="p">:</span><span class="s">&#39;ICS-BLUE-FF-130516-1131&#39;</span>
+    <span class="p">},</span>
+    <span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;relay&#39;</span><span class="p">,</span> <span class="s">&#39;circuits&#39;</span><span class="p">:[</span><span class="s">&#39;usb.pc.vcc&#39;</span><span class="p">,</span> <span class="s">&#39;handset.battery&#39;</span><span class="p">]},</span>
+    <span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;workspace&#39;</span><span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>If the broker cannot satisfy the request and a forwarding rule is set
+to point to another broker on the network, then the request will be
+passed on and tried there instead. This chain can be arbitrarily long.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="api-for-administrative-clients">
+<span id="broker-admin-api"></span><h2>API for Administrative Clients<a class="headerlink" href="#api-for-administrative-clients" title="Permalink to this headline">¶</a></h2>
+<p>Connecting as administrator gives the client new capabilities and removes some.
+The administrator role is supposed to be used by web frontends and the like, not
+by regular programs.</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">ave.broker.</tt><tt class="descname">Broker</tt><big>(</big><em>authkey</em><big>)</big></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>authkey</strong> &#8211; An authentication string that must match the value of the
+<tt class="docutils literal"><span class="pre">&quot;admin&quot;</span></tt> field in <tt class="docutils literal"><span class="pre">.ave/config/authkeys.json</span></tt>.</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt>
+<tt class="descname">get</tt><big>(</big><em>*profiles</em><big>)</big></dt>
+<dd></dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises ConnectionClosed:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">The client is not allowed to allocate resources
+while logged in as administrator.</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="ave.broker.Broker.list_allocations_all">
+<tt class="descname">list_allocations_all</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.broker.Broker.list_allocations_all" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of profiles representing the combined allocations of
+all clients.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ave.broker.Broker.list_collateral_all">
+<tt class="descname">list_collateral_all</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.broker.Broker.list_collateral_all" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of profiles representing the collateral of the combined
+allocations of all clients.</td>
+</tr>
+</tbody>
+</table>
+<p>Collateral is any equipment that is part of a stack that the client has
+taken some other resource from, but not the equipment itself. It is an
+internal book keeping mechanism that secures that different clients
+cannot accidentally get resources that will interfere with each other
+when manipulated.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ave.broker.Broker.start_sharing">
+<tt class="descname">start_sharing</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.broker.Broker.start_sharing" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the broker has a sharing rule, this call will force it to start
+sharing its equipment over the network.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ave.broker.Broker.stop_sharing">
+<tt class="descname">stop_sharing</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.broker.Broker.stop_sharing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop sharing equipment with another broker.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ave.broker.Broker.list_shares">
+<tt class="descname">list_shares</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.broker.Broker.list_shares" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all brokers that share equipment with this broker.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ave.broker.Broker.drop_share">
+<tt class="descname">drop_share</tt><big>(</big><em>address</em><big>)</big><a class="headerlink" href="#ave.broker.Broker.drop_share" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>address</strong> &#8211; A <em>(host, port)</em> tuple.</td>
+</tr>
+</tbody>
+</table>
+<p>Causes the broker to disconnect another broker that shares equipment
+with it. The call has no effect if no such broker is connected. Note
+that sharing brokers are by default configured to try to reconnect when
+they loose the connection. This call is only useful for diagnostics.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ave.broker.Broker.drop_all_shares">
+<tt class="descname">drop_all_shares</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.broker.Broker.drop_all_shares" title="Permalink to this definition">¶</a></dt>
+<dd><p>Causes the broker to disconnect all brokers that share equipment with
+it. Note that sharing brokers are by default configured to try to
+reconnect when they loose the connection. This call is only useful for
+diagnostics.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ave.broker.Broker.list_equipment">
+<tt class="descname">list_equipment</tt><big>(</big><em>profile=None</em><big>)</big><a class="headerlink" href="#ave.broker.Broker.list_equipment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of equipment that matches the profile. The equipment does
+not have to be available for allocation.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ave.broker.Broker.list_available">
+<tt class="descname">list_available</tt><big>(</big><em>profile=None</em><big>)</big><a class="headerlink" href="#ave.broker.Broker.list_available" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of equipment that matches the profile and is available
+for allocation.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ave.broker.Broker.list_stacks">
+<tt class="descname">list_stacks</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.broker.Broker.list_stacks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of the broker&#8217;s configured equipment stacks. Stacking
+determines what equipment can be allocated together. (Workspaces can
+always be allocated together with equipment and is not listed in the
+stacks.)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="starting-and-stopping-the-broker">
+<h2>Starting and Stopping the Broker<a class="headerlink" href="#starting-and-stopping-the-broker" title="Permalink to this headline">¶</a></h2>
+<p>On systems that use <tt class="docutils literal"><span class="pre">Upstart</span></tt>, the broker and other AVE services will be
+started by <tt class="docutils literal"><span class="pre">init</span></tt> on system boot. On other systems, the user has to start
+the broker manually:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ave</span><span class="o">-</span><span class="n">broker</span> <span class="o">--</span><span class="n">start</span>
+</pre></div>
+</div>
+<p>The broker can be restarted without affecting clients and their sessions:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ave</span><span class="o">-</span><span class="n">broker</span> <span class="o">--</span><span class="n">restart</span>
+</pre></div>
+</div>
+<p>Stopping the broker terminates all open sessions and disconnects all clients:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ave</span><span class="o">-</span><span class="n">broker</span> <span class="o">--</span><span class="n">stop</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="configuration-files">
+<h2>Configuration Files<a class="headerlink" href="#configuration-files" title="Permalink to this headline">¶</a></h2>
+<p>The files are located under <tt class="docutils literal"><span class="pre">$home/.ave/config</span></tt>, where the value of <tt class="docutils literal"><span class="pre">$home</span></tt>
+is read from <tt class="docutils literal"><span class="pre">/etc/ave/user</span></tt>.</p>
+<p>Changes to the files take effect when the broker is restarted:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># change the config files</span>
+<span class="n">ave</span><span class="o">-</span><span class="n">broker</span> <span class="o">--</span><span class="n">restart</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Some changes require a full stop and start of the broker: Port numbers
+and changes to authentication keys:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="n">ave</span><span class="o">-</span><span class="n">broker</span> <span class="o">--</span><span class="n">stop</span>
+<span class="c"># change the config files</span>
+<span class="n">ave</span><span class="o">-</span><span class="n">broker</span> <span class="o">--</span><span class="n">start</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="broker-json">
+<h3><tt class="docutils literal"><span class="pre">broker.json</span></tt><a class="headerlink" href="#broker-json" title="Permalink to this headline">¶</a></h3>
+<p>The smallest valid configuration is just the empty dictionary:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{}</span>
+</pre></div>
+</div>
+<p>A broker that is configured to forward failed allocations to another broker
+uses the <em>remote</em> rule (always use port 4000 unless you know what you are
+doing):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;remote&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;host&quot;</span>  <span class="p">:</span> <span class="s">&quot;hostname&quot;</span><span class="p">,</span>
+        <span class="s">&quot;port&quot;</span>  <span class="p">:</span> <span class="mi">4000</span><span class="p">,</span>
+        <span class="s">&quot;policy&quot;</span><span class="p">:</span> <span class="s">&quot;forward&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A broker that is configured to share its equipment with another broker also
+uses the <em>remote</em> rule, but with slightly different settings. The <em>authkey</em>
+field must match the <em>share</em> value of the remote broker&#8217;s <tt class="docutils literal"><span class="pre">authkeys.json</span></tt>
+file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;remote&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;host&quot;</span>   <span class="p">:</span> <span class="s">&quot;hostname&quot;</span><span class="p">,</span>
+        <span class="s">&quot;port&quot;</span>   <span class="p">:</span> <span class="mi">4000</span><span class="p">,</span>
+        <span class="s">&quot;policy&quot;</span> <span class="p">:</span> <span class="s">&quot;share&quot;</span><span class="p">,</span>
+        <span class="s">&quot;authkey&quot;</span><span class="p">:</span> <span class="s">&quot;sharing key of the other broker&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A broker that is configured to handle stacked equipment can add the <em>stacks</em>
+field. Each entry must be a list of profiles that contain the <em>type</em> field and
+a field that uniquely identifies an instance of that kind of equipment. In the
+following example, handsets (identified by serial number) are stacked against
+relays (identified by symbolic ID&#8217;s):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;stacks&quot;</span><span class="p">:[</span>
+        <span class="p">[{</span><span class="s">&quot;type&quot;</span><span class="p">:</span><span class="s">&quot;relay&quot;</span><span class="p">,</span><span class="s">&quot;uid&quot;</span><span class="p">:</span><span class="s">&quot;a&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;type&quot;</span><span class="p">:</span><span class="s">&quot;handset&quot;</span><span class="p">,</span><span class="s">&quot;serial&quot;</span><span class="p">:</span><span class="s">&quot;CB5A1JYXRQ&quot;</span><span class="p">}],</span>
+        <span class="p">[{</span><span class="s">&quot;type&quot;</span><span class="p">:</span><span class="s">&quot;relay&quot;</span><span class="p">,</span><span class="s">&quot;uid&quot;</span><span class="p">:</span><span class="s">&quot;b&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;type&quot;</span><span class="p">:</span><span class="s">&quot;handset&quot;</span><span class="p">,</span><span class="s">&quot;serial&quot;</span><span class="p">:</span><span class="s">&quot;CB511VD8AF&quot;</span><span class="p">}],</span>
+        <span class="p">[{</span><span class="s">&quot;type&quot;</span><span class="p">:</span><span class="s">&quot;relay&quot;</span><span class="p">,</span><span class="s">&quot;uid&quot;</span><span class="p">:</span><span class="s">&quot;c&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;type&quot;</span><span class="p">:</span><span class="s">&quot;handset&quot;</span><span class="p">,</span><span class="s">&quot;serial&quot;</span><span class="p">:</span><span class="s">&quot;CB5A1M7CTP&quot;</span><span class="p">}]</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A broker configuration can contain both <em>remote</em> and <em>stacks</em> rules.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Although JSON is great for comfortable configuration handling, it is
+a format with some limitations:</p>
+<ul class="last simple">
+<li>It is not possible to put comments in the files. Hopefully this document
+is so smashingly fantastic that this is not a problem...</li>
+<li>If the same field occurs more than once, the Python JSON parser simply
+keeps the last entry and silently overwrites whatever was already there.
+E.g. it is not possible to use the <em>remote</em> rule twice, but the broker
+will not complain about it because the JSON parser doesn&#8217;t.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="authkeys-json">
+<h3><tt class="docutils literal"><span class="pre">authkeys.json</span></tt><a class="headerlink" href="#authkeys-json" title="Permalink to this headline">¶</a></h3>
+<p>Certain adiministrative functions in the broker are protected by authentication
+keys to prevent accidental usage of functionality that are not meant to be used
+by regular clients. These are keys are generated automatically when AVE is
+installed but can be changed to more memorable values:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;admin&quot;</span><span class="p">:</span> <span class="s">&quot;Some random stuff... 1234!&quot;</span><span class="p">,</span>
+    <span class="s">&quot;share&quot;</span><span class="p">:</span> <span class="s">&quot;please stick to printable characters, ok?&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In the API documentation above, functions that require use of the <em>admin</em> key
+have been put under their own section.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Resource Brokering</a><ul>
+<li><a class="reference internal" href="#basic-rules-of-correct-usage">Basic Rules of Correct Usage</a></li>
+<li><a class="reference internal" href="#examples-of-incorrect-usage">Examples of Incorrect Usage</a></li>
+<li><a class="reference internal" href="#api-for-regular-clients">API for Regular Clients</a></li>
+<li><a class="reference internal" href="#api-for-administrative-clients">API for Administrative Clients</a></li>
+<li><a class="reference internal" href="#starting-and-stopping-the-broker">Starting and Stopping the Broker</a></li>
+<li><a class="reference internal" href="#configuration-files">Configuration Files</a><ul>
+<li><a class="reference internal" href="#broker-json"><tt class="docutils literal"><span class="pre">broker.json</span></tt></a></li>
+<li><a class="reference internal" href="#authkeys-json"><tt class="docutils literal"><span class="pre">authkeys.json</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../../vcsjob/docs/guide.html"
+                        title="previous chapter"><tt class="docutils literal"><span class="pre">vcsjob</span></tt>: Version Controlled Test Jobs</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../../handset/docs/index.html"
+                        title="next chapter">Handset</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/broker/docs/api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../handset/docs/index.html" title="Handset"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../../vcsjob/docs/guide.html" title="vcsjob: Version Controlled Test Jobs"
+             >previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

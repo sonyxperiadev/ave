@@ -1,0 +1,96 @@
+Version 31
+===============
+
+* ImageAnalyzer initial contribution
+    :Tree: semctools/ave/vision
+    :Commit: 0e525c4713d806f6c275f247d9f6c15de823827b
+
+* ImageAnalyzer initial contribution
+    :Tree: semctools/ave/workspace
+    :Commit:  63c3db77947bf4c3310c95001185ff31b81b8596
+
+* update a function to fetch latest & official label
+    :Tree: semctools/ave/workspace
+    :Commit:  6314eeed73bdfd06f91959256acc94f2750ec54a
+
+* Changes for allocation of workspace
+    :Tree: semctools/ave/workspace
+    :Commit: 9bbe6f2303c1168ca06fcce497531e91df58103f
+
+* Update default workspace profile
+    :Tree: semctools/ave/common
+    :Commit:  6286c556d1f976fba9c826b6be324c06eb724772
+
+* Add test case to test allocate workspace with wifi-capable
+    :Tree: semctools/ave/broker
+    :Commit: de3a32ba27a15b0ef2a7ece561e462c339afdfd9
+
+* Thermal: Added testcase for thermal mitigation
+    :Tree: semctools/ave/handset
+    :Commit: 3c8029663cee241aa2401ebf3ab78af609335a9e
+
+* Thermal: Emergency fix for performance and testcase repair
+    :Tree: semctools/ave/handset
+    :Commit: 09eaa2fef868cc1c164c2144125c42646c4a5957
+
+* AVE-175 Support for extra parameters in vcsjob file
+    :Tree: semctools/ave/vcsjob
+    :Commit: 474d489df10d5c89f8bc6268179e86cac6d73311
+
+* Change handset.json file's location
+    :Tree: semctools/ave/handset
+    :Commit: b43bbb3e5bafb5271652ad255d205996372a1101
+
+* Add methods for enable/disable simple home
+    :Tree: semctools/ave/handset
+    :Commit: 58aba600b9e097786706f640ea4475b15b6df080
+
+* download_git to use `git clone --depth=1`
+    :Tree: semctools/ave/workspace
+    :Commit: d1f73adfb642384e0182ba7ca07c159d8b2fe9b7
+
+* vcsjob.fetch to use `git clone --depth=1`
+    :Tree: semctools/ave/vcsjob
+    :Commit: 83d7a6da8c65b9394d933e9ec39ec74ef06cb666
+
+* AVE-166 Add method to trigger gort to set silent mode
+    :Tree: semctools/ave/handset
+    :Commit: 04e56c5307265deb5dbc030c9087db5bb4af9b56
+
+* AVE-166 Disable vibration when set silent mode
+    :Tree: semctools/ave/gort
+    :Commit: 04bb8124ce3215cbd3525144739a569162ed2d01
+
+* AVE-165 Gnuplot support
+    :Tree: semctools/ave/workspace
+    :Commit: fa16ab8dc3726126101819fc47ecd668a9e9b543
+
+* AVE-165 Add gnuplot into workspace config
+    :Tree: semctools/ave/common
+    :Commit: e003e24816304001254b362c1d1ad3db29330acb
+
+* AVE-178 Added more properties of customerization
+    :Tree: semctools/ave/handset
+    :Commit: 5391bd4d893a43a86a03094788ed957142637fba
+
+* AVE-187 Solution to choosing repository_type
+    :Tree: semctools/ave/workspace
+    :Commit: 4fd6ee246f0b321f61f9490a26a0101e6be7947a
+
+* Delete the debug code added for AVE-143
+    :Tree: semctools/ave/broker
+    :Commit: 92a2c51dd970451551bbba23a64db34e288ac329
+
+* Add ability to set unicode encoding in cat
+    :Tree: semctools/ave/workspace
+    :Commit: d35923811503028c538204ceda17c01f5de2a77c
+
+* No need root right to get property
+    :Tree: semctools/ave/handset
+    :Commit: 7aa034150de9de60244eb8facc61204836aa46c5
+
+* Get phone number on sdk 22
+    :Tree: semctools/ave/handset
+    :Commit: 59af78dec1a916f7d7c8070e4c94b9c036c6c4af
+
+

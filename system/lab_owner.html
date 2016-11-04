@@ -1,0 +1,485 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Lab Owner’s Guide &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../index.html" />
+    <link rel="up" title="System Documentation" href="index.html" />
+    <link rel="next" title="Logging" href="logging.html" />
+    <link rel="prev" title="Conceptual Summary" href="conceptual_summary.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="logging.html" title="Logging"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="conceptual_summary.html" title="Conceptual Summary"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">System Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="lab-owner-s-guide">
+<span id="lab-owners-guide"></span><h1>Lab Owner&#8217;s Guide<a class="headerlink" href="#lab-owner-s-guide" title="Permalink to this headline">¶</a></h1>
+<p>This document collects information that may be useful to all AVE lab owners,
+from single workstations to large centralized labs.</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>AVE is published to SoMC&#8217;s internal Debian repository for Ubuntu workstations
+and servers. To install it one must have administrator privileges on the target
+machine.</p>
+<p class="rubric">Privileges</p>
+<p>First try to become owner and admin according to the normal IT process. Run:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">makemeowner</span>
+</pre></div>
+</div>
+<p>and type <tt class="docutils literal"><span class="pre">ADMIN</span></tt> when prompted.</p>
+<p>If this does not work because someone else already owns the machine, you can
+still become administrator with some help from the current administrator. <em>That</em>
+person should run:</p>
+<div class="highlight-python"><pre>sudo usermod -a -G admin &lt;your user name&gt;</pre>
+</div>
+<p class="rubric">Installation</p>
+<p>To install from the default repository, run:</p>
+<div class="highlight-python"><pre>sudo apt-get update
+sudo apt-get install ave</pre>
+</div>
+<p>Alternatively, you can open <tt class="docutils literal"><span class="pre">synaptic</span></tt> or another Debian package manager to
+check what the latest available version is before actually installing anything.</p>
+<p>Be prepared to enter your 23-number when prompted. Users at external partners&#8217;
+should enter their login user names, whatever that may be.</p>
+<p class="rubric">Uninstallation</p>
+<p>Open the Debian package manager of your choice (<tt class="docutils literal"><span class="pre">synaptic</span></tt> is recommended),
+search for &#8220;ave-&#8221; packages and mark all of them for complete removal. Then
+apply the change.</p>
+<p class="rubric">Beta Testing</p>
+<p>Instructions for beta testing are found <a class="reference internal" href="../governance/beta_testing.html#beta-testing"><em>here</em></a>.</p>
+<div class="section" id="default-configuration-files">
+<h3>Default Configuration Files<a class="headerlink" href="#default-configuration-files" title="Permalink to this headline">¶</a></h3>
+<p>The installation creates the file <tt class="docutils literal"><span class="pre">/etc/ave/user</span></tt> which contains two items:</p>
+<ul class="simple">
+<li><strong>User name</strong>: This tells all AVE services which user account to use to run
+themselves. AVE will not run as <tt class="docutils literal"><span class="pre">root</span></tt>, not even if specified in this file.</li>
+<li><strong>Home directory</strong>: AVE services and modules will look for their configuration
+files in <tt class="docutils literal"><span class="pre">&lt;home</span> <span class="pre">directory&gt;/.ave/config</span></tt>. To not repeat the same explanation
+all the time, AVE documents only refer to this directory as <tt class="docutils literal"><span class="pre">.ave/config</span></tt>.</li>
+</ul>
+<p>Some default configuration files are also created under <tt class="docutils literal"><span class="pre">.ave/config</span></tt>. These
+control the behavior of AVE services and various equipment classes.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If all you need is to allocate a locally connected handset without
+any supplemental equipment (relays, power meters, etc) then you can stop
+reading now and focus on test job development instead.</p>
+</div>
+</div>
+</div>
+<div class="section" id="configure-broker">
+<h2>Configure Broker<a class="headerlink" href="#configure-broker" title="Permalink to this headline">¶</a></h2>
+<p>Out of the box, AVE is configured to only work with locally available equipment
+and will not share this equipment with other hosts. This can be improved on by
+forwarding allocations to a centralized lab, or by sharing local equipment to a
+centralized lab. Which configuration to choose depends on what kind of host is
+to be configured.</p>
+<p>The forwarding and sharing roles are described in the <a class="reference internal" href="../broker/docs/allocation.html#broker-network-allocation"><em>broker system
+documentation</em></a>. Please note that a host cannot be
+configured for both roles simultanously.</p>
+<div class="section" id="configure-forwarding">
+<h3>Configure Forwarding<a class="headerlink" href="#configure-forwarding" title="Permalink to this headline">¶</a></h3>
+<p>This assumes that another host is running a master broker. Two brokers cannot
+refer to each other with the forwarding rule. Instructions:</p>
+<ol class="arabic">
+<li><p class="first">Open <tt class="docutils literal"><span class="pre">.ave/config/broker.json</span></tt></p>
+</li>
+<li><p class="first">Add or edit the &#8220;remote&#8221; entry, where <tt class="docutils literal"><span class="pre">&lt;hostname&gt;</span></tt> is the IP address or
+DNS name of the master broker host:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;remote&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;policy&quot;</span><span class="p">:</span> <span class="s">&quot;forward&quot;</span><span class="p">,</span>
+        <span class="s">&quot;host&quot;</span>  <span class="p">:</span> <span class="s">&quot;&lt;hostname&gt;&quot;</span><span class="p">,</span>
+        <span class="s">&quot;port&quot;</span>  <span class="p">:</span>  <span class="mi">4000</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Save and restart the broker:</p>
+<div class="highlight-python"><pre>sudo ave-broker --restart</pre>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="configure-lab-master">
+<h3>Configure Lab Master<a class="headerlink" href="#configure-lab-master" title="Permalink to this headline">¶</a></h3>
+<p>This assumes that other hosts will share equipment to this master host. The
+master will be configured to require a password from sharing slaves. Note that
+this mechanism is only meant to prevent misconfigured slaves from accidental
+sharing with the master. It is not a security feature.</p>
+<ol class="arabic">
+<li><p class="first">Open <tt class="docutils literal"><span class="pre">.ave/config/authkeys.json</span></tt></p>
+</li>
+<li><p class="first">Edit the &#8220;share&#8221; entry. Any UTF-8 string should be usable but for ease
+of reference you should probably avoid locale specific characters such as
+&#8220;ÅÄÖ&#8221; and Japanese or Chinese glyphs.</p>
+</li>
+<li><p class="first">Save and restart the broker:</p>
+<div class="highlight-python"><pre>sudo ave-broker --restart</pre>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="configure-sharing">
+<h3>Configure Sharing<a class="headerlink" href="#configure-sharing" title="Permalink to this headline">¶</a></h3>
+<p>This assumes that another broker is acting as a master, as described above. To
+configure the slave you need the hostname of the master and its share password.</p>
+<ol class="arabic">
+<li><p class="first">Open <tt class="docutils literal"><span class="pre">.ave/config/broker.json</span></tt></p>
+</li>
+<li><p class="first">Add or edit the &#8220;remote&#8221; entry, where <tt class="docutils literal"><span class="pre">&lt;hostname&gt;</span></tt> is the IP address or
+DNS name of the master broker host, and <tt class="docutils literal"><span class="pre">&lt;authkey&gt;</span></tt> is the share key set
+in <tt class="docutils literal"><span class="pre">.ave/config/authkeys.json</span></tt> on that host:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;remote&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;policy&quot;</span> <span class="p">:</span> <span class="s">&quot;share&quot;</span><span class="p">,</span>
+        <span class="s">&quot;host&quot;</span>   <span class="p">:</span> <span class="s">&quot;&lt;hostname&gt;&quot;</span><span class="p">,</span>
+        <span class="s">&quot;port&quot;</span>   <span class="p">:</span>  <span class="mi">4000</span><span class="p">,</span>
+        <span class="s">&quot;authkey&quot;</span><span class="p">:</span> <span class="s">&quot;&lt;authkey&gt;&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Save and restart the broker:</p>
+<div class="highlight-python"><pre>sudo ave-broker --restart</pre>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="equipment-stacks">
+<h3>Equipment Stacks<a class="headerlink" href="#equipment-stacks" title="Permalink to this headline">¶</a></h3>
+<p>The broker cannot automatically figure out what equipment is set up to be used
+together with some other equipment. The &#8220;togetherness&#8221; is known as &#8220;stacking&#8221;.
+A full description of the concept and instructions for configuration is given
+in the <a class="reference internal" href="../broker/docs/stacking.html#broker-equipment-stacking"><em>broker system documentation</em></a>.</p>
+<p>The broker needs a restart after a change to the stacking configuration:</p>
+<div class="highlight-python"><pre>sudo ave-broker --restart</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Unique equipment references are made from the <tt class="docutils literal"><span class="pre">&quot;uid&quot;</span></tt> and <tt class="docutils literal"><span class="pre">&quot;type&quot;</span></tt>
+entries for a single piece (see <em>Listing Equipment</em>, below.) There is one
+exception for handsets which, for legacy reasons, are referred to by
+<tt class="docutils literal"><span class="pre">&quot;serial&quot;</span></tt> instead of <tt class="docutils literal"><span class="pre">&quot;uid&quot;</span></tt>. See the <a class="reference internal" href="../broker/docs/stacking.html#broker-equipment-stacking"><em>broker system documentation</em></a>.</p>
+</div>
+</div>
+</div>
+<div class="section" id="configure-supplemental-services">
+<h2>Configure Supplemental Services<a class="headerlink" href="#configure-supplemental-services" title="Permalink to this headline">¶</a></h2>
+<p>A number of supplemental services run in the background of an AVE deployment.
+To avoid needless repetition the configuration mechanisms of these services are
+not detailed here. Please refer to the links given here:</p>
+<ul>
+<li><p class="first"><strong>Relay server</strong>: Controls relay equipment. A dedicated server is needed to
+split single boards into multiple logical units. Otherwise one would have to
+use a whole board with every single handset, which would be quite wasteful.
+<a class="reference internal" href="../relay/docs/api.html#relay-config-files"><em>Configuration details</em></a>.</p>
+</li>
+<li><p class="first"><strong>Image server</strong>: Provides a caching mechanism and concurrent access to ye
+good olde <tt class="docutils literal"><span class="pre">semcpkgtoimg</span></tt>. <em class="xref std std-ref">Configuration details</em>.</p>
+</li>
+<li><p class="first"><strong>Equipment listers</strong>: There is one for every kind of equipment: Handsets,
+relays, power meters and WLAN dongles. A lister&#8217;s job is to report unique
+equipment profiles to the local broker. To see what the listers add to the
+local broker, please run:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">tail</span> <span class="o">-</span><span class="n">f</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ave</span><span class="o">-</span><span class="n">broker</span><span class="o">.</span><span class="n">log</span>
+</pre></div>
+</div>
+<p>and plug in a piece of equipment.</p>
+</li>
+<li><p class="first"><strong>ADB server</strong>: A special wrapper running as <tt class="docutils literal"><span class="pre">root</span></tt> is used to increase the
+reliability of the ADB server. This is the only AVE component that runs with
+elevated privileges. <a class="reference internal" href="../handset/docs/adb_server_api.html#adb-server-config"><em>Configuration details</em></a> and
+<a class="reference internal" href="../faq/adb.html#adb-server-behavior"><em>potential configuration problems</em></a>.</p>
+</li>
+<li><p class="first"><strong>FG3 Daemon</strong>: This service is not part of AVE. It is used to flash handsets.
+Unfortunately FG3 offers few automation controls and it is easier for the lab
+owner to manage it manually than for AVE to do it programmatically. Its
+configuration is updated by starting it:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">fg3console</span> <span class="o">-</span><span class="n">dm</span>
+</pre></div>
+</div>
+<p>Sometimes the daemon will exit fairly soon afterwards (within a minute or so).
+In this case simply start it again.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="listing-equipment">
+<h2>Listing Equipment<a class="headerlink" href="#listing-equipment" title="Permalink to this headline">¶</a></h2>
+<p>The broker command line tool can produce simple equipment lists:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ave</span><span class="o">-</span><span class="n">broker</span> <span class="o">--</span><span class="nb">list</span>     <span class="c"># list available equipment</span>
+<span class="n">ave</span><span class="o">-</span><span class="n">broker</span> <span class="o">--</span><span class="nb">list</span><span class="o">-</span><span class="nb">all</span> <span class="c"># list all equipment, allocated or not</span>
+</pre></div>
+</div>
+<p>This works with both local and shared equipment but is not very sophisticated.
+To make a specialized lister, please consult the <a class="reference internal" href="../broker/docs/api.html#broker-admin-api"><em>broker API for
+administrative clients</em></a>.</p>
+</div>
+<div class="section" id="when-to-restart-services">
+<h2>When to Restart Services<a class="headerlink" href="#when-to-restart-services" title="Permalink to this headline">¶</a></h2>
+<p>The AVE services restart themselves when newer versions are installed. However,
+changes to configuration files, limited upgrades of AVE and a few other special
+circumstances require manual restarts:</p>
+<ul>
+<li><p class="first">Restarts after configuration changes have already been covered above, or are
+covered by separate documentation for various supplemental services.</p>
+</li>
+<li><p class="first">A broker restart is needed after upgrading a non-service package. Normally a
+full stable release of AVE will trigger all necessary restarts, but during
+debugging or develoment a lab owner may want to install a changed version of
+e.g. <tt class="docutils literal"><span class="pre">ave-handset</span></tt> separately:</p>
+<div class="highlight-python"><pre>sudo dpkg -i ave-handset-999.deb
+sudo ave-broker --restart</pre>
+</div>
+</li>
+<li><p class="first">ADB server is never restarted automatically, not even by a full AVE release.
+The reason is that doing so would interfere with all currently running test
+jobs. Instead the lab owner has to do this explicitly if a new ADB version is
+shipped by SWD Tools:</p>
+<div class="highlight-python"><pre>sudo ave-adb-server --restart</pre>
+</div>
+</li>
+<li><p class="first">Changes to port numbers in various <tt class="docutils literal"><span class="pre">.ave/config</span></tt> files cannot be made while
+that service is running. Fully stop the service before editing the config file
+and then start the service again.</p>
+</li>
+<li><p class="first">Changing the &#8220;admin&#8221; entry in <tt class="docutils literal"><span class="pre">.ave/config/authkeys.json</span></tt> cannot be done
+while any AVE service is running. Fully stop <em>all</em> AVE services before editing
+the &#8220;admin&#8221; entry, then start them all again.</p>
+</li>
+<li><p class="first">Changes to <tt class="docutils literal"><span class="pre">/etc/ave/user</span></tt> cannot be made while any AVE service is running.
+Fully stop <em>all</em> AVE services before editing it, then start them all again.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="debugging-techniques">
+<h2>Debugging Techniques<a class="headerlink" href="#debugging-techniques" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">Internal errors and exceptions of AVE services are logged to various files in
+<tt class="docutils literal"><span class="pre">/var/tmp/</span></tt>.</p>
+</li>
+<li><p class="first">It is often instructive to look at AVE&#8217;s process tree. This set of switches
+shows the actual process names instead of the command line tool that started
+them:</p>
+<div class="highlight-python"><pre>ps -ejH | grep ave-</pre>
+</div>
+<p>This will e.g. show you all running broker sessions, which may help explain
+why some piece of equipment is considered unavailable.</p>
+</li>
+<li><p class="first">If a service has crashed completely it will typically leave a stale PID file
+behind in <tt class="docutils literal"><span class="pre">/var/tmp/</span></tt>. If <tt class="docutils literal"><span class="pre">ps</span></tt> does not list the service and starting it
+gives an error such as &#8220;pid file /var/tmp/ave-broker.pid exists&#8221;, then you
+can start the service anyway by adding the <tt class="docutils literal"><span class="pre">--force</span></tt> argument. Never do
+this if the service is in fact running:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ave</span><span class="o">-</span><span class="n">broker</span> <span class="o">--</span><span class="n">start</span> <span class="o">--</span><span class="n">force</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">If a service is not responding, please run:</p>
+<div class="highlight-python"><pre>ave-&lt;service&gt; --hickup
+tar -czf hickups.tar.gz .ave/hickup/*
+lsof &gt; lsof.txt
+tar -czf logs.tar.gz /var/tmp/ave-*</pre>
+</div>
+<p>SWD Tools may want to have the archives for analysis.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="usb-power-flashing">
+<h2>USB, Power &amp; Flashing<a class="headerlink" href="#usb-power-flashing" title="Permalink to this headline">¶</a></h2>
+<p>Flashing can fail without any explanation if the host computer does not provide
+enough power over USB. Always use separately powered USB hubs to avoid this. It
+is recommended to use hubs that guarantee 0.5-1.0 ampere per port.</p>
+<p>With adequate power supply it should be possible to connect a large number of
+handsets to a single host. However, a large number of concurrent flash jobs may
+tax the IO capacity of the host so much that client RPC connections start to
+time out. The practical limits to concurrent flashing are not known.</p>
+<p>Even more demanding than flashing is the composition of flashable images. This
+is done by <tt class="docutils literal"><span class="pre">ave-imager</span></tt>, a cache &amp; concurrency wrapper for <tt class="docutils literal"><span class="pre">semcpkgtoimg</span></tt>.
+AVE sets the IO priority for this work to the lowest possible, but making more
+than very few images concurrently may still make the host unresponsive. In a
+DUST lab this situation can be avoided by only connecting handsets of the same
+model to any single host. Future versions of AVE will address this by queueing
+composition work jobs and by taking ready-made compositions from a centralized
+server.</p>
+</div>
+<div class="section" id="one-host-multiple-users">
+<h2>One Host, Multiple Users<a class="headerlink" href="#one-host-multiple-users" title="Permalink to this headline">¶</a></h2>
+<p>Multiple users may log in on the same host and use a common AVE installation,
+but some configuration work is normally required. The configuration files that
+were created for the user who made the installation are not only read by the
+AVE services, but also by clients that try to connect. The clients will look in
+<tt class="docutils literal"><span class="pre">/etc/ave/user</span></tt> to find the <tt class="docutils literal"><span class="pre">.ave/config</span></tt> directory but will get stuck if
+that directory is not readable. The easiest solution is normally that the user
+who made the installation also runs:</p>
+<div class="highlight-python"><pre>chmod -R a+rx ~/.ave
+chmod a+x ~</pre>
+</div>
+<p>However, this opens up the home directory of that user a little bit. If this is
+not wanted, one may instead change AVE&#8217;s home directory in <tt class="docutils literal"><span class="pre">/etc/ave/user</span></tt>.
+This is, regrettably, more complicated because AVE uses external tools that need
+access to additional files from the original user&#8217;s home directory:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">~/.gitconfig</span></tt>: To be able to use Git related workspace functions.</li>
+<li><tt class="docutils literal"><span class="pre">~/.ssh</span></tt>: Because the global Git configuration rewrites some host accesses
+to use SSH.</li>
+<li><tt class="docutils literal"><span class="pre">~/.c2d</span></tt>: If a non-default C2D configuration is used, typically a protected
+server.</li>
+</ul>
+<p>Especially the SSH configuration is tricky to move. If at all possible, avoid
+using a non-default home directory until AVE provides better debugging support
+for this use case.</p>
+</div>
+<div class="section" id="running-ave-as-jenkins">
+<h2>Running AVE as Jenkins<a class="headerlink" href="#running-ave-as-jenkins" title="Permalink to this headline">¶</a></h2>
+<p>This is a variation of the <em>One Host, Multiple Users</em> scenario.</p>
+<p>The host must have a Jenkins user account and a matching home directory with
+correct SSH keys, etc. If so:</p>
+<ol class="arabic simple">
+<li>Enter the Jenkins user account name when installing AVE.</li>
+</ol>
+<p>If AVE was already installed, consider fully uninstalling it and installing it
+again as the Jenkins user.</p>
+<p>You may also try this:</p>
+<ol class="arabic simple">
+<li>Stop all AVE services.</li>
+<li>Edit <tt class="docutils literal"><span class="pre">/etc/ave/user</span></tt>: Change &#8220;user&#8221; to the Jenkins account and &#8220;home&#8221; to
+the corresponding home directory.</li>
+<li>Move the <tt class="docutils literal"><span class="pre">.ave</span></tt> to the Jenkins home directory.</li>
+<li>Use <tt class="docutils literal"><span class="pre">chmod</span></tt> and/or <tt class="docutils literal"><span class="pre">chown</span></tt> recursively on the moved <tt class="docutils literal"><span class="pre">.ave</span></tt> directory
+to make it fully owned and controlled by the Jenkins user account.</li>
+<li>Start all AVE services.</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Lab Owner&#8217;s Guide</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a><ul>
+<li><a class="reference internal" href="#default-configuration-files">Default Configuration Files</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configure-broker">Configure Broker</a><ul>
+<li><a class="reference internal" href="#configure-forwarding">Configure Forwarding</a></li>
+<li><a class="reference internal" href="#configure-lab-master">Configure Lab Master</a></li>
+<li><a class="reference internal" href="#configure-sharing">Configure Sharing</a></li>
+<li><a class="reference internal" href="#equipment-stacks">Equipment Stacks</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configure-supplemental-services">Configure Supplemental Services</a></li>
+<li><a class="reference internal" href="#listing-equipment">Listing Equipment</a></li>
+<li><a class="reference internal" href="#when-to-restart-services">When to Restart Services</a></li>
+<li><a class="reference internal" href="#debugging-techniques">Debugging Techniques</a></li>
+<li><a class="reference internal" href="#usb-power-flashing">USB, Power &amp; Flashing</a></li>
+<li><a class="reference internal" href="#one-host-multiple-users">One Host, Multiple Users</a></li>
+<li><a class="reference internal" href="#running-ave-as-jenkins">Running AVE as Jenkins</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="conceptual_summary.html"
+                        title="previous chapter">Conceptual Summary</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="logging.html"
+                        title="next chapter">Logging</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/system/lab_owner.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="logging.html" title="Logging"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="conceptual_summary.html" title="Conceptual Summary"
+             >previous</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" >System Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

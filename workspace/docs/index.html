@@ -1,0 +1,170 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Workspaces &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../../index.html" />
+    <link rel="next" title="Client API" href="client_api.html" />
+    <link rel="prev" title="Relay" href="../../relay/docs/api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="client_api.html" title="Client API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../../relay/docs/api.html" title="Relay"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="workspaces">
+<h1>Workspaces<a class="headerlink" href="#workspaces" title="Permalink to this headline">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">module:</th><td class="field-body">ave-workspace</td>
+</tr>
+</tbody>
+</table>
+<p>This class has two main purposes:
+* Provide an API used to query properties about the machine that holds</p>
+<blockquote>
+<div>the workspace. Such properties may include the SSID of the local WLAN
+or whether a particular tool is installed on the machine. This should
+be used whenever a test job would otherwise use hard coded values
+which may not be valid when the test job is executed on a different
+machine. Test jobs can use <tt class="docutils literal"><span class="pre">get_profile()</span></tt> to get a dictionary with
+all such properties of a workspace. Most of the properties are set in
+<tt class="docutils literal"><span class="pre">.ave/config/workspace.json</span></tt>.</div></blockquote>
+<ul class="simple">
+<li>Give the test job writer a convenient API to interface with official
+CM and delivery systems: Git, C2D, Jenkins, Goobug, flashable image
+creatin, etc.</li>
+</ul>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="client_api.html">Client API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="client_api.html#git">Git</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client_api.html#jenkins">Jenkins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client_api.html#zip-file">Zip File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client_api.html#flocker">Flocker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client_api.html#profiling">Profiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client_api.html#temporary-files">Temporary Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client_api.html#file-manipulation">File Manipulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client_api.html#apk-inspection">APK Inspection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client_api.html#miscellaneous">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client_api.html#external-tools">External Tools</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="system_api.html">System API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="system_api.html#workspace">Workspace</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config.html#root-directory">Root Directory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html#lab-identity">Lab Identity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html#flocker">Flocker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html#external-tools">External Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html#jenkins">Jenkins</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../../relay/docs/api.html"
+                        title="previous chapter">Relay</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="client_api.html"
+                        title="next chapter">Client API</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/workspace/docs/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="client_api.html" title="Client API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../../relay/docs/api.html" title="Relay"
+             >previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

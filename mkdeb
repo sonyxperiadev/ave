@@ -1,0 +1,350 @@
+#! /usr/bin/python2
+
+import os
+import sys
+import shutil
+import re
+import subprocess
+import glob
+
+def run(cmd):
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = proc.communicate()
+    if proc.returncode:
+        print(out)
+        print(err)
+        sys.exit(1)
+
+if __name__ == '__main__':
+    root = os.path.dirname(os.path.realpath(sys.argv[0]))
+
+    # clean out old staging material
+    for entry in os.listdir(root + '/packaging'):
+        if entry == 'DEBIAN':
+            continue
+        dst = root + '/packaging/' + entry
+        if os.path.isfile(dst):
+            os.unlink(dst)
+        else:
+            shutil.rmtree(dst)
+
+#common-------------------------------------------------------------------
+
+    run(['make', '-C', root+'/common/src/libfdtx', 'clean'])
+
+    # build libfdtx
+    run(['make', '-C', root+'/common/src/libfdtx', 'libfdtx.so'])
+
+    # copy other executables to /usr/bin
+    src = glob.glob(root + '/common/bin/*')
+    dst = root + '/packaging/usr/bin'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    for s in src:
+        if s.endswith('aapt') or s.endswith('hprof-conv'):
+            continue
+        shutil.copy(s, dst)
+
+    # copy modules and tests to /usr/lib/pymodules/ave
+    for path in ['/', '/network/']:
+        src = glob.glob(root + '/common/src/ave' + path + '*.py')
+        # ... except __init__.py which has to be an empty file
+        src = [s for s in src if os.path.basename(s) != '__init__.py']
+        for dst in [
+            root + '/packaging/usr/lib/pymodules/python2.6/ave' + path,
+            root + '/packaging/usr/lib/pymodules/python2.7/ave' + path
+        ]:
+            if not os.path.exists(dst):
+                os.makedirs(dst)
+            for s in src:
+                shutil.copy(s, dst)
+            # create the empty __init__.py
+            f = open(os.path.join(dst, '__init__.py'), 'w')
+            f.close()
+
+    # copy libfdtx to /usr/lib
+    src = root + '/common/src/libfdtx/libfdtx.so'
+    dst = root + '/packaging/usr/lib'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    shutil.copy(src, dst)
+
+    # add search path to ave (fix for ubuntu 12).
+    for subver in [6, 7]:
+        path = root + '/packaging/usr/lib/python2.' + \
+               str(subver) + '/dist-packages'
+        if not os.path.exists(path):
+            os.makedirs(path)
+        with open(path + '/ave.pth', 'w') as text_file:
+            text_file.write('/usr/lib/pymodules/python2.' + str(subver) + '\n')
+
+#broker-------------------------------------------------------------------
+
+    # copy upstart integration files to /etc/init
+    src = root + '/broker/etc/init/ave-broker.conf'
+    dst = root + '/packaging/etc/init'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    shutil.copy(src, dst)
+
+    # copy executables to /usr/bin
+    src = glob.glob(root + '/broker/bin/*')
+    dst = root + '/packaging/usr/bin'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    for s in src:
+        shutil.copy(s, dst)
+
+    # copy all modules to /usr/lib/pymodules/python-2.*/ave/broker
+    src = glob.glob(root + '/broker/src/ave/broker/*.py')
+    for dst in [
+        root + '/packaging/usr/lib/pymodules/python2.6/ave/broker',
+        root + '/packaging/usr/lib/pymodules/python2.7/ave/broker'
+    ]:
+        if not os.path.exists(dst):
+            os.makedirs(dst)
+        for s in src:
+            shutil.copy(s, dst)
+
+    # copy all modules to /usr/lib/pymodules/ave/broker
+    src = glob.glob(root + '/broker/src/ave/broker/tools/*.py')
+    for dst in [
+        root + '/packaging/usr/lib/pymodules/python2.6/ave/broker/tools',
+        root + '/packaging/usr/lib/pymodules/python2.7/ave/broker/tools'
+    ]:
+        if not os.path.exists(dst):
+            os.makedirs(dst)
+        for s in src:
+            shutil.copy(s, dst)
+
+#handset-------------------------------------------------------------------
+    # copy all handset modules to /usr/lib/pymodules/ave/handset
+    src = glob.glob(root + '/handset/src/ave/handset/*.py')
+    # ... except __init__.py which is owned by the ave-common package
+    src = [s for s in src if os.path.basename(s) != '__init__.py']
+    for dst in [
+        root + '/packaging/usr/lib/pymodules/python2.6/ave/handset',
+        root + '/packaging/usr/lib/pymodules/python2.7/ave/handset'
+    ]:
+        if not os.path.exists(dst):
+            os.makedirs(dst)
+        for s in src:
+            shutil.copy(s, dst)
+        # create the empty __init__.py
+        f = open(os.path.join(dst, '__init__.py'), 'w')
+        f.close()
+
+    # copy all adb modules to /usr/lib/pymodules/ave/adb
+    src = glob.glob(root + '/handset/src/ave/adb/*.py')
+    # ... except __init__.py which is owned by the ave-common package
+    src = [s for s in src if os.path.basename(s) != '__init__.py']
+    for dst in [
+        root + '/packaging/usr/lib/pymodules/python2.6/ave/adb',
+        root + '/packaging/usr/lib/pymodules/python2.7/ave/adb'
+    ]:
+        if not os.path.exists(dst):
+            os.makedirs(dst)
+        for s in src:
+            shutil.copy(s, dst)
+        # create the empty __init__.py
+        f = open(os.path.join(dst, '__init__.py'), 'w')
+        f.close()
+
+    # copy all in /usr/share/ave/handset to packaging
+    src = glob.glob(root + '/handset/usr/share/ave/handset/*')
+    dst = root + '/packaging/usr/share/ave/handset'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    for s in src:
+        shutil.copy(s, dst)
+
+    # copy all in bin to /usr/bin
+    src = glob.glob(root + '/handset/bin/*')
+    dst = root + '/packaging/usr/bin'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    for s in src:
+        shutil.copy(s, dst)
+
+    # copy all in etc to /etc/init
+    src = glob.glob(root + '/handset/etc/init/*')
+    dst = root + '/packaging/etc/init'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    for s in src:
+        shutil.copy(s, dst)
+
+    # copy all in etc to /etc/ave
+    src = glob.glob(root + '/handset/etc/ave/*')
+    dst = root + '/packaging/etc/ave'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    for s in src:
+        shutil.copy(s, dst)
+
+#gerrit-------------------------------------------------------------------
+    # copy modules to /usr/lib/pymodules/python2.*/ave/gerrit
+    src = glob.glob(root + '/gerrit/src/ave/gerrit/*.py')
+    # ... except __init__.py which has to be an empty file
+    src = [s for s in src if os.path.basename(s) != '__init__.py']
+    for dst in [
+        root + '/packaging/usr/lib/pymodules/python2.6/ave/gerrit',
+        root + '/packaging/usr/lib/pymodules/python2.7/ave/gerrit'
+    ]:
+        if not os.path.exists(dst):
+            os.makedirs(dst)
+        for s in src:
+            shutil.copy(s, dst)
+        # create the empty __init__.py
+        f = open(os.path.join(dst, '__init__.py'), 'w')
+        f.close()
+
+#vcsjob-------------------------------------------------------------------
+    # copy binaries to /usr/bin
+    src = root + '/vcsjob/bin/vcsjob'
+    dst = root + '/packaging/usr/bin'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    shutil.copy(src, dst)
+
+    # copy package & modules to /usr/lib/pymodules/python2.6/vcsjob
+    src = glob.glob(root + '/vcsjob/src/vcsjob/*.py')
+    dst = root + '/packaging/usr/lib/pymodules/python2.6/vcsjob'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    for s in src:
+        shutil.copy(s, dst)
+
+    # copy package & modules to /usr/lib/pymodules/python2.7/vcsjob
+    dst = root + '/packaging/usr/lib/pymodules/python2.7/vcsjob'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    for s in src:
+        shutil.copy(s, dst)
+
+#util-------------------------------------------------------------------
+    # copy modules and tests to /usr/lib/pymodules/ave
+    for path in ['/utils/']:
+        src = glob.glob(root + '/utils/src/ave' + path + '*.py')
+        # ... except __init__.py which has to be an empty file
+        src = [s for s in src if os.path.basename(s) != '__init__.py']
+        for dst in [
+            root + '/packaging/usr/lib/pymodules/python2.6/ave' + path,
+            root + '/packaging/usr/lib/pymodules/python2.7/ave' + path
+        ]:
+            if not os.path.exists(dst):
+                os.makedirs(dst)
+            for s in src:
+                shutil.copy(s, dst)
+            # create the empty __init__.py
+            f = open(os.path.join(dst, '__init__.py'), 'w')
+            f.close()
+
+#workspace-------------------------------------------------------------------
+    # copy emma jar lib to /usr/share/ave/workspace
+    src = root + '/workspace/usr/share/ave/workspace/emma.jar'
+    dst = root + '/packaging/usr/share/ave/workspace'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    shutil.copy(src, dst)
+
+    # copy executables to /usr/bin
+    src = glob.glob(root + '/workspace/bin/*')
+    dst = root + '/packaging/usr/bin'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    for s in src:
+        shutil.copy(s, dst)
+
+    # copy all modules and tests to /usr/lib/pymodules/python2.*/ave ...
+    src = glob.glob(root + '/workspace/src/ave/*.py')
+    # ... except __init__.py which is owned by the ave-common package
+    src = [s for s in src if os.path.basename(s) != '__init__.py']
+    for dst in [
+        root + '/packaging/usr/lib/pymodules/python2.6/ave',
+        root + '/packaging/usr/lib/pymodules/python2.7/ave'
+    ]:
+        if not os.path.exists(dst):
+            os.makedirs(dst)
+        for s in src:
+            shutil.copy(s, dst)
+
+#galatea-------------------------------------------------------------------
+    def make_apk(root, branch):
+        cwd = os.getcwd()
+        os.chdir(root+'/galatea')
+
+        run(['sdkdownload', '-b', branch])
+        os.environ['ANDROID_HOME'] = os.getenv('HOME') + '/sdk/' + branch
+
+        run(['./gradlew', 'clean', 'assemble'])
+
+        src = root+'/galatea/galatea-main/build/outputs/apk/galatea-main-release.apk'
+        dst = root+'/packaging/usr/share/ave/galatea/galatea.apk'
+        if not os.path.exists(os.path.dirname(dst)):
+            os.makedirs(os.path.dirname(dst))
+        shutil.copy(src, dst)
+
+        os.chdir(cwd)
+    make_apk(root, 'm-kitakami')
+
+#relay-------------------------------------------------------------------
+    # copy upstart integration files to /etc/init
+    src = root + '/relay/etc/init/ave-relay.conf'
+    dst = root + '/packaging/etc/init'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    shutil.copy(src, dst)
+
+    # copy udev rules to /etc
+    src = glob.glob(root + '/relay/etc/udev/rules.d/*.rules')
+    dst = root + '/packaging/etc/udev/rules.d'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    for s in src:
+        shutil.copy(s, dst)
+
+    # copy executables to /usr/bin
+    src = glob.glob(root + '/relay/bin/*')
+    dst = root + '/packaging/usr/bin'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    for s in src:
+        shutil.copy(s, dst)
+
+    # copy all modules to /usr/lib/pymodules/python2.*/ave/relay
+    src = glob.glob(root + '/relay/src/ave/relay/*.py')
+    # ... except __init__.py which has special content in the local tree
+
+    src = [s for s in src if os.path.basename(s) != '__init__.py']
+    for dst in [
+        root + '/packaging/usr/lib/pymodules/python2.6/ave/relay',
+        root + '/packaging/usr/lib/pymodules/python2.7/ave/relay'
+    ]:
+        if not os.path.exists(dst):
+            os.makedirs(dst)
+        for s in src:
+            shutil.copy(s, dst)
+        # create the empty __init__.py
+        f = open(os.path.join(dst, '__init__.py'), 'w')
+        f.close()
+
+#----------------------------------------------------------------------------
+    # extract version information from the package control file
+    f = open(root + '/packaging/DEBIAN/control')
+    version = None
+    for line in f.readlines():
+        m = re.match('Version:\s*(?P<version>.*)', line)
+        if m:
+            version = m.group('version')
+            break
+    if not version:
+        print('ERROR: Could not find the version field in DEBIAN/control file')
+        sys.exit(1)
+
+    # generate the Debian package
+    src = root + '/packaging'
+    run(['fakeroot', 'dpkg-deb', '--build', src,
+         '%s/ave-oss-%s.deb' % (root, version)])
+    print('created %s/ave-oss-%s.deb' % (root, version))
+

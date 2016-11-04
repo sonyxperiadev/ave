@@ -1,0 +1,306 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Logging &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../../index.html" />
+    <link rel="up" title="Utils" href="index.html" />
+    <link rel="next" title="Test Job Base Classes" href="testjob_api.html" />
+    <link rel="prev" title="Utils" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="testjob_api.html" title="Test Job Base Classes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Utils"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Utils</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="logging">
+<h1>Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h1>
+<p>Logger classes used to generate structured logs in Flocker</p>
+<div class="section" id="logger">
+<h2><tt class="docutils literal"><span class="pre">Logger</span></tt><a class="headerlink" href="#logger" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ave.utils.logger_api.Logger">
+<em class="property">class </em><tt class="descclassname">ave.utils.logger_api.</tt><tt class="descname">Logger</tt><big>(</big><em>workspace</em>, <em>guid</em>, <em>file_path='test_job_log.txt'</em>, <em>lowest_level='x'</em><big>)</big><a class="headerlink" href="#ave.utils.logger_api.Logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles all logging, pushes logs to Flocker and shouts Flocker links to
+Panotti, using the scheduler GUID as label.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>workspace</strong> &#8211; Workspace that is used to push strings to Flocker.</li>
+<li><strong>guid</strong> &#8211; The global unique identifier that is used to set a label on the
+Flocker URL when it is uploaded to Panotti.</li>
+<li><strong>file_path</strong> &#8211; Name of the log file. Defaults to <em>&#8216;test_job_log.txt&#8217;</em>.</li>
+<li><strong>lowest_level</strong> &#8211; Sets the lowest level of log messages that should be
+added to log. Defaults to <em>&#8216;x&#8217;</em> - unknown.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="ave.utils.logger_api.Logger.set_lowest_log_level">
+<tt class="descname">set_lowest_log_level</tt><big>(</big><em>lvl</em><big>)</big><a class="headerlink" href="#ave.utils.logger_api.Logger.set_lowest_log_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the lowest log level that should be added to log.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>lvl</strong> &#8211; Sets the lowest level of log messages that should be added to
+the log.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ave.utils.logger_api.Logger.log_traceback">
+<tt class="descname">log_traceback</tt><big>(</big><em>lvl</em><big>)</big><a class="headerlink" href="#ave.utils.logger_api.Logger.log_traceback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a stack trace and prints it to log.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>lvl</strong> &#8211; Sets the level of the log entry.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ave.utils.logger_api.Logger.log_it">
+<tt class="descname">log_it</tt><big>(</big><em>lvl</em>, <em>message</em>, <em>handset=None</em><big>)</big><a class="headerlink" href="#ave.utils.logger_api.Logger.log_it" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logs the message with a time stamp, a level descriptor and a color code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lvl</strong> &#8211; Sets the level of the log entry.</li>
+<li><strong>message</strong> &#8211; The message to log.</li>
+<li><strong>handset</strong> &#8211; Print the handset&#8217;s serial (Optional)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The return parameter from <tt class="docutils literal"><span class="pre">Workspace.flocker_push_string()</span></tt>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ave.utils.logger_api.Logger.parse_flocker_data">
+<tt class="descname">parse_flocker_data</tt><big>(</big><em>flocker_return</em><big>)</big><a class="headerlink" href="#ave.utils.logger_api.Logger.parse_flocker_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses the flocker return value to a URL.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>flocker_return</strong> &#8211; The return value from
+<tt class="docutils literal"><span class="pre">Workspace.flocker_push_string()</span></tt>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A tuple: The Flocker URL and the Flocker session key.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="loglevel">
+<h2><tt class="docutils literal"><span class="pre">LogLevel</span></tt><a class="headerlink" href="#loglevel" title="Permalink to this headline">¶</a></h2>
+<p>Used by <tt class="docutils literal"><span class="pre">Logger</span></tt> to colorize strings and retrieving name and numeric value
+from a log level.</p>
+<p>The different log levels:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&#39;Level&#39;</span>         <span class="s">&#39;Name&#39;</span>          <span class="s">&#39;Numeric value&#39;</span>     <span class="s">&#39;Color&#39;</span>
+<span class="s">&#39;d&#39;</span>             <span class="s">&#39;DEBUG&#39;</span>         <span class="s">&#39;10&#39;</span>                <span class="s">&#39;White&#39;</span>
+<span class="s">&#39;i&#39;</span>             <span class="s">&#39;INFO&#39;</span>          <span class="s">&#39;20&#39;</span>                <span class="s">&#39;Blue&#39;</span>
+<span class="s">&#39;w&#39;</span>             <span class="s">&#39;WARNING&#39;</span>       <span class="s">&#39;30&#39;</span>                <span class="s">&#39;Yellow&#39;</span>
+<span class="s">&#39;e&#39;</span>             <span class="s">&#39;ERROR&#39;</span>         <span class="s">&#39;40&#39;</span>                <span class="s">&#39;Red&#39;</span>
+<span class="s">&#39;x&#39;</span>             <span class="s">&#39;UNKNOWN&#39;</span>       <span class="s">&#39;0&#39;</span>                 <span class="s">&#39;Purple&#39;</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="ave.utils.logger.LogLevel.colorize_string">
+<tt class="descclassname">ave.utils.logger.LogLevel.</tt><tt class="descname">colorize_string</tt><big>(</big><em>level</em>, <em>string</em><big>)</big><a class="headerlink" href="#ave.utils.logger.LogLevel.colorize_string" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>level</strong> &#8211; The level to set color.</li>
+<li><strong>string</strong> &#8211; The string to colorize.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The colorized string.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ave.utils.logger.LogLevel.get_level_numeric">
+<tt class="descclassname">ave.utils.logger.LogLevel.</tt><tt class="descname">get_level_numeric</tt><big>(</big><em>level</em><big>)</big><a class="headerlink" href="#ave.utils.logger.LogLevel.get_level_numeric" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> &#8211; The level to get the numeric value for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The numeric value of the log level.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ave.utils.logger.LogLevel.get_level_name">
+<tt class="descclassname">ave.utils.logger.LogLevel.</tt><tt class="descname">get_level_name</tt><big>(</big><em>level</em><big>)</big><a class="headerlink" href="#ave.utils.logger.LogLevel.get_level_name" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> &#8211; The level to get the name for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The name of the log level.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ave.utils.logger.LogLevel.verify_level">
+<tt class="descclassname">ave.utils.logger.LogLevel.</tt><tt class="descname">verify_level</tt><big>(</big><em>level</em><big>)</big><a class="headerlink" href="#ave.utils.logger.LogLevel.verify_level" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> &#8211; The level to verify</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The level if it is an ok level</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body">Exception if the level supplied is not an ok level</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Logging</a><ul>
+<li><a class="reference internal" href="#logger"><tt class="docutils literal"><span class="pre">Logger</span></tt></a></li>
+<li><a class="reference internal" href="#loglevel"><tt class="docutils literal"><span class="pre">LogLevel</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Utils</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="testjob_api.html"
+                        title="next chapter">Test Job Base Classes</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/utils/docs/logger_api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="testjob_api.html" title="Test Job Base Classes"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Utils"
+             >previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" >Utils</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

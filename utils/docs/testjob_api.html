@@ -1,0 +1,724 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Test Job Base Classes &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../../index.html" />
+    <link rel="up" title="Utils" href="index.html" />
+    <link rel="next" title="System Documentation" href="../../system/index.html" />
+    <link rel="prev" title="Logging" href="logger_api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../system/index.html" title="System Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="logger_api.html" title="Logging"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Utils</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="test-job-base-classes">
+<h1>Test Job Base Classes<a class="headerlink" href="#test-job-base-classes" title="Permalink to this headline">¶</a></h1>
+<p>Base classes for implementing test jobs that is compliant with test schedulers.</p>
+<div class="section" id="testjob">
+<h2><tt class="docutils literal"><span class="pre">TestJob</span></tt><a class="headerlink" href="#testjob" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ave.utils.testjob.TestJob">
+<em class="property">class </em><tt class="descclassname">ave.utils.testjob.</tt><tt class="descname">TestJob</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.utils.testjob.TestJob" title="Permalink to this definition">¶</a></dt>
+<dd><p>May be used as a base class when implementing test jobs to be executed.
+Implement a class inheriting from this class and at least override the
+<tt class="docutils literal"><span class="pre">main()</span></tt> function. It is recommended to set the instance
+variable branch to the CM branch that the test is running on.</p>
+<p>Call <tt class="docutils literal"><span class="pre">execute()</span></tt> on the class instance in the test job. This will pick up
+parameters including the globally unique ID, or &#8220;GUID&#8221;, used
+to track the job&#8217;s execution.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When executing on a development machine, the GUID is randomized
+by <tt class="docutils literal"><span class="pre">TestJob</span></tt>. If test results are reported to <em>Decibel</em>, this GUID
+may be used to find those results in that database.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">If the scheduler issued an invalid GUID.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<div class="section" id="flocker-support">
+<h3>Flocker Support<a class="headerlink" href="#flocker-support" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><dl class="attribute">
+<dt id="flocker_session_key">
+<tt class="descname">flocker_session_key</tt><a class="headerlink" href="#flocker_session_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use this attribute in calls to <tt class="docutils literal"><span class="pre">Workspace.flocker_push_*()</span></tt> functions
+to get all logs collected in the same Flocker session.</p>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="state-machine">
+<h3>State Machine<a class="headerlink" href="#state-machine" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><p>The different states of the state machine are:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&#39;Setup&#39;</span>
+<span class="s">&#39;Pre&#39;</span>
+<span class="s">&#39;Main&#39;</span>
+<span class="s">&#39;Post&#39;</span>
+<span class="s">&#39;Teardown&#39;</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="execute">
+<tt class="descname">execute</tt><big>(</big><em>nr_of_iterations</em><big>)</big><a class="headerlink" href="#execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drives the whole test job execution state machine. Will run
+setup-pre-main-post-teardown looping over pre-main-post the specified
+number of times.</p>
+<p>Each call to the functions are contained in a try statement that catches
+exceptions, logs it to file and exits the execution flow in an ordered
+way if an exception is caught.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nr_of_iterations</strong> &#8211; A number that states how many times pre-main-post
+should be iterated in the state machine</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="setup">
+<tt class="descname">setup</tt><big>(</big><big>)</big><a class="headerlink" href="#setup" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Setup</em> state in execution state machine, should be used for general
+setup for the test job. Regardless of <em>nr_of_iterations</em> parameter in
+execute it will be executed once.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pre">
+<tt class="descname">pre</tt><big>(</big><big>)</big><a class="headerlink" href="#pre" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Pre</em> state in execution state machine, should be used for setup that is
+closely connected to the test performed in the following main function.
+If execute is called with parameter <em>nr_of_iterations</em> &gt; 1, <tt class="docutils literal"><span class="pre">pre()</span></tt>
+will be executed that number of times.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="main">
+<tt class="descname">main</tt><big>(</big><big>)</big><a class="headerlink" href="#main" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <em>Main</em> state in the state machine. Must be overridden in a subclass.
+Will be executed <em>nr_of_iteration</em> times.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="post">
+<tt class="descname">post</tt><big>(</big><big>)</big><a class="headerlink" href="#post" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Post</em> state in execution state machine, should be used for cleanup that
+is closely connected to the test performed in the previous main
+function. If <tt class="docutils literal"><span class="pre">execute()</span></tt> is called with parameter <em>nr_of_iterations</em>
+&gt; 1, <tt class="docutils literal"><span class="pre">post()</span></tt> will be executed that number of times.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="teardown">
+<tt class="descname">teardown</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Teardown</em> state in execution state machine, should be used for general
+cleanup for the test job. Regardless of <em>nr_of_iterations</em> parameter in
+<tt class="docutils literal"><span class="pre">execute()</span></tt> it will be executed once.</p>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="convenience-methods">
+<h3>Convenience Methods<a class="headerlink" href="#convenience-methods" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="allocate_equipment">
+<tt class="descname">allocate_equipment</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#allocate_equipment" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="function">
+<dt>
+<tt class="descname">allocate_equipment</tt><big>(</big><big>)</big></dt>
+<dd><p>Retrieves the profiles from <tt class="docutils literal"><span class="pre">vcsjob</span></tt> and assigns equipment with the
+<tt class="docutils literal"><span class="pre">equipment_assignment()</span></tt> function.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="equipment_assignment">
+<tt class="descname">equipment_assignment</tt><big>(</big><em>profiles</em><big>)</big><a class="headerlink" href="#equipment_assignment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Must be overridden in subclass.</p>
+<p>Subclass function should assign all the equipment with a single call
+to <tt class="docutils literal"><span class="pre">Broker.get()</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>profiles</strong> &#8211; List of profiles that should be assigned.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="evaluate_results">
+<tt class="descname">evaluate_results</tt><big>(</big><big>)</big><a class="headerlink" href="#evaluate_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Must be overridden in subclass.</p>
+<p>Should evaluate results and set a verdict of the test job to one of
+<tt class="docutils literal"><span class="pre">vcsjob.OK</span></tt>, <tt class="docutils literal"><span class="pre">vcsjob.FAILURES</span></tt> or <tt class="docutils literal"><span class="pre">vcsjob.ERROR</span></tt>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="find_suitable_label">
+<tt class="descname">find_suitable_label</tt><big>(</big><big>)</big><a class="headerlink" href="#find_suitable_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the build label from the allocated handset. If it is set to
+<tt class="docutils literal"><span class="pre">&quot;private&quot;</span></tt>, then the latest official build label on the current
+branch is used instead.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A string with the found label</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="print_handset_info">
+<tt class="descname">print_handset_info</tt><big>(</big><big>)</big><a class="headerlink" href="#print_handset_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints all info in the handset profile plus build label and SIM
+information to log.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="update_status">
+<tt class="descname">update_status</tt><big>(</big><em>test_job_status</em><big>)</big><a class="headerlink" href="#update_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setter of <em>self.test_job_status</em>. Use this method to avoid overwriting
+values with higher priority, to get logging, and to not set invalid
+status values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>test_job_status</strong> &#8211; the status to be set.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="multiple-handset-handling">
+<h3>Multiple Handset Handling<a class="headerlink" href="#multiple-handset-handling" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><dl class="function">
+<dt id="register_handset_workspace">
+<tt class="descname">register_handset_workspace</tt><big>(</big><em>handset</em>, <em>workspace</em><big>)</big><a class="headerlink" href="#register_handset_workspace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use to register handset and workspace. Create an HandsetWorkspaceData
+object and put it into <em>self.handset_workspace_data_dict</em> which is a
+dict, handset&#8217;s serial as key, HandsetWorkspaceData object as value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>handset</strong> &#8211; the handset allocated</li>
+<li><strong>workspace</strong> &#8211; the workspace allocated with handset together</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="get_handset_workspace_data">
+<tt class="descname">get_handset_workspace_data</tt><big>(</big><em>handset</em><big>)</big><a class="headerlink" href="#get_handset_workspace_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the HandsetWorkspaceData object linked with given handset</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>handset</strong> &#8211; the handset allocated</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A HandsetWorkspaceData object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="androidtestjob">
+<h2><tt class="docutils literal"><span class="pre">AndroidTestJob</span></tt><a class="headerlink" href="#androidtestjob" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ave.utils.testjob_android.AndroidTestJob">
+<em class="property">class </em><tt class="descclassname">ave.utils.testjob_android.</tt><tt class="descname">AndroidTestJob</tt><big>(</big><em>logcat_active=True</em><big>)</big><a class="headerlink" href="#ave.utils.testjob_android.AndroidTestJob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inherits from <tt class="docutils literal"><span class="pre">TestJob</span></tt>.</p>
+<p>Base class for test jobs that are written for Android handsets.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>logcat_active</strong> &#8211; Run <tt class="docutils literal"><span class="pre">logcat</span></tt> for the duration of the test job?</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<div class="section" id="id1">
+<h3>State Machine<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><dl class="function">
+<dt>
+<tt class="descname">setup</tt><big>(</big><big>)</big></dt>
+<dd><ul class="simple">
+<li>Calls the <tt class="docutils literal"><span class="pre">TestJob.setup()</span></tt> function.</li>
+<li>Removes crashes from handset by calling
+<tt class="docutils literal"><span class="pre">remove_crashes_from_handset()</span></tt>.</li>
+<li>Initiates logcat if variable <em>logcat_active</em> is set to <em>True</em>.</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">teardown</tt><big>(</big><big>)</big></dt>
+<dd><ul class="simple">
+<li>Get all logcat data and pushes it to flocker if <em>logcat_active</em> is
+set to <em>True</em>.</li>
+<li>Handles crash dumps.</li>
+<li>Calls the <tt class="docutils literal"><span class="pre">TestJob.teardown()</span></tt> function.</li>
+</ul>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="packages-installation">
+<h3>Packages Installation<a class="headerlink" href="#packages-installation" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><dl class="function">
+<dt id="download_binary">
+<tt class="descname">download_binary</tt><big>(</big><em>pkg</em>, <em>app</em>, <em>label=None</em>, <em>version=None</em>, <em>package_component=None</em>, <em>handset=None</em><big>)</big><a class="headerlink" href="#download_binary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Downloads the specified application from C2D or Jenkins depending on
+how <em>self.build_url</em> is set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pkg</strong> &#8211; The package to fetch from.</li>
+<li><strong>app</strong> &#8211; The application to fetch.</li>
+<li><strong>label</strong> &#8211; The label to fetch from. <em>Not used if downloading from
+Jenkins.</em></li>
+<li><strong>package_component</strong> &#8211; Package component to download from, will not be
+used if label is set. <em>Not used if downloading from Jenkins.</em></li>
+<li><strong>version</strong> &#8211; Version to download, will not be used if label is set.
+<em>Not used if downloading from Jenkins.</em></li>
+<li><strong>handset</strong> &#8211; the handset used, must be set. For backwards compatibility,
+Defaults to <em>None</em></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The path to the downloaded files. <em>Not used if downloading
+from Jenkins.</em></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="download_binary_from_jenkins">
+<tt class="descname">download_binary_from_jenkins</tt><big>(</big><em>pkg</em>, <em>app</em>, <em>build_url=None</em>, <em>pkg_path=None</em>, <em>handset=None</em><big>)</big><a class="headerlink" href="#download_binary_from_jenkins" title="Permalink to this definition">¶</a></dt>
+<dd><p>Downloads the specified application from Jenkins.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pkg</strong> &#8211; The package to fetch from.</li>
+<li><strong>app</strong> &#8211; The application to fetch.</li>
+<li><strong>build_url</strong> &#8211; The path to the Jenkins build.</li>
+<li><strong>pkg_path</strong> &#8211; The path to the artifacts created by the Jenkins build.
+Not necessary to set unless a special Jenkins job is used that does
+not follow standard BOC setup.</li>
+<li><strong>handset</strong> &#8211; the handset used, must be set. For backwards compatibility,
+Defaults to <em>None</em></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The path to the downloaded files.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="fetch_binary">
+<tt class="descname">fetch_binary</tt><big>(</big><em>label</em>, <em>pkg</em>, <em>app</em>, <em>handset=None</em><big>)</big><a class="headerlink" href="#fetch_binary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deprecated. Use <tt class="docutils literal"><span class="pre">download_binary()</span></tt>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="install_binary">
+<tt class="descname">install_binary</tt><big>(</big><em>path</em>, <em>timeout=30</em>, <em>handset=None</em><big>)</big><a class="headerlink" href="#install_binary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper function for <tt class="docutils literal"><span class="pre">AndroidHandset.install()</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path</strong> &#8211; Path to the place to find files that should be installed.</li>
+<li><strong>timeout</strong> &#8211; Timeout in seconds (defaults to 30 seconds).</li>
+<li><strong>handset</strong> &#8211; the handset used, must be set. For backwards compatibility,
+Defaults to <em>None</em></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="reinstall_binary">
+<tt class="descname">reinstall_binary</tt><big>(</big><em>path</em>, <em>timeout=30</em>, <em>handset=None</em><big>)</big><a class="headerlink" href="#reinstall_binary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper function for <tt class="docutils literal"><span class="pre">AndroidHandset.reinstall()</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path</strong> &#8211; Path to the place to find files that should be reinstalled.</li>
+<li><strong>timeout</strong> &#8211; Timeout in seconds (defaults to 30 seconds).</li>
+<li><strong>handset</strong> &#8211; the handset used, must be set. For backwards compatibility,
+Defaults to <em>None</em></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="uninstall_binary">
+<tt class="descname">uninstall_binary</tt><big>(</big><em>pkg</em>, <em>handset=None</em><big>)</big><a class="headerlink" href="#uninstall_binary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if a package is installed and if it is it is uninstalled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pkg</strong> &#8211; The name of the package to uninstall.</li>
+<li><strong>handset</strong> &#8211; the handset used, must be set. For backwards compatibility,
+Defaults to <em>None</em></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="crash-handling">
+<h3>Crash Handling<a class="headerlink" href="#crash-handling" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><dl class="function">
+<dt id="remove_crashes_from_handset">
+<tt class="descname">remove_crashes_from_handset</tt><big>(</big><big>)</big><a class="headerlink" href="#remove_crashes_from_handset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes all found crashes on the allocated handset.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="handle_crash_dumps">
+<tt class="descname">handle_crash_dumps</tt><big>(</big><big>)</big><a class="headerlink" href="#handle_crash_dumps" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the allocated handset has an official build label, then all crashes
+are pulled and reported to Goobug.</p>
+<p>Removes all crashes from the handset.</p>
+</dd></dl>
+
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="androidinstrumentationtestjob">
+<h2><tt class="docutils literal"><span class="pre">AndroidInstrumentationTestJob</span></tt><a class="headerlink" href="#androidinstrumentationtestjob" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ave.utils.testjob_android.AndroidInstrumentationTestJob">
+<em class="property">class </em><tt class="descclassname">ave.utils.testjob_android.</tt><tt class="descname">AndroidInstrumentationTestJob</tt><big>(</big><em>logcat_active=True</em><big>)</big><a class="headerlink" href="#ave.utils.testjob_android.AndroidInstrumentationTestJob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inherits from <tt class="docutils literal"><span class="pre">AndroidTestJob</span></tt>.</p>
+<p>Base class for test jobs that are written for Android handsets, that run
+instrumentation tests.</p>
+</dd></dl>
+
+<div class="section" id="instrumentation">
+<h3>Instrumentation<a class="headerlink" href="#instrumentation" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><dl class="function">
+<dt id="execute_instrumentation_tests">
+<tt class="descname">execute_instrumentation_tests</tt><big>(</big><em>runner</em>, <em>test_name</em>, <em>test_options</em>, <em>timeout=600</em>, <em>handset=None</em><big>)</big><a class="headerlink" href="#execute_instrumentation_tests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes an instrumentation test. Stores the JUnit result file in the
+local results directory and pushes it to flocker, then shouts it to
+Panotti.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>runner</strong> &#8211; The runner to run.</li>
+<li><strong>test_name</strong> &#8211; The Name of the test.</li>
+<li><strong>test_options</strong> &#8211; Test options that are passed on to <tt class="docutils literal"><span class="pre">run_junit()</span></tt>.
+Defaults to <em>None</em>.</li>
+<li><strong>timeout</strong> &#8211; Timeout in seconds, defaults to 600.</li>
+<li><strong>handset</strong> &#8211; the handset used, must be set. For backwards compatibility,
+Defaults to <em>None</em></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">evaluate_results</tt><big>(</big><big>)</big></dt>
+<dd><p>Reports the test by using <tt class="docutils literal"><span class="pre">report_instrumentation_tests()</span></tt>. If the
+reporting succeeds, then the report is evaluated with the function
+<tt class="docutils literal"><span class="pre">evaluate_instrumentation_report()</span></tt>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="report_instrumentation_tests">
+<tt class="descname">report_instrumentation_tests</tt><big>(</big><em>handset=None</em><big>)</big><a class="headerlink" href="#report_instrumentation_tests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reports the Instrumentation test to decibel</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>handset</strong> &#8211; the handset used, must be set. For backwards compatibility,
+Defaults to <em>None</em></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>True</em> if the reporting is successful.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="evaluate_instrumentation_report">
+<tt class="descname">evaluate_instrumentation_report</tt><big>(</big><em>handset=None</em><big>)</big><a class="headerlink" href="#evaluate_instrumentation_report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates the instrumentation test report and sets the test job status
+to <tt class="docutils literal"><span class="pre">vcsjob.ERROR</span></tt>, <tt class="docutils literal"><span class="pre">vcsjob.FAILURES</span></tt> or <tt class="docutils literal"><span class="pre">vcsjob.OK</span></tt> depending on
+the result of the tests.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>handset</strong> &#8211; the handset used, must be set. For backwards compatibility,
+Defaults to <em>None</em></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="id2">
+<h3>State Machine<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><dl class="function">
+<dt>
+<tt class="descname">setup</tt><big>(</big><big>)</big></dt>
+<dd><p>Calls <tt class="docutils literal"><span class="pre">AndroidInstrumentationTestJob.setup()</span></tt>.</p>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="id3">
+<h3>State Machine<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><dl class="function">
+<dt>
+<tt class="descname">setup</tt><big>(</big><big>)</big></dt>
+<dd><p>Calls <tt class="docutils literal"><span class="pre">AndroidTestJob.setup()</span></tt>.</p>
+</dd></dl>
+
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="handsetworkspacedata">
+<h2><tt class="docutils literal"><span class="pre">HandsetWorkspaceData</span></tt><a class="headerlink" href="#handsetworkspacedata" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ave.utils.testjob.HandsetWorkspaceData">
+<em class="property">class </em><tt class="descclassname">ave.utils.testjob.</tt><tt class="descname">HandsetWorkspaceData</tt><big>(</big><em>handset</em>, <em>workspace</em><big>)</big><a class="headerlink" href="#ave.utils.testjob.HandsetWorkspaceData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data structure for the shared variables linked to a handset.</p>
+<dl class="docutils">
+<dt>List of variables set::</dt>
+<dd>HandsetWorkspaceData.handset
+HandsetWorkspaceData.workspace
+HandsetWorkspaceData.results_directory
+HandsetWorkspaceData.sw
+HandsetWorkspaceData.hw
+HandsetWorkspaceData.serial
+HandsetWorkspaceData.imei
+HandsetWorkspaceData.instrumentation_report
+HandsetWorkspaceData.build_handler
+HandsetWorkspaceData.logcat_handler
+HandsetWorkspaceData.crash_handler
+HandsetWorkspaceData.run
+HandsetWorkspaceData.junit_test_completed</dd>
+</dl>
+<dl class="function">
+<dt>
+<tt class="descname">set(name, value):</tt></dt>
+<dd><p>The function assigns the value to the attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> &#8211; A string may name an existing attribute or a new attribute</li>
+<li><strong>value</strong> &#8211; an arbitrary value</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Test Job Base Classes</a><ul>
+<li><a class="reference internal" href="#testjob"><tt class="docutils literal"><span class="pre">TestJob</span></tt></a><ul>
+<li><a class="reference internal" href="#flocker-support">Flocker Support</a></li>
+<li><a class="reference internal" href="#state-machine">State Machine</a></li>
+<li><a class="reference internal" href="#convenience-methods">Convenience Methods</a></li>
+<li><a class="reference internal" href="#multiple-handset-handling">Multiple Handset Handling</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#androidtestjob"><tt class="docutils literal"><span class="pre">AndroidTestJob</span></tt></a><ul>
+<li><a class="reference internal" href="#id1">State Machine</a></li>
+<li><a class="reference internal" href="#packages-installation">Packages Installation</a></li>
+<li><a class="reference internal" href="#crash-handling">Crash Handling</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#androidinstrumentationtestjob"><tt class="docutils literal"><span class="pre">AndroidInstrumentationTestJob</span></tt></a><ul>
+<li><a class="reference internal" href="#instrumentation">Instrumentation</a></li>
+<li><a class="reference internal" href="#id2">State Machine</a></li>
+<li><a class="reference internal" href="#id3">State Machine</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#handsetworkspacedata"><tt class="docutils literal"><span class="pre">HandsetWorkspaceData</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="logger_api.html"
+                        title="previous chapter">Logging</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../../system/index.html"
+                        title="next chapter">System Documentation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/utils/docs/testjob_api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../system/index.html" title="System Documentation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="logger_api.html" title="Logging"
+             >previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" >Utils</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

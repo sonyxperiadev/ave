@@ -1,0 +1,368 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Dialogs &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="dialogs">
+<h1>Dialogs<a class="headerlink" href="#dialogs" title="Permalink to this headline">¶</a></h1>
+<p>Our capability to predict when dialogs appear is low. They often stop execution
+of test cases until the dialog has been dismissed, so dialogs incur a high risk
+against test automation. To handle this, AVE provides functions to configure, enable and disable individual dialogs.</p>
+<p>Known dialogs must be checked that they can be enabled/disabled with AVE during
+bring-up. The bring-up team also needs to make an inventory of new dialogs that
+did not exist before, and handle these.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Generally it is not possible to know with absolute certainty that all
+possible dialogs receive sufficient handling in either AVE or in the test
+jobs that use AVE. Manual verification of the handling is needed.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Alternative Handling</p>
+<p class="last">Sometimes it is important for a test that a dialog <em>does</em> pop up. For these
+situations the handset UI manipulation functions should be used to dismiss
+dialogs. The UI manipulation functions are covered by the fully automated
+AVE handset tests.</p>
+</div>
+<div class="section" id="auto-power-off">
+<h2>Auto Power Off<a class="headerlink" href="#auto-power-off" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>AVE implementation: None</li>
+<li>Bring-up handling: SHOULD handle. SIM card should not be necessary to have
+in all lab prototypes.</li>
+<li>Preferred implementation: Enable/disable the behavior (not the dialog). We
+don&#8217;t want the handset to turn itself off. Disabling the behavior should
+disable the dialog.</li>
+<li>How to recognize: Shown soon after boot completed on handsets without a SIM.
+Warns user that handset will be turned off automatically within 15 minutes
+of idling.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="dangerous-listening-volume">
+<h2>Dangerous Listening Volume<a class="headerlink" href="#dangerous-listening-volume" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>AVE implementation: None</li>
+<li>Bring-up handling: NICE to have. Headset must be connected to trigger.</li>
+<li>Preferred implementation: Let user enable/disable the dialog.</li>
+<li>How to recognize: Connect headset, set volume to max. Dialog will appear with
+warning about high volume levels causing impaired hearing.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="data-disclaimer">
+<h2>Data Disclaimer<a class="headerlink" href="#data-disclaimer" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>AVE implementation: None</li>
+<li>Bring-up handling: MUST handle. Does not seem to block tests, but likely
+we just haven&#8217;t tripped over the blocked tests yet.</li>
+<li>Preferred implementation: Let user enable/disable the dialog.</li>
+<li>How to recognize: <em>&#8220;Data disclaimer. For quality purposes, your device will
+check for software updates to your preinstalled Sony applications ...
+&lt;Accept&gt;&#8221;</em></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="data-transmission-charges-may-apply">
+<h2>Data Transmission Charges May Apply<a class="headerlink" href="#data-transmission-charges-may-apply" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>AVE implementation: None</li>
+<li>Bring-up handling: SHOULD handle. GPS tests currently have to dismiss the
+dialog with UI traversal. This just adds execution time if the dialog does
+not appear (within a timeout).</li>
+<li>Preferred implementation: Let user pre-configure the presented choice to
+disable the dialog.</li>
+<li>How to recognize: <em>&#8220;The device will download inforation about your current
+location to improve the performance. Data transmission charges may apply.
+&lt;checkbox&gt; Don&#8217;t ask me again &lt;Disagree|Agree&gt;&#8221;</em></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="improved-stamina-tips">
+<h2>Improved Stamina Tips<a class="headerlink" href="#improved-stamina-tips" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>AVE implementation: None</li>
+<li>Bring-up handling: SHOULD handle. Uncertain if this dialog blocks testing.</li>
+<li>Preferred implementation: Let user enable/disable the dialog.</li>
+<li>How to recognize: ...</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="insufficient-power">
+<h2>Insufficient Power<a class="headerlink" href="#insufficient-power" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>AVE implementation: None</li>
+<li>Bring-up handling: MUST handle. This information is needed by AVE to avoid
+draining prototype batteries.</li>
+<li>Preferred implementation: Let user enable/disable the dialog. The condition
+itself should be exposed as a property or event that can be interfaced by a
+programmable solution.</li>
+<li>How to recognize: <em>&#8220;The connected power source is not sufficient. The
+battery is discharging faster than it is charging. Please change to your AC
+charger.&#8221;</em></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="key-guard">
+<h2>Key Guard<a class="headerlink" href="#key-guard" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>AVE implementation: <tt class="docutils literal"><span class="pre">AndroidHandset.disable_keyguard()</span></tt></li>
+<li>Bring-up handling: MUST handle.</li>
+<li>Preferred implementation: Let user select the exact key guard. E.g. &#8220;Swipe&#8221;,
+&#8220;PIN&#8221; or &#8220;None&#8221;, as seen in Android menu <tt class="docutils literal"><span class="pre">Settings</span> <span class="pre">/</span> <span class="pre">Security</span> <span class="pre">/</span> <span class="pre">Screen</span>
+<span class="pre">lock</span></tt>.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="learning-client">
+<h2>Learning Client<a class="headerlink" href="#learning-client" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>AVE implementation: <tt class="docutils literal"><span class="pre">AndroidHandset.uninstall_learning_client()</span></tt>.</li>
+<li>Bring-up handling: MUST handle.</li>
+<li>Preferred implementation: The dialog is currently disabled by uninstalling
+the learning client. It would be better if it could be pre-configured.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="location-consent">
+<h2>Location Consent<a class="headerlink" href="#location-consent" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>AVE implementation: None</li>
+<li>Bring-up handling: MUST handle. GPS tests currently have to use UI traversal
+to dismiss the dialog.</li>
+<li>Preferred implementation: Let user pre-configure the presented choice to
+disable the dialog.</li>
+<li>How to recognize: <em>&#8220;Location consent. Allow Google&#8217;s location service to
+collect anonymous location data. Some data may be stored on your device.
+Collection may occur even when no apps are running. &lt;Disagree|Agree&gt;&#8221;</em></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="package-verifier">
+<h2>Package Verifier<a class="headerlink" href="#package-verifier" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>AVE implementation: <tt class="docutils literal"><span class="pre">AndroidHandset.disable_package_verifier()</span></tt></li>
+<li>Bring-up handling: MUST handle.</li>
+<li>Preferred implementation: Current implementation.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="pc-companion">
+<h2>PC Companion<a class="headerlink" href="#pc-companion" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>AVE implementation: <tt class="docutils literal"><span class="pre">AndroidHandset.disable_pc_companion()</span></tt></li>
+<li>Bring-up handling: MUST handle.</li>
+<li>Preferred implementation: Current implementation.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="process-x-has-stopped">
+<h2>Process X has Stopped<a class="headerlink" href="#process-x-has-stopped" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>AVE implementation: None</li>
+<li>Bring-up handling: SHOULD handle. It seems these dialogs disappear anyway.
+The risk is that the dialog masks something in the UI that a test is looking
+for.</li>
+<li>Preferred implementation: Let user enable/disable. Report should be written
+to on-device storage instead (if it isn&#8217;t already).</li>
+<li>How to recognize: Duh...</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="regularly-check-apps">
+<h2>Regularly Check Apps<a class="headerlink" href="#regularly-check-apps" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>AVE implementation: None</li>
+<li>Bring-up handling: MUST handle. Blocking on JB MR2.</li>
+<li>Preferred implementation: Let user enable/disable the dialog.</li>
+<li>How to recognize: <em>&#8220;Google may regularly check installed apps ...&#8221;</em></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="satelite-notification">
+<h2>Satelite Notification<a class="headerlink" href="#satelite-notification" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>AVE implementation: Test jobs that encounter this dialog currently uninstall
+<tt class="docutils literal"><span class="pre">/system/app/GpsSatellitesNotification.apk</span></tt> from the handset.</li>
+<li>Bring-up handling: SHOULD handle.</li>
+<li>Preferred implementation: Let user enable/disable without uninstalling the
+APK.</li>
+<li>How to recognize: Unknown. Ask positioning team.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="setup-wizard">
+<h2>Setup Wizard<a class="headerlink" href="#setup-wizard" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>AVE implementation: <tt class="docutils literal"><span class="pre">AndroidHandset.uninstall_setup_wizard()</span></tt></li>
+<li>Bring-up handling: MUST handle.</li>
+<li>Preferred implementation: The dialog is currently disabled by uninstalling
+the setup wizard. It would be better if it could be pre-configured.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="this-is-a-prototype">
+<h2>This is a Prototype<a class="headerlink" href="#this-is-a-prototype" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>AVE implementation: None</li>
+<li>Bring-up handling: MUST handle. Blocks all UI driven tests.</li>
+<li>Preferred implementation: Let user enable/disable the dialog.</li>
+<li>How to recognize: <em>&#8220;This is a prototype...&#8221;</em></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="upload-reminder">
+<h2>Upload Reminder<a class="headerlink" href="#upload-reminder" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>AVE implementation: <tt class="docutils literal"><span class="pre">AndroidHandset.uninstall_upload_reminder()</span></tt></li>
+<li>Bring-up handling: MUST handle.</li>
+<li>Preferred implementation: Current implementation.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="water-resistance">
+<h2>Water Resistance<a class="headerlink" href="#water-resistance" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>AVE implementation: None</li>
+<li>Bring-up handling: MUST handle. Blocks UI driven tests.</li>
+<li>Preferred implementation: Let user enable/disable the dialog. Take guidance
+from the implementation in DeviceEnvironment.</li>
+<li>How to recognize: Warns user that water protection flaps are being left open.</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Dialogs</a><ul>
+<li><a class="reference internal" href="#auto-power-off">Auto Power Off</a></li>
+<li><a class="reference internal" href="#dangerous-listening-volume">Dangerous Listening Volume</a></li>
+<li><a class="reference internal" href="#data-disclaimer">Data Disclaimer</a></li>
+<li><a class="reference internal" href="#data-transmission-charges-may-apply">Data Transmission Charges May Apply</a></li>
+<li><a class="reference internal" href="#improved-stamina-tips">Improved Stamina Tips</a></li>
+<li><a class="reference internal" href="#insufficient-power">Insufficient Power</a></li>
+<li><a class="reference internal" href="#key-guard">Key Guard</a></li>
+<li><a class="reference internal" href="#learning-client">Learning Client</a></li>
+<li><a class="reference internal" href="#location-consent">Location Consent</a></li>
+<li><a class="reference internal" href="#package-verifier">Package Verifier</a></li>
+<li><a class="reference internal" href="#pc-companion">PC Companion</a></li>
+<li><a class="reference internal" href="#process-x-has-stopped">Process X has Stopped</a></li>
+<li><a class="reference internal" href="#regularly-check-apps">Regularly Check Apps</a></li>
+<li><a class="reference internal" href="#satelite-notification">Satelite Notification</a></li>
+<li><a class="reference internal" href="#setup-wizard">Setup Wizard</a></li>
+<li><a class="reference internal" href="#this-is-a-prototype">This is a Prototype</a></li>
+<li><a class="reference internal" href="#upload-reminder">Upload Reminder</a></li>
+<li><a class="reference internal" href="#water-resistance">Water Resistance</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/governance/bringup_dialogs.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

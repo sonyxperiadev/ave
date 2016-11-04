@@ -1,0 +1,174 @@
+Version 34
+==========
+* bugfix for adb root's error
+    :Tree: semctools/ave/handset
+    :Commit: 4325df58b38887c6924a0d4bb26cba2c61e733dd
+
+* AVE-287 Improvement for Thermal function
+    :Tree: semctools/ave/handset
+    :Commit: 43ace0746e7b8e5e97fa29e59b8b32fcd7a34155
+
+* AVE-258 Support flashing of ODM handsets through setflafla
+    :Tree: semctools/ave/handset
+    :Commit: edd0615e979843fcf3be77afd42aa244aa86313f
+
+* Bugfix and update test cases for handling popup windows
+    :Tree: semctools/ave/handset
+    :Commit: a6887872915f101f449f0f6b1d6912dd7b7c6e73
+
+* AVE-284 bugfix for disable/enable package in M
+    :Tree: semctools/ave/handset
+    :Commit: 9c21fda15377e5f989c694f90f4d8d06e45f17e7
+
+* Refactoring thermal fucntions and add support for MTK platform
+    :Tree: semctools/ave/handset
+    :Commit: d45c3ce12dcdc7b8f0d87c0a0d55e2f84e3b3baf
+
+* Revert "AVE-197 remove .git from /usr/share/ave/handset"
+    :Tree: semctools/ave/handset
+    :Commit: a38953684930ef652950281dd6078207e74609cc
+
+* AVE-216&AVE-244&AVE-247 Add Support for FG4
+    :Tree: semctools/ave/handset
+    :Commit: cd4e5dd8f9f8740c7db998f4370824e5f9e34858
+
+* add some handset model in handset.json
+    :Tree: semctools/ave/handset
+    :Commit: 88208ccae049f06146caad75f07ebe44f48408e3
+
+* AVE-10 Add doc for APN related methods
+    :Tree: semctools/ave/handset
+    :Commit: 6a6a97bd13e72764e9a90e9243136a780718876c
+
+* update handset.push() method in doc
+    :Tree: semctools/ave/handset
+    :Commit: d69a078445cd37b5bae2b8356769006c5921fff1
+
+* AVE-234 Add a method to get remaining battery capacity
+    :Tree: semctools/ave/handset
+    :Commit: dfb8a9eae2d677ddcdde75311993561489a10e2b
+
+* AVE-268-modify pretty name for model SO-02F in handset.json
+    :Tree: semctools/ave/handset
+    :Commit: e9d40e502cc98ce75051088ece252b9ca1575b92
+
+* Add support for reading workstation name from handset
+    :Tree: semctools/ave/handset
+    :Commit: 0c8215cffa20f39cc3689d30af8d70dab4b2b2fc
+
+* AVE-225 Matching of ave handset.json and local handset.json
+    :Tree: semctools/ave/handset
+    :Commit: 15eb64fc5f239fd071c2ea03db3a7261ed9533d3
+
+* Bugfix for checking sdcard mounted status on Android M
+    :Tree: semctools/ave/handset
+    :Commit: f06df986e1a175e45176330714bdce87d1a2e332
+
+* Update enable setup wizard method for Android M
+    :Tree: semctools/ave/handset
+    :Commit: f41836015cfe7314efdddd050d600625b319d515
+
+* Update test case for adb logcat
+    :Tree: semctools/ave/handset
+    :Commit: 57924c97de00989d2e23b950c811ab03907e26ca
+
+* Bugfix for adb forward
+    :Tree: semctools/ave/handset
+    :Commit: bdb59af881527ccdd3ecc1680f2a9f8cd0f16f36
+
+* Bugfix for the issues caused by the latest adb
+    :Tree: semctools/ave/handset
+    :Commit: 886bc8b209e30e3bbc44ad06ff45937e6f9fdda5
+
+* Bugfix for add proxy config in workspace.json
+    :Tree: semctools/ave/workspace
+    :Commit: 75c94b7144ad216a901dc7b823ad58648f49db29
+
+* bugfix: download_uep
+    :Tree: semctools/ave/workspace
+    :Commit: a2153fad910e8219eed053f2043bd4226a2db190
+
+* Add support for FG4
+    :Tree: semctools/ave/workspace
+    :Commit: 8e594c780a589a492defd9ababebf23ca57b6f7b
+
+* AVE-193 Support cdf id and rev in make image
+    :Tree: semctools/ave/workspace
+    :Commit: cd08bd53f851556e91f1cf7c4ecc4b55dbf4d420
+
+* AVE-269 Validate zip file in workspace
+    :Tree: semctools/ave/workspace
+    :Commit: a049bf0d0bb3ca632e304118775b51592eb2850d
+
+* add  workspace.promote method in doc
+    :Tree: semctools/ave/workspace
+    :Commit: 56aee1383197513d4d66afcf7dfd90119f23da1a
+
+* modify cig.escape to make xml format right
+    :Tree: semctools/ave/workspace
+    :Commit: b00ec8ecb8dc83d49099eca12ff3c1d06fd90ece
+
+* AVE-270 download_uep
+    :Tree: semctools/ave/workspace
+    :Commit: e59df1ed80b38761a83e63f9686fa837b5706602
+
+* AVE-219 Update ave.git.branch to adapt git-v2.4.2
+    :Tree: semctools/ave/workspace
+    :Commit: c32983cd31445163af17b2a84ba92e3588d7b3c8
+
+* bugfix: AVE-250 solve flocker_push_files times out
+    :Tree: semctools/ave/workspace
+    :Commit: 21f135e284d4f352440e23afc13733521ebf922c
+
+* Update handset profile in setup
+    :Tree: semctools/ave/broker
+    :Commit: dac8b45507839a0bff828dba832a26b2dd0d879d
+
+* modify doc for broker.get method
+    :Tree: semctools/ave/broker
+    :Commit: 5833331fc371835351707e0126245e3085c6fc56
+
+* can print handset's workstation through cmd 'ave-broker --list'
+    :Tree: semctools/ave/broker
+    :Commit: 055eaa2a2bd3ef9df9a5e1adb0c92426e6f1c181
+
+* AVE-192 part2 master unable to get resources from slave when restart
+    :Tree: semctools/ave/broker
+    :Commit: 6a93a169eb7d6ca0907bf3f8c6053f3d4e0ff084
+
+* AVE-213 Bugfix for the exception when get handset config
+    :Tree: semctools/ave/broker
+    :Commit: 29ba8767e1dd4c7e82d73ce4b51e8dbab87f0dc4
+
+* Add support for FG4
+    :Tree: semctools/ave/common
+    :Commit: 2bf4310928684ba362af6cfa337787da083a4b79
+
+* modify workspace config
+    :Tree: semctools/ave/common
+    :Commit: 2399d623668d13ac78af20c0c2a75d39ccb7e256
+
+* AVE-192 master unable to get resources from slave when restart
+    :Tree: semctools/ave/common
+    :Commit: 51faac0104d1ab0d483907f2abcd6ed2d8e3ecd0
+
+* AVE-258 Support flashing of ODM handsets through setflafla
+    :Tree: semctools/ave/flash
+    :Commit: df991654b7c2ad6fc6dd3ce0e45d2c430eba8ab6
+
+* AVE-199 Add a template for removing simlock fgc file
+    :Tree: semctools/ave/flash
+    :Commit: d7822f4de1397141a6165d924b46bb881f5f4999
+
+* AVE-216&AVE-244&AVE-247 Add Support for FG4
+    :Tree: semctools/ave/flash
+    :Commit: 9df34e9eddf38084d6e06124a7507499e12ff4d9
+
+* PyFlash module proof of concept
+    :Tree: semctools/ave/flash
+    :Commit: 30e417460118f82ddf206e884ea652dd7dd463ce
+
+* Dummy commit that will be used for testing
+    :Tree: semctools/ave/gerrit
+    :Commit: b10f393c761895c57fec0045df15de764faa6e8e
+

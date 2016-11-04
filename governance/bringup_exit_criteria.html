@@ -1,0 +1,298 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>AVE Bring-up Exit Criteria &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="ave-bring-up-exit-criteria">
+<h1>AVE Bring-up Exit Criteria<a class="headerlink" href="#ave-bring-up-exit-criteria" title="Permalink to this headline">¶</a></h1>
+<p>Each development project that wishes to use AVE for automated testing must
+follow a couple of steps to prove that the product is ready for automated
+testing. By doing so the project secures that test results generated with AVE
+are credible:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://dmweb.sonyericsson.net/pages/fba/edit-fba.html?id=569">http://dmweb.sonyericsson.net/pages/fba/edit-fba.html?id=569</a>
+This is FBA page which SW project will request AVE team to bring up AVE
+on the new SW platform in a project. This is maintained by AVE product owner.</li>
+<li>Set up official builds to produce and store test packages in C2D and Jenkins.</li>
+<li>Make sure AVE can flash the new handset models.</li>
+<li>Make necessary changes to AVE&#8217;s Handset components.</li>
+<li>Keep track of system dialogs that cannot be disabled or pre-configured in
+the product.</li>
+<li>Check that all AVE&#8217;s self tests pass.</li>
+<li>Enable AVE&#8217;s smoke tests in DUST to catch future changes in the product that
+break the verification environment.</li>
+</ul>
+<div class="section" id="process-overview">
+<h2>Process Overview<a class="headerlink" href="#process-overview" title="Permalink to this headline">¶</a></h2>
+<p>AVE supports official test schedulers (e.g. DUST) which support verification
+of selected feature scopes. This maps to existing project checkpoints:</p>
+<div class="figure align-center">
+<img alt="../_images/ave-bring-up.jpg" src="../_images/ave-bring-up.jpg" />
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>It is recommended to start AVE bring-up already before <cite>CP Basic</cite> but the
+hard requirement is to finish before <cite>CP Open</cite>. It is not possible to fully
+complete the AVE bring-up before <cite>CP Open</cite> because of dependencies toward
+official build systems and CM labeling which are not available until that
+time.</li>
+<li>FBA dependency: Telephony, Positioning, Android System Thermal.</li>
+</ul>
+</div>
+<p><strong>Before CP Open</strong></p>
+<p>An AVE bring-up is an entirely technical affair guided by test cases, most of
+which are automated. The automated tests verify that a product supports various
+API&#8217;s that are required to make the product testable. They also verify that
+delivery systems are correctly set up for use in continuous integration with
+DUST. The manual tests verify that no popup dialogs can block test execution.</p>
+<p>PM&#8217;s are recommended to use a mix of personnel with competencies in tooling and
+certain domains of product functionality to secure an AVE bring-up:</p>
+<ul class="simple">
+<li>SWD Tools (primary, with support from System Verification)</li>
+<li>Telephony (if needed for problems with calling and messaging functions)</li>
+<li>Positioning (if needed for problems with GPS related functions)</li>
+<li>Local connectivity (if needed for problems with USB stability)</li>
+<li>Android System (if needed for problems with suppression of dialogs and other
+system configuration issues)</li>
+</ul>
+<p>Passing the bring-up tests may require changes to AVE and/or the product itself.
+It is not always the case that the product offers the needed testability out of
+the box.</p>
+<p><strong>A Minimal Bring-Up</strong></p>
+<p>As suggested, it is often not possible to pass <cite>all</cite> AVE self tests during the
+early bring-up activities. The reason is simple: The product does not yet have
+all legacy features, many of which are exposed through AVE.</p>
+<p>However, a small set of AVE features are so essential that almost no tests can
+run without them. In reality, these are <cite>product</cite> features:</p>
+<ul class="simple">
+<li>A unique handset serial number is visible in the USB device descriptor.</li>
+<li>ADB over USB works.</li>
+<li>The command <tt class="docutils literal"><span class="pre">adb</span> <span class="pre">-s</span> <span class="pre">&lt;serial</span> <span class="pre">number&gt;</span> <span class="pre">reboot</span> <span class="pre">oem-53</span></tt> reboots the handset to
+soft service mode.</li>
+<li>The handset can be flashed in soft service mode.</li>
+<li>The handset automatically reboots to Android mode after a successful flash.</li>
+<li>The handset automatically sets the property <tt class="docutils literal"><span class="pre">sys.boot_completed</span></tt> <cite>after</cite>
+the home and lock screens are fully loaded. It is not possible to allocate
+the handset to a test job before this works. If the property is set too
+early, many test jobs will fail because the handset is not ready for remote
+control.</li>
+<li>Ability to force-wake the handset.</li>
+<li>Ability to disable the handset keyguard.</li>
+</ul>
+<p><strong>After CP Open</strong></p>
+<p>Once the minimal bring-up has been completed, it should be possible to execute
+a wide variety of AVE-based test jobs in DUST. This is handled by System
+Verification (owner of DUST).</p>
+<p>At this point the PM can start tracking an initial test scope, and expand it
+with the goal of having the full scope in place for <cite>CP Feature Complete</cite>. It
+is normal that many tests do not initially pass and many test jobs will not be
+meaningful to enable before missing features have been integrated. This should
+be business as usual for the PM and System teams.</p>
+<p><strong>A Complete Bring-Up</strong></p>
+<p>As the platform and legacy bring-up nears completion, more and more of AVE&#8217;s
+self tests should pass. SWD Tools tracks this progress and helps the development
+project prioritize product issues that block test automation. If the new product
+is significantly different from an old one in some way that affects AVE API&#8217;s,
+SWD Tools also implements support for these changes in AVE.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The rest of this document is concerned with the combined set of AVE bring-up
+activities that must be completed before <cite>CP Legacy Complete</cite></p>
+</div>
+</div>
+<div class="section" id="detailed-task-lists">
+<h2>Detailed Task Lists<a class="headerlink" href="#detailed-task-lists" title="Permalink to this headline">¶</a></h2>
+<p>The linked documents below contain the technical details about how to pass all
+AVE bring-up exit criteria:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="bringup_official_build.html">Official Builds</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bringup_official_build.html#label-builds">Label Builds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_official_build.html#commit-builds">Commit Builds</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bringup_flash.html">Flashing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bringup_handset.html">Handset Changes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bringup_handset.html#tests-to-run">Tests to Run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_handset.html#individual-handset-functions">Individual Handset Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_handset.html#individual-gort-functions">Individual Gort Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_handset.html#rebuilding-galatea">Rebuilding Galatea</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bringup_dialogs.html">Dialogs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bringup_dialogs.html#auto-power-off">Auto Power Off</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_dialogs.html#dangerous-listening-volume">Dangerous Listening Volume</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_dialogs.html#data-disclaimer">Data Disclaimer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_dialogs.html#data-transmission-charges-may-apply">Data Transmission Charges May Apply</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_dialogs.html#improved-stamina-tips">Improved Stamina Tips</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_dialogs.html#insufficient-power">Insufficient Power</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_dialogs.html#key-guard">Key Guard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_dialogs.html#learning-client">Learning Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_dialogs.html#location-consent">Location Consent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_dialogs.html#package-verifier">Package Verifier</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_dialogs.html#pc-companion">PC Companion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_dialogs.html#process-x-has-stopped">Process X has Stopped</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_dialogs.html#regularly-check-apps">Regularly Check Apps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_dialogs.html#satelite-notification">Satelite Notification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_dialogs.html#setup-wizard">Setup Wizard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_dialogs.html#this-is-a-prototype">This is a Prototype</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_dialogs.html#upload-reminder">Upload Reminder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bringup_dialogs.html#water-resistance">Water Resistance</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="wrapping-up">
+<h2>Wrapping Up<a class="headerlink" href="#wrapping-up" title="Permalink to this headline">¶</a></h2>
+<p>So you think you are done? Please bump the version numbers of the components you
+had to change:</p>
+<ul class="simple">
+<li>Bump Gort&#8217;s version number by increasing the value of <tt class="docutils literal"><span class="pre">Version:</span></tt> in the
+file <tt class="docutils literal"><span class="pre">semctools/ave/gort/packaging/DEBIAN/control</span></tt>.</li>
+<li>Bump Galatea&#8217;s version number by increasing the value of <tt class="docutils literal"><span class="pre">Version:</span></tt> in the
+file <tt class="docutils literal"><span class="pre">semctools/ave/galatea/packaging/DEBIAN/control</span></tt>.</li>
+<li>Bump flash&#8217;s version number by increasing the value of <tt class="docutils literal"><span class="pre">Version:</span></tt> in the
+file <tt class="docutils literal"><span class="pre">semctools/ave/flash/packaging/DEBIAN/control</span></tt>.</li>
+<li>Set the handset&#8217;s Debian package to require the new versions of <tt class="docutils literal"><span class="pre">ave-gort</span></tt>,
+<tt class="docutils literal"><span class="pre">ave-galatea</span></tt> and <tt class="docutils literal"><span class="pre">ave-flash</span></tt>.</li>
+<li>Bump handset&#8217;s version number by increasing the value of <tt class="docutils literal"><span class="pre">Version:</span></tt> in the
+file <tt class="docutils literal"><span class="pre">semctools/ave/handset/packaging/DEBIAN/control</span></tt>.</li>
+</ul>
+<p>Then make system installations of everything and run the acceptance tests:</p>
+<div class="highlight-python"><pre>#!/bin/sh
+
+semctools/ave/handset/mkdeb
+semctools/ave/gort/mkdeb
+semctools/ave/galatea/mkdeb
+semctools/ave/flash/mkdeb
+
+sudo dpkg -i semctools/ave/handset/ave-handset-&lt;Debian version&gt;.deb
+sudo dpkg -i semctools/ave/gort/ave-gort-&lt;Debian version&gt;.deb
+sudo dpkg -i semctools/ave/galatea/ave-galatea-&lt;Debian version&gt;.deb
+sudo dpkg -i semctools/ave/flash/ave-flash-&lt;Debian version&gt;.deb
+
+ave-broker --restart
+
+vcsjob execute -j semctools/ave/handset -t ACCEPTANCE</pre>
+</div>
+<p>If everything passes and no dialogs are known to cause any problems, then you
+are probably ready to go into code review.</p>
+</div>
+<div class="section" id="finale">
+<h2>Finale<a class="headerlink" href="#finale" title="Permalink to this headline">¶</a></h2>
+<p>These last steps will be done in code review, but you can prepare by checking
+them yourself:</p>
+<ul class="simple">
+<li>To avoid breaking AVE, run the acceptance tests again against older products
+that are known to pass AVE&#8217;s handset tests.</li>
+<li>To avoid breaking AVE, run positioning reference tests (found in this git:
+<tt class="docutils literal"><span class="pre">semctools/ave/positioning</span></tt>). You need a GPS simulator from Spirent to do
+this. Contact the Positioning team for more information.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">AVE Bring-up Exit Criteria</a><ul>
+<li><a class="reference internal" href="#process-overview">Process Overview</a></li>
+<li><a class="reference internal" href="#detailed-task-lists">Detailed Task Lists</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#wrapping-up">Wrapping Up</a></li>
+<li><a class="reference internal" href="#finale">Finale</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/governance/bringup_exit_criteria.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

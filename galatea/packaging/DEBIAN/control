@@ -1,0 +1,7 @@
+Package:      ave-galatea
+Version:      21.0
+Architecture: all
+Depends:      sdkdownload (>=1.25)
+Suggests:     ave-broker, ave-handset (>=110.0)
+Maintainer:   Klas Lindberg <klas.lindberg@sonymobile.com>
+Description:  Expose ATF functionality to test jobs

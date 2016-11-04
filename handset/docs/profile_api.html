@@ -1,0 +1,161 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Handset Profile &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../../index.html" />
+    <link rel="up" title="Handset" href="index.html" />
+    <link rel="next" title="ADB Handset" href="adb_api.html" />
+    <link rel="prev" title="Handset" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="adb_api.html" title="ADB Handset"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Handset"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Handset</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="handset-profile">
+<h1>Handset Profile<a class="headerlink" href="#handset-profile" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="ave.handset.profile.HandsetProfile">
+<em class="property">class </em><tt class="descclassname">ave.handset.profile.</tt><tt class="descname">HandsetProfile</tt><big>(</big><em>values</em><big>)</big><a class="headerlink" href="#ave.handset.profile.HandsetProfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inherits from <tt class="docutils literal"><span class="pre">ave.profile.Profile</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>values</strong> &#8211; A dictionary that contains profile data. All keys must be
+strings.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="ave.handset.profile.HandsetProfile.minimize">
+<tt class="descname">minimize</tt><big>(</big><em>profile=None</em><big>)</big><a class="headerlink" href="#ave.handset.profile.HandsetProfile.minimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reduces <em>self</em> to whatever is in <em>profile</em>, plus the fields that are
+mandatory:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&#39;type&#39;</span><span class="p">,</span> <span class="s">&#39;platform&#39;</span><span class="p">,</span> <span class="s">&#39;serial&#39;</span><span class="p">,</span> <span class="s">&#39;sysfs_path&#39;</span><span class="p">,</span> <span class="s">&#39;pretty&#39;</span><span class="p">,</span> <span class="s">&#39;power_state&#39;</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">If the profile is not complete enough to be
+minimized.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function is used by the broker to ensure that profiles
+contain enough information to be used in all parts of AVE.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Handset</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="adb_api.html"
+                        title="next chapter">ADB Handset</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/handset/docs/profile_api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="adb_api.html" title="ADB Handset"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Handset"
+             >previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" >Handset</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

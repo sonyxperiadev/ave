@@ -1,0 +1,186 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>System Documentation &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../index.html" />
+    <link rel="next" title="Conceptual Summary" href="conceptual_summary.html" />
+    <link rel="prev" title="Test Job Base Classes" href="../utils/docs/testjob_api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="conceptual_summary.html" title="Conceptual Summary"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../utils/docs/testjob_api.html" title="Test Job Base Classes"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="system-documentation">
+<h1>System Documentation<a class="headerlink" href="#system-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="conceptual_summary.html">Conceptual Summary</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="conceptual_summary.html#goals">Goals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conceptual_summary.html#illustrations-legend">Illustrations Legend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conceptual_summary.html#terminology">Terminology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conceptual_summary.html#test-anatomy">Test Anatomy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conceptual_summary.html#cm-labeling-of-test-jobs">CM Labeling of Test Jobs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conceptual_summary.html#allocation-control-of-test-equipment">Allocation &amp; Control of Test Equipment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conceptual_summary.html#advanced-equipment-state-tracking">Advanced Equipment State Tracking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conceptual_summary.html#a-strategy-against-waste">A Strategy Against Waste</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="lab_owner.html">Lab Owner&#8217;s Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lab_owner.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lab_owner.html#configure-broker">Configure Broker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lab_owner.html#configure-supplemental-services">Configure Supplemental Services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lab_owner.html#listing-equipment">Listing Equipment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lab_owner.html#when-to-restart-services">When to Restart Services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lab_owner.html#debugging-techniques">Debugging Techniques</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lab_owner.html#usb-power-flashing">USB, Power &amp; Flashing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lab_owner.html#one-host-multiple-users">One Host, Multiple Users</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lab_owner.html#running-ave-as-jenkins">Running AVE as Jenkins</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="logging.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.html#stdout-prints-by-test-jobs"><tt class="docutils literal"><span class="pre">stdout</span></tt> Prints by Test Jobs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.html#stderr-prints-by-daemons"><tt class="docutils literal"><span class="pre">stderr</span></tt> Prints by Daemons</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.html#consolidation-of-job-logs">Consolidation of Job Logs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.html#structured-logging-to-panotti">Structured Logging to Panotti</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.html#test-results">Test Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.html#performance-results">Performance Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.html#scheduler-work-performed-on-a-jobs-behalf">Scheduler Work Performed on a Job’s Behalf</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../broker/docs/system.html">Broker</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../broker/docs/stacking.html">Equipment Stacking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../broker/docs/restart.html">Restart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../broker/docs/allocation.html">Networked Allocation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../relay/docs/system.html">Relay Server</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../relay/docs/system.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../relay/docs/system.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../relay/docs/system.html#equipment-detection">Equipment Detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../relay/docs/system.html#equipment-allocation">Equipment Allocation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../relay/docs/system.html#equipment-reclamation">Equipment Reclamation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../relay/docs/system.html#implementation">Implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../relay/docs/system.html#restarting-the-server">Restarting the Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../relay/docs/system.html#configuration-files">Configuration Files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="upstart_integration.html">Upstart Integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="upstart_integration.html#model">Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="upstart_integration.html#notes">Notes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="services.html">Services</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="services.html#starting">Starting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="services.html#restarting">Restarting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="services.html#stopping">Stopping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="services.html#systemic-uses">Systemic Uses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="services.html#notes">Notes</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../utils/docs/testjob_api.html"
+                        title="previous chapter">Test Job Base Classes</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="conceptual_summary.html"
+                        title="next chapter">Conceptual Summary</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/system/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="conceptual_summary.html" title="Conceptual Summary"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../utils/docs/testjob_api.html" title="Test Job Base Classes"
+             >previous</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

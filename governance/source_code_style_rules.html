@@ -1,0 +1,181 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Source Code Style Rules &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="source-code-style-rules">
+<h1>Source Code Style Rules<a class="headerlink" href="#source-code-style-rules" title="Permalink to this headline">¶</a></h1>
+<p>There are just a few rules for source code style. Follow them.</p>
+<div class="section" id="python">
+<h2>Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>Must run on versions 2.6 and 2.7 of CPython.</li>
+<li>Max 80 chars per line.</li>
+<li>Avoid deep class hierarchies.</li>
+<li>Prefer a procedural programming style. Mimic C, not Java.</li>
+<li>It is forbidden to pass <tt class="docutils literal"><span class="pre">self</span></tt> references into an object held by <tt class="docutils literal"><span class="pre">self</span></tt>,
+or otherwise create circular references.</li>
+<li>It is forbidden to declare variables with global scope. Only constants,
+classes and functions may have global scope.</li>
+<li>User visible functions must only take parameters that are JSON serializable.</li>
+<li>User visible functions must only return values that are JSON serializable.</li>
+<li>Avoid function declarations inside other functions. All functions should be
+callable from tests.</li>
+<li>Functions must raise exceptions to signal error conditions. The caller must
+not be forced to inspect the regular return value to look for an error
+condition.</li>
+<li>Prefix user invisible function names with &#8220;_&#8221;.</li>
+<li>Classes must not be implemented as singletons.</li>
+<li>Base classes must inherit from <tt class="docutils literal"><span class="pre">object</span></tt> or <tt class="docutils literal"><span class="pre">Exception</span></tt>.</li>
+<li>Use the <tt class="docutils literal"><span class="pre">ctypes</span></tt> module to interface with native code libraries.</li>
+<li>Use the <tt class="docutils literal"><span class="pre">ave.cmd</span></tt> module to interface with external programs.</li>
+<li>Default values for function parameters must be of type <tt class="docutils literal"><span class="pre">None</span></tt>, <tt class="docutils literal"><span class="pre">int</span></tt>,
+<tt class="docutils literal"><span class="pre">float</span></tt>, <tt class="docutils literal"><span class="pre">str</span></tt> or <tt class="docutils literal"><span class="pre">unicode</span></tt>.</li>
+</ul>
+</div></blockquote>
+<p>An example to illustrate the importance of the last rule. The default values
+have non-simple types (a dictionary and a list). Python treats these as globals
+that are not created fresh on each call to the function. Instead a single object
+is used over and over. Needless to say this can give you very strange results.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/python2</span>
+
+<span class="c"># structured types for default parameters are not ok. behavior depends on</span>
+<span class="c"># how many times the function was called before.</span>
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;a&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="s">&#39;b&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">},</span> <span class="n">b</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]):</span>
+    <span class="k">print</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+    <span class="n">a</span><span class="p">[</span><span class="s">&#39;b&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="n">f</span><span class="p">()</span> <span class="c"># prints &quot;{&#39;a&#39;: 1, &#39;b&#39;: 2} [1, 2, 3]&quot;</span>
+<span class="n">f</span><span class="p">()</span> <span class="c"># prints &quot;{&#39;a&#39;: 1, &#39;b&#39;: 3} [1, 2, 3, 4]&quot;</span>
+</pre></div>
+</div>
+<p>What about <tt class="docutils literal"><span class="pre">ave.cmd</span></tt>? Why not use the <tt class="docutils literal"><span class="pre">subprocess</span></tt> module?  Programs started
+with <tt class="docutils literal"><span class="pre">subprocess</span></tt> can be very hard to kill completely if they started their
+own sub-processes. A user of <tt class="docutils literal"><span class="pre">ave.cmd</span></tt> can simply terminate itself to also
+terminate the external programs it started.</p>
+</div>
+<div class="section" id="java">
+<h2>Java<a class="headerlink" href="#java" title="Permalink to this headline">¶</a></h2>
+<p>Gort and Galatea. Coding style rules are <strong>TODO</strong> items.</p>
+</div>
+<div class="section" id="javascript">
+<h2>JavaScript<a class="headerlink" href="#javascript" title="Permalink to this headline">¶</a></h2>
+<p>Marionette is used to implement helper functions in Firefox OS products. Coding
+style rules are <strong>TODO</strong> items.</p>
+</div>
+<div class="section" id="c">
+<h2>C<a class="headerlink" href="#c" title="Permalink to this headline">¶</a></h2>
+<p>Mostly <strong>TODO</strong>. However:</p>
+<blockquote>
+<div><ul class="simple">
+<li>If the program is for the handset (and not for the host), then it cannot be
+part of AVE. It must instead be part of the product and built by the product
+build system. This is necessary because different products run on different
+CPU architectures. Cross compilation of C is out of scope for AVE.</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Source Code Style Rules</a><ul>
+<li><a class="reference internal" href="#python">Python</a></li>
+<li><a class="reference internal" href="#java">Java</a></li>
+<li><a class="reference internal" href="#javascript">JavaScript</a></li>
+<li><a class="reference internal" href="#c">C</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/governance/source_code_style_rules.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

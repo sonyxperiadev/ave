@@ -1,0 +1,509 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Relay &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../../index.html" />
+    <link rel="next" title="Workspaces" href="../../workspace/docs/index.html" />
+    <link rel="prev" title="ADB Server" href="../../handset/docs/adb_server_api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../workspace/docs/index.html" title="Workspaces"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../../handset/docs/adb_server_api.html" title="ADB Server"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="relay">
+<h1>Relay<a class="headerlink" href="#relay" title="Permalink to this headline">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">module:</th><td class="field-body"><tt class="docutils literal"><span class="pre">ave-relay</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p>Relays may be used to control the electrical connectivity of many types of
+equipment, including handsets. The relays are allocated by symbolic name, such
+as <tt class="docutils literal"><span class="pre">&quot;usb.pc.vcc&quot;</span></tt> or <tt class="docutils literal"><span class="pre">&quot;handset.battery&quot;</span></tt> to control USB voltage supply and
+the battery of a handset, respectively.</p>
+<div class="section" id="symbolic-circuit-names">
+<h2>Symbolic Circuit Names<a class="headerlink" href="#symbolic-circuit-names" title="Permalink to this headline">¶</a></h2>
+<p>The following symbolic circuit names are currently defined. In all cases, the
+lab owner is responsible for setting up actual wiring of the equipment and to
+create configuration files that match the wiring. See the <em>Configuration Files</em>
+section for details on lab maintenance.</p>
+<p>The list of circuit names is a governed name space. Contact the <a class="reference external" href="mailto:DL-WW-AVE-GB">AVE governance
+board</a> to request additions to the name space.</p>
+<div class="section" id="handset-circuits">
+<h3>Handset Circuits<a class="headerlink" href="#handset-circuits" title="Permalink to this headline">¶</a></h3>
+<p>The following circuits can be used if the lab owner has augmented corresponding
+physical handset buttons or connectors with electrical cords.</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">handset.battery</span></tt>: The connection between a handset and its battery. Open
+the circuit to disconnect the battery.</li>
+<li><tt class="docutils literal"><span class="pre">handset.power</span></tt>: The power button on a handset. Close the circuit to press
+the button.</li>
+<li><tt class="docutils literal"><span class="pre">handset.volume.up</span></tt>: The volume up button on a handset. Close the circuit
+to press the button.</li>
+<li><tt class="docutils literal"><span class="pre">handset.volume.down</span></tt>: The volume down button on a handset. Close the
+circuit to press the button.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="usb-circuits">
+<h3>USB Circuits<a class="headerlink" href="#usb-circuits" title="Permalink to this headline">¶</a></h3>
+<p>Note that opening and closing USB circuits should be done in a specific order.
+Always open <tt class="docutils literal"><span class="pre">usb.pc.vcc</span></tt> before opening other circuits. Always close
+<tt class="docutils literal"><span class="pre">usb.pc.vcc</span></tt> before closing other circuits.</p>
+<div class="section" id="pc-connector">
+<h4>PC connector<a class="headerlink" href="#pc-connector" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">usb.pc.vcc</span></tt>: PC 5V supply. Open the circuit to disconnect the PC from
+whatever is connected at the device end. Power may still leak through the
+remaining four circuits, but opening this circuit causes a full protocol
+level disconnect.</li>
+<li><tt class="docutils literal"><span class="pre">usb.pc.d+</span></tt>: PC D+ data pin.</li>
+<li><tt class="docutils literal"><span class="pre">usb.pc.d-</span></tt>: PC D- data pin.</li>
+<li><tt class="docutils literal"><span class="pre">usb.pc.gnd</span></tt>: PC ground.</li>
+<li><tt class="docutils literal"><span class="pre">usb.pc.id</span></tt>: PC ID pin.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="wall-charger">
+<h4>Wall Charger<a class="headerlink" href="#wall-charger" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">usb.wall.vcc</span></tt>: Wall charger 5V supply.</li>
+<li><tt class="docutils literal"><span class="pre">usb.wall.d+</span></tt>: Wall charger D+ data pin.</li>
+<li><tt class="docutils literal"><span class="pre">usb.wall.d-</span></tt>: Wall charger D- data pin.</li>
+<li><tt class="docutils literal"><span class="pre">usb.wall.gnd</span></tt>: Wall charger ground.</li>
+<li><tt class="docutils literal"><span class="pre">usb.wall.id</span></tt>: Wall charger ID pin.</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+</div>
+<div class="section" id="client-api">
+<h2>Client API<a class="headerlink" href="#client-api" title="Permalink to this headline">¶</a></h2>
+<p>Relays are allocated through a broker. The client must specify which symbolic
+circuit names it wishes to manipulate. In this example, the client asks for a
+relay that can manipulate the battery and general USB connectivity of a handset:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">ave.broker</span> <span class="kn">import</span> <span class="n">Broker</span>
+
+<span class="n">b</span> <span class="o">=</span> <span class="n">Broker</span><span class="p">()</span>
+<span class="n">r</span><span class="p">,</span><span class="n">h</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;relay&#39;</span><span class="p">,</span><span class="s">&#39;circuits&#39;</span><span class="p">:[</span><span class="s">&#39;handset.battery&#39;</span><span class="p">,</span><span class="s">&#39;usb.pc.vcc&#39;</span><span class="p">]},</span>
+    <span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">}</span>
+<span class="p">)</span>
+<span class="n">r</span><span class="o">.</span><span class="n">set_circuit</span><span class="p">(</span><span class="s">&#39;usb.pc.vcc&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">h</span><span class="o">.</span><span class="n">get_power_state</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;offline&#39;</span>
+
+<span class="c"># force a cold boot of the handset</span>
+<span class="n">r</span><span class="o">.</span><span class="n">set_circuit</span><span class="p">(</span><span class="s">&#39;handset.battery&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">r</span><span class="o">.</span><span class="n">set_circuit</span><span class="p">(</span><span class="s">&#39;handset.battery&#39;</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+<span class="n">r</span><span class="o">.</span><span class="n">set_circuit</span><span class="p">(</span><span class="s">&#39;usb.pc.vcc&#39;</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+<span class="n">h</span><span class="o">.</span><span class="n">wait_power_state</span><span class="p">(</span><span class="s">&#39;boot_completed&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="id1">
+<h3>Relay<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><dl class="function">
+<dt id="set_circuit">
+<tt class="descname">set_circuit</tt><big>(</big><em>circuit</em>, <em>closed</em><big>)</big><a class="headerlink" href="#set_circuit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open or close the named circuit. The allocation of the relay must have
+specified the named circuit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>closed</strong> &#8211; <em>True</em> closes the circuit. <em>False</em> opens the circuit.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">UTC time stamp to tell the client when the relay was actually
+manipulated by the server.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">If the client did not allocate a relay that includes
+the named circuit.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="reset">
+<tt class="descname">reset</tt><big>(</big><big>)</big><a class="headerlink" href="#reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset all circuits in the relay to their default states.</p>
+</dd></dl>
+
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="server-api">
+<h2>Server API<a class="headerlink" href="#server-api" title="Permalink to this headline">¶</a></h2>
+<p>This API is intended for administrative clients and require a valid <tt class="docutils literal"><span class="pre">admin</span></tt>
+authentication key.</p>
+<dl class="class">
+<dt id="ave.relay.server.RemoteRelayServer">
+<em class="property">class </em><tt class="descclassname">ave.relay.server.</tt><tt class="descname">RemoteRelayServer</tt><big>(</big><em>address=None</em>, <em>authkey=None</em><big>)</big><a class="headerlink" href="#ave.relay.server.RemoteRelayServer" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>address</strong> &#8211; A (string,integer) tuple denoting the hostname and port number
+where the relay server is running. If <em>None</em>, the address will be read
+from <tt class="docutils literal"><span class="pre">.ave/config/relay.json</span></tt>. (Also see the <em>Configuration Files</em>
+section below.)</li>
+<li><strong>authkey</strong> &#8211; A string. Must be set to the <tt class="docutils literal"><span class="pre">admin</span></tt> key used on the host
+where the relay server is running. (Also see the <em>Configuration Files</em>
+section below.)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="ave.relay.server.RemoteRelayServer.ping">
+<tt class="descname">ping</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.relay.server.RemoteRelayServer.ping" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The string &#8220;ave-relay pong&#8221; if a working RPC connection has
+been establised.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">stop():</tt></dt>
+<dd><p>Stops the relay server.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ave.relay.server.RemoteRelayServer.list_equipment">
+<tt class="descname">list_equipment</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.relay.server.RemoteRelayServer.list_equipment" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all physical relay boards, including manufacturer, device model id,
+etc.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of board profile dictionaries, describing the model,
+manufacturer and hardware specific details of each physical board
+handled by the server.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ave.relay.server.RemoteRelayServer.list_virtual">
+<tt class="descname">list_virtual</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.relay.server.RemoteRelayServer.list_virtual" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all virtual relay boards provided by the server. I.e. the relays
+that can be allocated through a broker.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of relay profile dictionaries, listing the named
+circuits that each relay can manipulate.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ave.relay.server.RemoteRelayServer.set_board_circuit">
+<tt class="descname">set_board_circuit</tt><big>(</big><em>profile</em>, <em>circuit</em>, <em>closed</em><big>)</big><a class="headerlink" href="#ave.relay.server.RemoteRelayServer.set_board_circuit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open or close a named circuit in a virtual relay.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>profile</strong> &#8211; A virtual relay profile as returned by <tt class="docutils literal"><span class="pre">list_virtual()</span></tt>.</li>
+<li><strong>circuit</strong> &#8211; A named circuit.</li>
+<li><strong>closed</strong> &#8211; <em>True</em> to close the circuit. <em>False</em> to open the circuit.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A UTC time stamp as a list of integers: [year, month, day,
+hour, minute, second, microsecond]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ave.relay.server.RemoteRelayServer.reset_board_group">
+<tt class="descname">reset_board_group</tt><big>(</big><em>profile</em><big>)</big><a class="headerlink" href="#ave.relay.server.RemoteRelayServer.reset_board_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset all circuits in a virtual relay.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>profile</strong> &#8211; A virtual relay profile as returned by <tt class="docutils literal"><span class="pre">list_virtual()</span></tt>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A UTC time stamp as a list of integers: [year, month, day,
+hour, minute, second, microsecond]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="starting-and-stopping-the-server">
+<h2>Starting and Stopping the Server<a class="headerlink" href="#starting-and-stopping-the-server" title="Permalink to this headline">¶</a></h2>
+<p>On systems that use Upstart, the relay server will be started by init on system
+boot. On other systems, the user has to start the relay server manually:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ave</span><span class="o">-</span><span class="n">relay</span> <span class="o">--</span><span class="n">start</span>
+</pre></div>
+</div>
+<p>The relay server can be restarted without affecting clients and their sessions:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ave</span><span class="o">-</span><span class="n">relay</span> <span class="o">--</span><span class="n">restart</span>
+</pre></div>
+</div>
+<p>Stopping the server terminates all open sessions and disconnects all clients:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ave</span><span class="o">-</span><span class="n">relay</span> <span class="o">--</span><span class="n">stop</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="configuration-files">
+<span id="relay-config-files"></span><h2>Configuration Files<a class="headerlink" href="#configuration-files" title="Permalink to this headline">¶</a></h2>
+<p>All configuration files are located in <tt class="docutils literal"><span class="pre">&lt;home&gt;/.ave/config/</span></tt>, where the value
+of <tt class="docutils literal"><span class="pre">&lt;home&gt;</span></tt> is read from <tt class="docutils literal"><span class="pre">/etc/ave/user</span></tt>.</p>
+<p>The relay server uses three kinds of configuration files:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Files for the relay server itself.</li>
+<li>Files for each supported board manufacturer.</li>
+<li>The equipment stacking configuration of the broker.</li>
+</ul>
+</div></blockquote>
+<p>Changes to configuration files require a full stop and start of the server. Not
+doing so will either make the server unreachable (in case of``relay.json`` and
+<tt class="docutils literal"><span class="pre">authkeys.json</span></tt>) or affect connected clients (for board specific files):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ave</span><span class="o">-</span><span class="n">relay</span> <span class="o">--</span><span class="n">stop</span>
+<span class="c"># change the config file</span>
+<span class="n">ave</span><span class="o">-</span><span class="n">relay</span> <span class="o">--</span><span class="n">start</span>
+</pre></div>
+</div>
+<div class="section" id="relay-json">
+<h3><tt class="docutils literal"><span class="pre">relay.json</span></tt><a class="headerlink" href="#relay-json" title="Permalink to this headline">¶</a></h3>
+<p>The smallest valid configuration is to not have the configuration file at all.
+In such cases, the server runs with default values:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;port&quot;</span><span class="p">:</span> <span class="mi">4006</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="authkeys-json">
+<h3><tt class="docutils literal"><span class="pre">authkeys.json</span></tt><a class="headerlink" href="#authkeys-json" title="Permalink to this headline">¶</a></h3>
+<p>Adiministrative functions in the relay server are protected by an authentication
+key to prevent accidental usage of functionality that is not meant for regular
+clients. The key is generated automatically when AVE is installed but can be
+changed to more memorable values:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;admin&quot;</span><span class="p">:</span> <span class="s">&quot;please stick to printable characters, ok?&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="devantech-json">
+<h3><tt class="docutils literal"><span class="pre">devantech.json</span></tt><a class="headerlink" href="#devantech-json" title="Permalink to this headline">¶</a></h3>
+<p>If this file does not exist, then the server will not be able to use boards from
+Devantech.</p>
+<p>In this example there are two sections. The first is a wild card that matches
+the serial number of all Devantech boards. The second matches a specific board
+with serial number &#8220;123abc&#8221;, which overrides the wild card section:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s2">&quot;*&quot;</span><span class="o">:</span><span class="p">{</span>
+        <span class="s2">&quot;groups&quot;</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;a&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;handset.power&quot;</span><span class="o">:</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;usb.pc.vcc&quot;</span><span class="o">:</span><span class="mi">2</span><span class="p">},</span>
+            <span class="s2">&quot;b&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;handset.power&quot;</span><span class="o">:</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;usb.pc.vcc&quot;</span><span class="o">:</span><span class="mi">4</span><span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;defaults&quot;</span><span class="o">:</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="p">}</span>
+
+    <span class="s2">&quot;123abc&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;groups&quot;</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;a&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;handset.power&quot;</span><span class="o">:</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;handset.battery&quot;</span><span class="o">:</span><span class="mi">2</span><span class="p">}</span>
+            <span class="s2">&quot;b&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;handset.power&quot;</span><span class="o">:</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;handset.battery&quot;</span><span class="o">:</span><span class="mi">4</span><span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;defaults&quot;</span><span class="o">:</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The file will be loaded each time a Devantech board is plugged in. The default
+values values for each board determine if circuits will be (re)set to open or
+closed by a call to <tt class="docutils literal"><span class="pre">Relay.reset()</span></tt> or by a unplug/plug of the USB connector.</p>
+<p>The &#8220;groups&#8221; sub-section for each board determines the symbolic circuit names
+associated with each physical port on the board. Port numbering starts with 1.
+The same port number cannot appear more than once in one board configuration.</p>
+</div>
+<div class="section" id="broker-json">
+<h3><tt class="docutils literal"><span class="pre">broker.json</span></tt><a class="headerlink" href="#broker-json" title="Permalink to this headline">¶</a></h3>
+<p>Refer to the broker documentation for generic equipment stacking information.
+In the stack declarations, use virtual relay profiles that contain the &#8220;type&#8221;
+and &#8220;uid&#8221; fields. Example profiles:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span> <span class="s">&quot;type&quot;</span><span class="p">:</span> <span class="s">&quot;relay&quot;</span><span class="p">,</span> <span class="s">&quot;uid&quot;</span><span class="p">:</span> <span class="s">&quot;00014007.b&quot;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The virtual relay UID&#8217;s can be found by using the administrative server function
+<tt class="docutils literal"><span class="pre">RemoteRelayServer.list_virtual()</span></tt>. See the <em>Server API</em> section for details.</p>
+</div>
+</div>
+<div class="section" id="supported-hardware">
+<h2>Supported Hardware<a class="headerlink" href="#supported-hardware" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference external" href="http://www.robot-electronics.co.uk/htm/usb_rly16ltech.htm">Devantech USB-RLY16</a>. This is the recommended board to use for all 5 volt
+applications, such as USB connections and handset batteries.</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Relay</a><ul>
+<li><a class="reference internal" href="#symbolic-circuit-names">Symbolic Circuit Names</a><ul>
+<li><a class="reference internal" href="#handset-circuits">Handset Circuits</a></li>
+<li><a class="reference internal" href="#usb-circuits">USB Circuits</a><ul>
+<li><a class="reference internal" href="#pc-connector">PC connector</a></li>
+<li><a class="reference internal" href="#wall-charger">Wall Charger</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#client-api">Client API</a><ul>
+<li><a class="reference internal" href="#id1">Relay</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#server-api">Server API</a></li>
+<li><a class="reference internal" href="#starting-and-stopping-the-server">Starting and Stopping the Server</a></li>
+<li><a class="reference internal" href="#configuration-files">Configuration Files</a><ul>
+<li><a class="reference internal" href="#relay-json"><tt class="docutils literal"><span class="pre">relay.json</span></tt></a></li>
+<li><a class="reference internal" href="#authkeys-json"><tt class="docutils literal"><span class="pre">authkeys.json</span></tt></a></li>
+<li><a class="reference internal" href="#devantech-json"><tt class="docutils literal"><span class="pre">devantech.json</span></tt></a></li>
+<li><a class="reference internal" href="#broker-json"><tt class="docutils literal"><span class="pre">broker.json</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#supported-hardware">Supported Hardware</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../../handset/docs/adb_server_api.html"
+                        title="previous chapter">ADB Server</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../../workspace/docs/index.html"
+                        title="next chapter">Workspaces</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/relay/docs/api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../workspace/docs/index.html" title="Workspaces"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../../handset/docs/adb_server_api.html" title="ADB Server"
+             >previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

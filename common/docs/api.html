@@ -1,0 +1,1580 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Common Subsystems &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../../index.html" />
+    <link rel="next" title="Utils" href="../../utils/docs/index.html" />
+    <link rel="prev" title="Configuration Files" href="../../workspace/docs/config.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../utils/docs/index.html" title="Utils"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../../workspace/docs/config.html" title="Configuration Files"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="common-subsystems">
+<h1>Common Subsystems<a class="headerlink" href="#common-subsystems" title="Permalink to this headline">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">module:</th><td class="field-body"><tt class="docutils literal"><span class="pre">ave-common</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p>Modules and packages that are used by several other AVE components. It may also
+be useful in</p>
+<blockquote>
+<div><ul class="simple">
+<li>Scheduler implementations</li>
+<li>Service implementations</li>
+<li>Handling of OS specific configuration details</li>
+</ul>
+</div></blockquote>
+<p>Regular test jobs would not use this package much, but AVE&#8217;s own test jobs use
+them extensively.</p>
+<div class="section" id="ave-cmd">
+<h2>ave.cmd<a class="headerlink" href="#ave-cmd" title="Permalink to this headline">¶</a></h2>
+<p>Run external commands through a forked pseudoterminal. This is done by using
+<tt class="docutils literal"><span class="pre">pty.fork()</span></tt> to create new processes. This affects the behavior of the new
+process:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Output written to <tt class="docutils literal"><span class="pre">stdout</span></tt> and <tt class="docutils literal"><span class="pre">stderr</span></tt> are mixed into a single stream.</li>
+<li>The process and its children are guaranteed to die when the pseudoterminal
+is destroyed. This means that the caller does not have to check that the
+external program is fully terminated afterwards.</li>
+<li>Programs that daemonize survive the destruction of the pseudoterminal, but
+they have to daemonize <em>correctly</em> to achieve this. I.e. do the double fork
+and make sure the final child is a new session leader before returning.</li>
+<li>There is no buffering of the program&#8217;s output. If the caller is a program
+that is attached to a pseudoterminal, then the called program&#8217;s output will
+be written immediately on the caller&#8217;s pseudoterminal.</li>
+</ul>
+</div></blockquote>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last"><tt class="docutils literal"><span class="pre">adb</span></tt> does not daemonize correctly and it is not possible to
+start an ADB server using the <tt class="docutils literal"><span class="pre">ave.cmd</span></tt> functions. Also note that ADB
+will start a server automatically when executing regular commands if none
+was running already. This leads to a cascading failure condition where
+every attemp to run an ADB command results in a new server that is killed
+as soon as the command returns.</p>
+</div>
+<dl class="method">
+<dt id="ave.cmd.run">
+<tt class="descclassname">ave.cmd.</tt><tt class="descname">run</tt><big>(</big><em>cmd</em>, <em>timeout=0</em>, <em>debug=False</em>, <em>cwd=''</em>, <em>output_file=None</em><big>)</big><a class="headerlink" href="#ave.cmd.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a command in a separate process.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cmd</strong> (<em>[string, ...] or string</em>) &#8211; A string or a list of strings where <tt class="docutils literal"><span class="pre">index=0</span></tt> is the executable
+to run. If <em>cmd</em> is a string, then it will be split on whitespace before
+being passed to the sub-process.</li>
+<li><strong>output_file</strong> (<em>file</em>) &#8211; A file object which is ready to be written to.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An <em>(integer, string)</em> tuple: The exit code from the process and
+all its output (<tt class="docutils literal"><span class="pre">stdout</span></tt> and <tt class="docutils literal"><span class="pre">stderr</span></tt> are mixed in the order they
+are written to, like in a terminal).</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>RunError</strong> &#8211; If creation of the sub-process failed.</li>
+<li><strong>Exception</strong> &#8211; If any unhandled OS error was encountered during the
+execution. Caller should check the exact type of exception.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.cmd.run_bg">
+<tt class="descclassname">ave.cmd.</tt><tt class="descname">run_bg</tt><big>(</big><em>cmd</em><big>)</big><a class="headerlink" href="#ave.cmd.run_bg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Works the same as <tt class="docutils literal"><span class="pre">ave.cmd.run()</span></tt>, except that it is non-blocking.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A <em>(PID, file descriptor)</em> tuple. The file descriptor is attached
+to the new process&#8217; pseudoterminal and will carry all messages written
+to <tt class="docutils literal"><span class="pre">stdout</span></tt> and <tt class="docutils literal"><span class="pre">stderr</span></tt>.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The caller <em>must</em> eventually use <tt class="docutils literal"><span class="pre">os.wait()</span></tt> or one of its
+variations on the PID and <tt class="docutils literal"><span class="pre">os.close()</span></tt> on the file descriptor. Failing
+to perform these cleanups will lead to defunct processes and/or running
+out of pseudoterminals.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="ave-config">
+<h2>ave.config<a class="headerlink" href="#ave-config" title="Permalink to this headline">¶</a></h2>
+<p>Functions to read and write system wide configuration details. Used by servers
+to find all of AVE&#8217;s domain specific configuration files. Also used by Debian
+package installation scripts to create default configuration files.</p>
+<dl class="method">
+<dt id="ave.config.create_default">
+<tt class="descclassname">ave.config.</tt><tt class="descname">create_default</tt><big>(</big><em>home</em><big>)</big><a class="headerlink" href="#ave.config.create_default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create default configuration files under <tt class="docutils literal"><span class="pre">&lt;home&gt;/.ave/config</span></tt>. Will also
+create the directories if they do not exist. Configuration files that
+already exist will not be touched.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>home</strong> &#8211; A string containing a path to a directory. Would normally be a
+user&#8217;s home directory, but can be anything where the caller has write
+and exec permissions.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A tuple of two lists. The first contains the paths of the created
+files. The second contains skipped files.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.config.load_authkeys">
+<tt class="descclassname">ave.config.</tt><tt class="descname">load_authkeys</tt><big>(</big><em>home</em><big>)</big><a class="headerlink" href="#ave.config.load_authkeys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load and return the administrative authentication keys from
+<tt class="docutils literal"><span class="pre">&lt;home&gt;/ave/config/authkeys.json</span></tt>. The object can be passed as the
+<tt class="docutils literal"><span class="pre">ault_keys</span></tt> parameter when creating <tt class="docutils literal"><span class="pre">Control</span></tt> instances. Functions
+marked with the <tt class="docutils literal"><span class="pre">&#64;Control.preauth()</span></tt> decorator can refer to account names
+found in the file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>home</strong> &#8211; The base directory to search for AVE configuration files.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A dictionary containing account/password pairs in plain text.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The use of authentication keys to limit access on API level
+does <em>not</em> constitute a security system. It is intended to prevent
+accidental use of features from contexts where they do not make sense
+to use and could potentially affect system performance severely.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.config.create_etc">
+<tt class="descclassname">ave.config.</tt><tt class="descname">create_etc</tt><big>(</big><em>path='/etc/ave/user'</em>, <em>user=None</em><big>)</big><a class="headerlink" href="#ave.config.create_etc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates <tt class="docutils literal"><span class="pre">/etc/ave/user</span></tt> &#8211; A JSON encoded dictionary. This is done by
+reading a string on <tt class="docutils literal"><span class="pre">stdin</span></tt> and checking that the value is an existing OS
+user account. It will write the account name and the path to the account&#8217;s
+home directory to the created file.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The contents of <tt class="docutils literal"><span class="pre">/etc/ave/user</span></tt> is used as a switch board to
+find all of AVE&#8217;s other configuration files. It also determines which
+user account should be used to run the system when it is started from
+the <tt class="docutils literal"><span class="pre">init</span></tt> process.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The function will block until it encounters <em>EOF</em> on <tt class="docutils literal"><span class="pre">stdin</span></tt>.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.config.load_etc">
+<tt class="descclassname">ave.config.</tt><tt class="descname">load_etc</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.config.load_etc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the contents of <tt class="docutils literal"><span class="pre">/etc/ave/user</span></tt> and returns it as a dictionary with
+the following entries:</p>
+<blockquote>
+<div><ul class="simple">
+<li><em>name</em>: The user name or OS account used to run AVE.</li>
+<li><em>home</em>: The directory under which <tt class="docutils literal"><span class="pre">.ave/config</span></tt> must be found.</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="ave-persona">
+<h2>ave.persona<a class="headerlink" href="#ave-persona" title="Permalink to this headline">¶</a></h2>
+<p>The functions in this module are UNIX specific and would need alternative
+implementations on other OS&#8217;es.</p>
+<dl class="method">
+<dt id="ave.persona.become_user">
+<tt class="descclassname">ave.persona.</tt><tt class="descname">become_user</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#ave.persona.become_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the current process&#8217; effective UID to that of the given user name.
+Can only be called by super user 0. This function is only intended for use
+from the <tt class="docutils literal"><span class="pre">init</span></tt> process during system boot.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> &#8211; An OS user name. Must be found in the <tt class="docutils literal"><span class="pre">password</span></tt> database, or
+a replacement authentication system.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The user&#8217;s home directory.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="ave-profile">
+<h2>ave.profile<a class="headerlink" href="#ave-profile" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ave.profile.Profile">
+<em class="property">class </em><tt class="descclassname">ave.profile.</tt><tt class="descname">Profile</tt><big>(</big><em>values</em><big>)</big><a class="headerlink" href="#ave.profile.Profile" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>values</strong> &#8211; A dictionary where all keys are strings.</td>
+</tr>
+</tbody>
+</table>
+<p>Profiles are essentially <tt class="docutils literal"><span class="pre">dict</span></tt> instances that implement <tt class="docutils literal"><span class="pre">__hash__()</span></tt>,
+so that they can be used as indices into other dictionaries. AVE uses
+profiles to communicate information about allocatable resources.</p>
+<dl class="method">
+<dt id="ave.profile.Profile.match">
+<tt class="descname">match</tt><big>(</big><em>profile</em><big>)</big><a class="headerlink" href="#ave.profile.Profile.match" title="Permalink to this definition">¶</a></dt>
+<dd><p>Match this profile against another profile or a dictionary: Iterate
+over the keys in <em>profile</em> and check that <em>self</em> contains the same key
+with the same value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>profile</strong> &#8211; A <em>dict</em> or <em>Profile</em> instance.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>True</em> if the matching succeeded, <em>False</em> otherwise.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.profile.Profile.minimize">
+<tt class="descname">minimize</tt><big>(</big><em>profile=None</em><big>)</big><a class="headerlink" href="#ave.profile.Profile.minimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a copy of &#8216;self&#8217; that contains the properties that are mandatory
+for the Profile subclass, plus the properties specified by <em>profile</em>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="ave-netwok-process">
+<h2>ave.netwok.process<a class="headerlink" href="#ave-netwok-process" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ave.network.process.Process">
+<em class="property">class </em><tt class="descclassname">ave.network.process.</tt><tt class="descname">Process</tt><big>(</big><em>target=None</em>, <em>args=None</em>, <em>logging=False</em>, <em>proc_name=None</em><big>)</big><a class="headerlink" href="#ave.network.process.Process" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the base classs for all AVE processes. It supports daemonization.
+It also supports synchronized creation so that children can be guaranteed
+to be fully initialized before the parent&#8217;s call to .start() returns. This
+is sometimes critical to avoid race conditions when the child must install
+its own signal handlers instead of inheriting those of the parent.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>target</strong> &#8211; A callable or function pointer. If not set it defaults to
+<tt class="docutils literal"><span class="pre">self.run</span></tt> which must then be implemented on a subclass. (No default
+implementation is provided.)</li>
+<li><strong>args</strong> &#8211; A tuple of arguments to be passed to <em>target</em>. It defaults to
+<tt class="docutils literal"><span class="pre">()</span></tt>, i.e. no arguments.</li>
+<li><strong>logging</strong> &#8211; Print activities of the new process to <tt class="docutils literal"><span class="pre">stderr</span></tt>. Defaults
+to <tt class="docutils literal"><span class="pre">False</span></tt>. Daemonized processes should redirect <tt class="docutils literal"><span class="pre">stderr</span></tt> to a file
+and set this to <tt class="docutils literal"><span class="pre">True</span></tt>.</li>
+<li><strong>proc_name</strong> &#8211; A string of at most 16 characters. This is the process name
+that is shown by some process inspection tools such as <tt class="docutils literal"><span class="pre">ps</span></tt>. E.g. the
+command <tt class="docutils literal"><span class="pre">ps</span> <span class="pre">-ejH</span> <span class="pre">|</span> <span class="pre">grep</span> <span class="pre">ave-</span></tt> will list processes tree with only the
+processes that were named something starting with &#8220;ave-&#8221;.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="ave.network.process.Process.start">
+<tt class="descname">start</tt><big>(</big><em>daemonize=False</em>, <em>synchronize=False</em><big>)</big><a class="headerlink" href="#ave.network.process.Process.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the parent process to start the new process.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>daemonize</strong> &#8211; Perform two forks instead of one to get the new process
+re-parented to <tt class="docutils literal"><span class="pre">init</span></tt>. Defaults to <tt class="docutils literal"><span class="pre">False</span></tt>.</li>
+<li><strong>synchronize</strong> &#8211; Do not return until the new process has completed all
+initialization steps: <tt class="docutils literal"><span class="pre">self.redirect()</span></tt> and <tt class="docutils literal"><span class="pre">self.initialize()</span></tt>.
+Useful if the parent will terminate itself immediately after the
+start of the new process and needs to be sure that signal handlers
+and other OS level initialization details of the child are in place.
+Defaults to <tt class="docutils literal"><span class="pre">False</span></tt>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.process.Process.close_fds">
+<tt class="descname">close_fds</tt><big>(</big><em>exclude</em><big>)</big><a class="headerlink" href="#ave.network.process.Process.close_fds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Must be implemented by subclasses that accept open file descriptors in
+their constructors. Append descriptors that should remain open in the
+new process to the <em>exclude</em> list before passing it to <tt class="docutils literal"><span class="pre">close_fds()</span></tt>
+on the superclass.</p>
+<p><tt class="docutils literal"><span class="pre">Process.close_fds()</span></tt> is called after the process has forked but
+before its target function is called.</p>
+<p>If no implementation is provided, the default implementation will close
+all file descriptors except 0, 1 and 2.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>exclude</strong> &#8211; List of integers (file descriptors).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.process.Process.terminate">
+<tt class="descname">terminate</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.network.process.Process.terminate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send SIGTERM to the process. May be called from the parent process. May
+also be used on daemonized processes if started with <em>synchonize=True</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.process.Process.join">
+<tt class="descname">join</tt><big>(</big><em>timeout=None</em><big>)</big><a class="headerlink" href="#ave.network.process.Process.join" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait for the process to terminate. May only be called by the parent of
+the process. <em>Must</em> eventually be called by the parent process unless
+the new process was started with <em>daemonize=True</em> in which case <tt class="docutils literal"><span class="pre">init</span></tt>
+will wait for the new process. See zombie control in UNIX litterature.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> &#8211; An integer or float. Raise a <tt class="docutils literal"><span class="pre">Timeout</span></tt> exception if the
+process does not terminate within <em>timeout</em> seconds.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The exit value of the terminated process.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.process.Process.is_alive">
+<tt class="descname">is_alive</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.network.process.Process.is_alive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the child process is still running. Can only be called from
+the parent process. The parent should call <tt class="docutils literal"><span class="pre">join()</span></tt> on processes that
+are no longer alive.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Boolean.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The following methods are only available to the new process as methods
+on <tt class="docutils literal"><span class="pre">self</span></tt> and cannot be called by the parent.</p>
+</div>
+<dl class="method">
+<dt id="ave.network.process.Process.log">
+<tt class="descname">log</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#ave.network.process.Process.log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print a time stamped message to <tt class="docutils literal"><span class="pre">stderr</span></tt> if the process was created
+with <em>logging=True</em> (see constructor).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>message</strong> &#8211; A string. A timestamp will be added before it is printed.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.process.Process.redirect">
+<tt class="descname">redirect</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.network.process.Process.redirect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default implementation is empty. Subclasses may implement it to redirect
+file descriptors that were inherited by the process. Normally used to
+redirect <tt class="docutils literal"><span class="pre">stderr</span></tt> to log files.</p>
+<p>Note: <tt class="docutils literal"><span class="pre">Process.redirect()</span></tt> is called <em>after</em> <tt class="docutils literal"><span class="pre">Process.close_fds()</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.process.Process.perform_prctl">
+<tt class="descname">perform_prctl</tt><big>(</big><em>death_signal=0</em><big>)</big><a class="headerlink" href="#ave.network.process.Process.perform_prctl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set OS specific process controls. Will be called by default during the
+child&#8217;s initialization.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>death_signal</strong> &#8211; An integer matching a valid POSIX signal number.
+Defaults to <tt class="docutils literal"><span class="pre">0</span></tt>. If set, the process will receive this signal when
+its parent process dies.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.process.Process.handle_SIGTERM">
+<tt class="descname">handle_SIGTERM</tt><big>(</big><em>signum</em>, <em>frame</em><big>)</big><a class="headerlink" href="#ave.network.process.Process.handle_SIGTERM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default handler for the SIGTERM signal. Exit the process immediately,
+without calling Python exit handlers. Should normally not be implemented
+by subclasses.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.process.Process.handle_SIGUSR1">
+<tt class="descname">handle_SIGUSR1</tt><big>(</big><em>signum</em>, <em>frame</em><big>)</big><a class="headerlink" href="#ave.network.process.Process.handle_SIGUSR1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default handler for the SIGUSR1 signal. Creates a trace file for the
+process in <tt class="docutils literal"><span class="pre">.ave/hickup</span></tt> and sends SIGUSR1 to all children whose
+process names start with &#8220;ave-&#8221; (see <em>proc_name</em> parameter on the
+constructor). This has debugging purposes. Should not be implemented
+by subclasses.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="ave-network-control">
+<h2>ave.network.control<a class="headerlink" href="#ave-network-control" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ave.network.control.Control">
+<em class="property">class </em><tt class="descclassname">ave.network.control.</tt><tt class="descname">Control</tt><big>(</big><em>port</em>, <em>authkey=None</em>, <em>socket=None</em>, <em>alt_keys=None</em>, <em>interval=None</em>, <em>home=None</em>, <em>proc_name=None</em>, <em>logging=False</em><big>)</big><a class="headerlink" href="#ave.network.control.Control" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the base class for all RPC capable AVE services. It accepts new
+connections on a listening TCP socket and polls the resulting sockets for
+traffic. Incoming JSON encoded messages are treated as remote procedure
+calls.</p>
+<p><tt class="docutils literal"><span class="pre">Control</span></tt> implements a very limited cookie based authentication mechanism
+to secure that clients and their sessions are not accidentally mixed up,
+and a similar system based on persistent cookies to limit and/or expand
+client capabilities.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>port</strong> &#8211; The port number to listen on.</li>
+<li><strong>authkey</strong> &#8211; If set, clients who do not provide the same key will not be
+allowed to connect.</li>
+<li><strong>socket</strong> &#8211; Must be a socket object that is listening on the same port as
+was specified with the <em>port</em> parameter.</li>
+<li><strong>alt_keys</strong> &#8211; A dictionary of alternative authentication keys that may be
+used to implement persistent cookies. Keys that appear in this dict may
+be used with the <tt class="docutils literal"><span class="pre">&#64;Control.preauth()</span></tt> decorator. Functions that are
+marked this way can only be called by clients that authenticated with
+the right key when connecting.</li>
+<li><strong>interval</strong> &#8211; The interval in seconds at which the <tt class="docutils literal"><span class="pre">Control.idle()</span></tt>
+method is called.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">None of the <tt class="docutils literal"><span class="pre">Control</span></tt> methods are directly accessible by RPC.
+Subclasses are expected to expose functions that should be accessible
+over RPC.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The use of persistent cookies to limit or expand a client&#8217;s
+access rights does <em>not</em> constitute a security system. It is intended
+to prevent accidental use of features from contexts where they do not
+make sense.</p>
+</div>
+<dl class="method">
+<dt id="ave.network.control.Control.shutdown">
+<tt class="descname">shutdown</tt><big>(</big><em>details=None</em><big>)</big><a class="headerlink" href="#ave.network.control.Control.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exit the main loop and write a last exit message on all connections
+before closing them. The exit message will be serialized as an <tt class="docutils literal"><span class="pre">Exit</span></tt>
+exception.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.control.Control.join_later">
+<tt class="descname">join_later</tt><big>(</big><em>proc</em><big>)</big><a class="headerlink" href="#ave.network.control.Control.join_later" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defer joining of the process to the control process&#8217; main loop. When
+the process is joined, <tt class="docutils literal"><span class="pre">Control.joined_process()</span></tt> will be called.
+Deferred joins are made non-blocking. Any object whose class inherits
+from <tt class="docutils literal"><span class="pre">ave.network.process.Process</span></tt> may be joined in this way. Errors
+encountered in the actual attempt to join the process will be printed
+with <tt class="docutils literal"><span class="pre">Process.log()</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.control.Control.joined_process">
+<tt class="descname">joined_process</tt><big>(</big><em>pid</em>, <em>exit</em><big>)</big><a class="headerlink" href="#ave.network.control.Control.joined_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>May be implemented by classes that inherit from Control. The function
+will be called whenever a process terminates with a deferred join. See
+<tt class="docutils literal"><span class="pre">Control.join_later()</span></tt> for more information.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.control.Control.add_connection">
+<tt class="descname">add_connection</tt><big>(</big><em>connection</em>, <em>authkey</em><big>)</big><a class="headerlink" href="#ave.network.control.Control.add_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>May be used by a subclass to add new open <tt class="docutils literal"><span class="pre">Connection</span></tt> objects to the
+main event loop.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.control.Control.remove_connection">
+<tt class="descname">remove_connection</tt><big>(</big><em>connection</em><big>)</big><a class="headerlink" href="#ave.network.control.Control.remove_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>May be used by a subclass to remove a <tt class="docutils literal"><span class="pre">Connection</span></tt> objects from the
+main event loop.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.control.Control.new_connection">
+<tt class="descname">new_connection</tt><big>(</big><em>connection</em>, <em>authkey</em><big>)</big><a class="headerlink" href="#ave.network.control.Control.new_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>May be implemented by classes that inherit directly from <tt class="docutils literal"><span class="pre">Control</span></tt>.
+The function will be called whenever a new connection is accepted by
+the <tt class="docutils literal"><span class="pre">Control</span></tt> object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.control.Control.lost_connection">
+<tt class="descname">lost_connection</tt><big>(</big><em>connection</em>, <em>authkey</em><big>)</big><a class="headerlink" href="#ave.network.control.Control.lost_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>May be implemented by classes that inherit directly from <tt class="docutils literal"><span class="pre">Control</span></tt>.
+The function will be called whenever a previously accepted connection,
+or one added with <tt class="docutils literal"><span class="pre">add_connection()</span></tt>, is lost. The function is called
+regardless of which peer caused the connection to be lost.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.control.Control.idle">
+<tt class="descname">idle</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.network.control.Control.idle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called periodically as long as there is no other activity in the main
+loop.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.control.Control.stop_listening">
+<tt class="descname">stop_listening</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.network.control.Control.stop_listening" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop accepting new clients. Close the listening socket.</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">&#64;rpc</tt></dt>
+<dd><p>Use this decorator on a subclass method to make it callable over the
+network. Clients can only call functions that have been marked this way.</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">&#64;auth</tt></dt>
+<dd><p>Use this decorator on a subclass RPC method to signal that only clients
+that have authenticated with the primary authentication key may use the
+method.</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">&#64;preauth(*accounts)</tt></dt>
+<dd><p>Use this decorator on a subclass RPC method to signal that only clients
+that have authenticated with an alternate authentication key may use the
+method.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.network.control.RemoteControl">
+<em class="property">class </em><tt class="descclassname">ave.network.control.</tt><tt class="descname">RemoteControl</tt><big>(</big><em>object</em><big>)</big><a class="headerlink" href="#ave.network.control.RemoteControl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class used to connect to <tt class="docutils literal"><span class="pre">Control</span></tt> objects. Creates a <tt class="docutils literal"><span class="pre">Connection</span></tt>
+object internally to handle socket traffic with the peer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>address</strong> &#8211; A (port, host) tuple. The host may be the empty string &#8216;&#8217;
+which is interpreted as <tt class="docutils literal"><span class="pre">localhost</span></tt>.</li>
+<li><strong>authkey</strong> &#8211; The authentication key, if any, to use.</li>
+<li><strong>timeout</strong> &#8211; Maximum amount of time in seconds to try connecting to a
+<tt class="docutils literal"><span class="pre">Control</span></tt> instance.</li>
+<li><strong>optimist</strong> &#8211; Set to <tt class="docutils literal"><span class="pre">True</span></tt> to keep retrying a connection attempt until
+it succeeds or the timeout expires.</li>
+<li><strong>sock</strong> &#8211; An open socket object that has already been connected to the
+port and host given in the <em>address</em> parameter.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="ave-network-connection">
+<h2>ave.network.connection<a class="headerlink" href="#ave-network-connection" title="Permalink to this headline">¶</a></h2>
+<dl class="method">
+<dt id="ave.network.connection.find_free_port">
+<tt class="descclassname">ave.network.connection.</tt><tt class="descname">find_free_port</tt><big>(</big><em>start=49152</em>, <em>stop=65536</em>, <em>listen=True</em><big>)</big><a class="headerlink" href="#ave.network.connection.find_free_port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find a free IP port by random picking in the selected range. If successful,
+a bound socket is returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>start</strong> &#8211; Start value for the search range.</li>
+<li><strong>stop</strong> &#8211; Stop value for the search range.</li>
+<li><strong>listen</strong> &#8211; Creates a listening socket.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A (socket, port) tuple.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><em>Exception</em> if no free port is found in 20000 attempts.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.network.connection.Connection">
+<em class="property">class </em><tt class="descclassname">ave.network.connection.</tt><tt class="descname">Connection</tt><big>(</big><em>address</em>, <em>socket=None</em><big>)</big><a class="headerlink" href="#ave.network.connection.Connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>A non-blocking TCP/IP socket based message queue.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>address</strong> &#8211; A (host,port) tuple. Represents the remote peer on outgoing
+connections. Represents the current host on listening connections.</li>
+<li><strong>socket</strong> &#8211; A pre-allocated socket. If not set, one will be created.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="ave.network.connection.Connection.fileno">
+<tt class="descname">fileno</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.network.connection.Connection.fileno" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The file descriptor of the underlying socket, if any.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.connection.Connection.listen">
+<tt class="descname">listen</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.network.connection.Connection.listen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the underlying socket to a new one that is listening.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.connection.Connection.accept">
+<tt class="descname">accept</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.network.connection.Connection.accept" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accepts a connection attempt on the underlying socket and returns a new
+connection object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.connection.Connection.connect">
+<tt class="descname">connect</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.network.connection.Connection.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect to the host/port provided in the constructor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><em>ConnectionInProgress</em> if the attempt could not complete
+immediately. The caller should poll the underlying socket for
+writing to determine when connection has been established.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.connection.Connection.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.network.connection.Connection.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shuts down and closes the underlying socket.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.connection.Connection.write">
+<tt class="descname">write</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#ave.network.connection.Connection.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a string on the underlying socket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><em>ConnectionAgain</em> if the write could not complete immediately
+and should be retried. The caller should poll the underlying socket
+for writing to determine when to retry.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><em>ConnectionClosed</em> if the connection is no longer open.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.connection.Connection.read">
+<tt class="descname">read</tt><big>(</big><em>size</em><big>)</big><a class="headerlink" href="#ave.network.connection.Connection.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a string serialized object from the underlying socket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>size</strong> &#8211; The number of characters to read.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A string.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><em>ConnectionAgain</em> if the write could not complete immediately
+and should be retried. The caller should poll the underlying socket
+for reading to determine when to retry.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><em>ConnectionClosed</em> if the connection is no longer open.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.connection.Connection.put">
+<tt class="descname">put</tt><big>(</big><em>payload</em><big>)</big><a class="headerlink" href="#ave.network.connection.Connection.put" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a payload to the network, prefixed by a 32 bit network order
+integer that carries the byte size of <em>payload</em>. A reference is kept to
+the payload internally so that the call may be retried later if writing
+can not be completed in a single step.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>payload</strong> &#8211; A string.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><em>ConnectionAgain</em> if the write could not complete immediately
+and should be retried. The caller should poll the underlying socket
+for reading to determine when to retry.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><em>ConnectionClosed</em> if the connection is no longer open.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.connection.Connection.get">
+<tt class="descname">get</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.network.connection.Connection.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a message from the network. The message must be composed of a 32
+bit network order integer header followed by a payload whose size is
+encoded in the header. Partially read messages are kept internally
+until they can be completed or the connection is lost.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The payload string, or <em>None</em> if the attempt should be tried
+again later.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><em>ConnectionClosed</em> if the connection is no longer open.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.network.connection.BlockingConnection">
+<em class="property">class </em><tt class="descclassname">ave.network.connection.</tt><tt class="descname">BlockingConnection</tt><big>(</big><em>address</em>, <em>socket=None</em><big>)</big><a class="headerlink" href="#ave.network.connection.BlockingConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>A blocking TCP/IP socket based message queue. Inherits from <em>Connection</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>address</strong> &#8211; A (host,port) tuple. Represents the remote peer on outgoing
+connections. Represents the current host on listening connections.</li>
+<li><strong>socket</strong> &#8211; A pre-allocated socket. If not set, one will be created.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="ave.network.connection.BlockingConnection.poll">
+<tt class="descname">poll</tt><big>(</big><em>mask</em>, <em>timeout</em><big>)</big><a class="headerlink" href="#ave.network.connection.BlockingConnection.poll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Blocks until the underlying socket satisfies a condition or the wait
+times out.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mask</strong> &#8211; See <tt class="docutils literal"><span class="pre">poll()</span></tt> semantics for POSIX.</li>
+<li><strong>timeout</strong> &#8211; Seconds. An integer or floating point value.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A list of (fd, event) tuples. <em>None</em> if no event was seen
+before the timeout.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.connection.BlockingConnection.connect">
+<tt class="descname">connect</tt><big>(</big><em>timeout=None</em>, <em>optimist=False</em><big>)</big><a class="headerlink" href="#ave.network.connection.BlockingConnection.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects the underlying socket to a remote peer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>timeout</strong> &#8211; Maximum time in seconds to spend on the attempt. May be
+<em>None</em> for infinite waiting.</li>
+<li><strong>optimist</strong> &#8211; Ignore error conditions on the socket. Useful when the
+peer has not yet started listening on its accepting socket. The
+client eventually gets a timeout instead of an immediate failure.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first"><em>ConnectionTimeout</em> if the connection could not be established
+before the timeout.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><em>ConnectionRefused</em> if there is an error condition and the
+attempt is not made optimistically.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.connection.BlockingConnection.write">
+<tt class="descname">write</tt><big>(</big><em>obj</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#ave.network.connection.BlockingConnection.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a string on the underlying socket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obj</strong> &#8211; A string.</li>
+<li><strong>timeout</strong> &#8211; Maximum time in seconds to spend on the attempt. May be
+<em>None</em> for infinite waiting.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first"><em>ConnectionClosed</em> if the connection is no longer open.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><em>ConnectionTimeout</em> if the attempt could not be completed
+before the timeout.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.connection.BlockingConnection.read">
+<tt class="descname">read</tt><big>(</big><em>size</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#ave.network.connection.BlockingConnection.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a string from the underlying socket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>size</strong> &#8211; The number of characters to read.</li>
+<li><strong>timeout</strong> &#8211; Maximum time in seconds to spend on the attempt. May be
+<em>None</em> for infinite waiting.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first"><em>ConnectionClosed</em> if the connection is no longer open.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first"><em>ConnectionTimeout</em> if the attempt could not be completed
+before the timeout.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A string.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.connection.BlockingConnection.put">
+<tt class="descname">put</tt><big>(</big><em>payload</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#ave.network.connection.BlockingConnection.put" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a payload to the network, prefixed by a 32 bit network order
+integer that carries the byte size of <em>payload</em>. A reference is kept to
+the payload internally so that the call may be retried later if writing
+can not be completed in a single step.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>payload</strong> &#8211; A string.</li>
+<li><strong>timeout</strong> &#8211; Maximum time in seconds to spend on the attempt. May be
+<em>None</em> for infinite waiting.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first"><em>ConnectionClosed</em> if the connection is no longer open.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><em>ConnectionTimeout</em> if the attempt could not be completed
+before the timeout.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.connection.BlockingConnection.get">
+<tt class="descname">get</tt><big>(</big><em>timeout=None</em><big>)</big><a class="headerlink" href="#ave.network.connection.BlockingConnection.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a message from the network. The message must be composed of a 32
+bit network order integer header followed by a payload whose size is
+encoded in the header. Partially read messages are kept internally
+until they can be completed or the connection is lost.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> &#8211; Maximum time in seconds to spend on the attempt. May be
+<em>None</em> for infinite waiting.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><em>ConnectionClosed</em> if the connection is no longer open.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><em>ConnectionTimeout</em> if the attempt could not be completed
+before the timeout.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The payload string, or <em>None</em> if the attempt should be tried
+again later.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="ave-exceptions">
+<h2>ave.exceptions<a class="headerlink" href="#ave-exceptions" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ave.exceptions.AveException">
+<em class="property">class </em><tt class="descclassname">ave.exceptions.</tt><tt class="descname">AveException</tt><big>(</big><em>details</em><big>)</big><a class="headerlink" href="#ave.exceptions.AveException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for all other AVE exception classes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>details</strong> &#8211; A <em>dict</em> where all keys are strings. One key must be the
+<tt class="docutils literal"><span class="pre">&quot;message&quot;</span></tt> key. A <tt class="docutils literal"><span class="pre">&quot;type&quot;</span></tt> key will be automatically set from the
+name of the exception class, unless provided in the <em>details</em> object.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="ave.exceptions.AveException.format_trace">
+<tt class="descname">format_trace</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.exceptions.AveException.format_trace" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A pretty printed version of trace information included in the</td>
+</tr>
+</tbody>
+</table>
+<p>exception. An empty string is returned if no trace is available.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.exceptions.Timeout">
+<em class="property">class </em><tt class="descclassname">ave.exceptions.</tt><tt class="descname">Timeout</tt><big>(</big><em>details</em><big>)</big><a class="headerlink" href="#ave.exceptions.Timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates that an operation timed out.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>details</strong> &#8211; A free form text message or a dictionary containing at least
+a <tt class="docutils literal"><span class="pre">&quot;message&quot;</span></tt> key.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.exceptions.Exit">
+<em class="property">class </em><tt class="descclassname">ave.exceptions.</tt><tt class="descname">Exit</tt><big>(</big><em>details</em><big>)</big><a class="headerlink" href="#ave.exceptions.Exit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates that an operation could not be performed because the hosting
+service (e.g the broker) has terminated in a controlled manner.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>details</strong> &#8211; A free form text message or a dictionary containing at least
+a <tt class="docutils literal"><span class="pre">&quot;message&quot;</span></tt> key.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.exceptions.AuthError">
+<em class="property">class </em><tt class="descclassname">ave.exceptions.</tt><tt class="descname">AuthError</tt><big>(</big><em>details</em><big>)</big><a class="headerlink" href="#ave.exceptions.AuthError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used internally in the client/broker, client/session, and other <tt class="docutils literal"><span class="pre">Control</span></tt>
+based handshakes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>details</strong> &#8211; A free form text message or a dictionary containing at least
+a <tt class="docutils literal"><span class="pre">&quot;message&quot;</span></tt> key.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.excetptions.RunError">
+<em class="property">class </em><tt class="descclassname">ave.excetptions.</tt><tt class="descname">RunError</tt><big>(</big><em>cmd</em>, <em>out</em>, <em>message=''</em><big>)</big><a class="headerlink" href="#ave.excetptions.RunError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates that an externally called tool has failed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>cmd</strong> &#8211; The command that was passed to <tt class="docutils literal"><span class="pre">ave.cmd.run()</span></tt>.</li>
+<li><strong>out</strong> &#8211; The output that was produced by the call.</li>
+<li><strong>message</strong> &#8211; A free form text message.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.exceptions.Restarting">
+<em class="property">class </em><tt class="descclassname">ave.exceptions.</tt><tt class="descname">Restarting</tt><big>(</big><em>details</em><big>)</big><a class="headerlink" href="#ave.exceptions.Restarting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates that an operation could not be performed because the hosting
+service (e.g the broker) has restarted and is no longer accepting new calls
+to the old instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>details</strong> &#8211; A free form text message or a dictionary containing at least
+a <tt class="docutils literal"><span class="pre">&quot;message&quot;</span></tt> key.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.exceptions.Terminated">
+<em class="property">class </em><tt class="descclassname">ave.exceptions.</tt><tt class="descname">Terminated</tt><big>(</big><em>details</em><big>)</big><a class="headerlink" href="#ave.exceptions.Terminated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates that a background activity has terminated. Background activities
+are typically long running processes, such as flashing a handset or making
+a flashable image, that AVE starts in the background and lets the client
+poll for completion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>details</strong> &#8211; A free form text message or a dictionary containing at least
+a <tt class="docutils literal"><span class="pre">&quot;message&quot;</span></tt> key.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.exceptions.Offline">
+<em class="property">class </em><tt class="descclassname">ave.exceptions.</tt><tt class="descname">Offline</tt><big>(</big><em>details</em><big>)</big><a class="headerlink" href="#ave.exceptions.Offline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates that an handset is offline.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>details</strong> &#8211; A free form text message or a dictionary containing at least
+a <tt class="docutils literal"><span class="pre">&quot;message&quot;</span></tt> key.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.exceptions.CompositionServerResponseNot200Exception">
+<em class="property">class </em><tt class="descclassname">ave.exceptions.</tt><tt class="descname">CompositionServerResponseNot200Exception</tt><big>(</big><em>details</em><big>)</big><a class="headerlink" href="#ave.exceptions.CompositionServerResponseNot200Exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates that the response code of composition server was not 200.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>details</strong> &#8211; A free form text message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.exceptions.CompositionServerResponseHttpRetryCode">
+<em class="property">class </em><tt class="descclassname">ave.exceptions.</tt><tt class="descname">CompositionServerResponseHttpRetryCode</tt><big>(</big><em>details</em><big>)</big><a class="headerlink" href="#ave.exceptions.CompositionServerResponseHttpRetryCode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates that the request was failed as composition server issue, user should
+try to request again. Retry HTTP codes:</p>
+<blockquote>
+<div>502,  # Bad Gateway
+503,  # Service (temporarily) unavailable
+504   # Gateway timeout</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>details</strong> &#8211; A free form text message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.exceptions.CompositionServerResponseOrderFailed">
+<em class="property">class </em><tt class="descclassname">ave.exceptions.</tt><tt class="descname">CompositionServerResponseOrderFailed</tt><big>(</big><em>details</em><big>)</big><a class="headerlink" href="#ave.exceptions.CompositionServerResponseOrderFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates that the result of order composition was failed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>details</strong> &#8211; A free form text message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.exceptions.CompositionDownloadImagesFailed">
+<em class="property">class </em><tt class="descclassname">ave.exceptions.</tt><tt class="descname">CompositionDownloadImagesFailed</tt><big>(</big><em>details</em><big>)</big><a class="headerlink" href="#ave.exceptions.CompositionDownloadImagesFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates that the composition was failed when downloading images</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>details</strong> &#8211; A free form text message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="ave-network-exceptions">
+<h2>ave.network.exceptions<a class="headerlink" href="#ave-network-exceptions" title="Permalink to this headline">¶</a></h2>
+<p>These exceptions are never propagated over the network. They are generated on
+the client side in response to various network issues. They refer to conditions
+that can be detected on <tt class="docutils literal"><span class="pre">ave.network.connection.Connection</span></tt> objects.</p>
+<dl class="class">
+<dt id="ave.network.exceptions.ConnectionClosed">
+<em class="property">class </em><tt class="descclassname">ave.network.exceptions.</tt><tt class="descname">ConnectionClosed</tt><big>(</big><em>msg='connection closed'</em><big>)</big><a class="headerlink" href="#ave.network.exceptions.ConnectionClosed" title="Permalink to this definition">¶</a></dt>
+<dd><p>The connection was closed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> &#8211; A string.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.network.exceptions.ConnectionTimeout">
+<em class="property">class </em><tt class="descclassname">ave.network.exceptions.</tt><tt class="descname">ConnectionTimeout</tt><big>(</big><em>msg='timed out'</em><big>)</big><a class="headerlink" href="#ave.network.exceptions.ConnectionTimeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>The connection timed out. I.e. no traffic could be read from, or written
+to, the conncetion within the time limit that had been set to govern all
+functions on the connection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> &#8211; A string.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.network.exceptions.ConnectionRefused">
+<em class="property">class </em><tt class="descclassname">ave.network.exceptions.</tt><tt class="descname">ConnectionRefused</tt><big>(</big><em>msg='connection refused'</em><big>)</big><a class="headerlink" href="#ave.network.exceptions.ConnectionRefused" title="Permalink to this definition">¶</a></dt>
+<dd><p>A connection could not be established because the other end refused it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> &#8211; A string.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.network.exceptions.ConnectionInProgress">
+<em class="property">class </em><tt class="descclassname">ave.network.exceptions.</tt><tt class="descname">ConnectionInProgress</tt><big>(</big><em>msg='connection in progress'</em><big>)</big><a class="headerlink" href="#ave.network.exceptions.ConnectionInProgress" title="Permalink to this definition">¶</a></dt>
+<dd><p>A non-blocking connection attempt is in progress and needs to be monitored
+with POSIX <tt class="docutils literal"><span class="pre">poll()</span></tt> to check for completeness.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> &#8211; A string.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.network.exceptions.ConnectionAgain">
+<em class="property">class </em><tt class="descclassname">ave.network.exceptions.</tt><tt class="descname">ConnectionAgain</tt><big>(</big><em>msg='connection again'</em><big>)</big><a class="headerlink" href="#ave.network.exceptions.ConnectionAgain" title="Permalink to this definition">¶</a></dt>
+<dd><p>A non-blocking read or write operation could not be completed and must be
+continued later. Use POSIX <tt class="docutils literal"><span class="pre">poll()</span></tt> to determine when the connection is
+ready for reading or writing.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> &#8211; A string.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.network.exceptions.ConnectionReset">
+<em class="property">class </em><tt class="descclassname">ave.network.exceptions.</tt><tt class="descname">ConnectionReset</tt><big>(</big><em>msg='connection reset'</em><big>)</big><a class="headerlink" href="#ave.network.exceptions.ConnectionReset" title="Permalink to this definition">¶</a></dt>
+<dd><p>The connection was reset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> &#8211; A string.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="ave-network-fdtx">
+<h2>ave.network.fdtx<a class="headerlink" href="#ave-network-fdtx" title="Permalink to this headline">¶</a></h2>
+<p>FdTx is short for File Descriptor Transfer. It is used when restarting brokers
+in a way that is invisible to clients.</p>
+<p>All functionality in this module is UNIX specific. It seems unlikely that a
+matching feature can be implemented on WIN32, which might mean that service
+restart on that platform would have to be implemented with some limitations.</p>
+<p>The motivation to use file descriptor transfer is based on the following
+dilemma:</p>
+<blockquote>
+<div><ul class="simple">
+<li>A session to be transfered may be temporarily unresponsive because it is
+busy evaluating a lengthy call.</li>
+<li>A broker can not tell if a session is alive and healthy without either
+actively polling it or at least checking if its TCP connection to the broker
+is open.</li>
+<li>A broker that is told to take over sessions started by someone else will not
+be able to reconnect immediately with sessions that are severely busy, and
+so will not be able to tell by either polling or connection openness if the
+session is alive.</li>
+<li>If the broker should wait for a busy session to become responsive, how long
+should it wait?</li>
+</ul>
+</div></blockquote>
+<p>Instead of trying to solve the dilemma, <tt class="docutils literal"><span class="pre">FdTx</span></tt> allows two processes to pass
+open file descriptors between each other and so it doesn&#8217;t become necessary for
+the receiver to reconnect with sessions to check their health. The receiver can
+poll for error conditions on the file descriptor just like the original owner
+did.</p>
+<p>Alternate solutions:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Drop the requirement on WIN32 that service restarts should be invisible to
+the clients. I.e. disconnect clients when an AVE service is restarted on a
+WIN32 host.</li>
+<li>Use at least two processes per broker session: One for communication with
+resources and one for communication with the broker and client. This might
+anyway be needed in the long run to support asynchronous manipulation of
+resources from a threaded or muliprocessed client (if that really is what
+is wanted).</li>
+</ul>
+</div></blockquote>
+<dl class="class">
+<dt id="ave.network.fdtx.FdTx">
+<em class="property">class </em><tt class="descclassname">ave.network.fdtx.</tt><tt class="descname">FdTx</tt><big>(</big><em>so_path</em><big>)</big><a class="headerlink" href="#ave.network.fdtx.FdTx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements file descriptor transfer between processes using a special
+feature of UNIX domain sockets. This feature is not wrapped by Python 2&#8217;s
+standard library, so the implementation resides in a separate C library
+which is interfaced with the <tt class="docutils literal"><span class="pre">ctypes</span></tt> module.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>so_path</strong> &#8211; <em>None</em> or a file system path to the underlying C library that
+implements file descriptor transfer.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="ave.network.fdtx.FdTx.listen">
+<tt class="descname">listen</tt><big>(</big><em>dirname</em>, <em>filename=None</em><big>)</big><a class="headerlink" href="#ave.network.fdtx.FdTx.listen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a UNIX domain socket in the file system and start listening on
+it for connections.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dirname</strong> &#8211; The file system directory where the socket file will be
+created.</li>
+<li><strong>filename</strong> &#8211; The file name of the created socket. Will be randomized
+if not set.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The full socket path.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><em>Exception</em> if the file already exists.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.fdtx.FdTx.accept">
+<tt class="descname">accept</tt><big>(</big><em>timeout=None</em><big>)</big><a class="headerlink" href="#ave.network.fdtx.FdTx.accept" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accept a connection. The caller must have called <tt class="docutils literal"><span class="pre">listen()</span></tt> first.</p>
+<p><tt class="docutils literal"><span class="pre">FdTx</span></tt> only keeps track of one open socket internally. Calling this
+function more than once has undefined behavior.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> &#8211; The maximum amount of time to wait, in seconds, for a
+connection attempt.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">A <em>Timeout</em> exception if the timeout expires.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.fdtx.FdTx.connect">
+<tt class="descname">connect</tt><big>(</big><em>path</em>, <em>timeout</em><big>)</big><a class="headerlink" href="#ave.network.fdtx.FdTx.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect to an accepting peer. The attempt will be retried until it is
+successful or <em>timeout</em> expires.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> &#8211; File system path to a UNIX domain socket that is accepting
+connections.</li>
+<li><strong>timeout</strong> &#8211; The maximum amount of time to wait, in seconds, for the
+connection attempt to be successful.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">A <em>Timeout</em> exception if the timeout expires.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.fdtx.FdTx.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#ave.network.fdtx.FdTx.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the underlying domain socket.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.fdtx.FdTx.put">
+<tt class="descname">put</tt><big>(</big><em>message</em>, <em>*fds</em><big>)</big><a class="headerlink" href="#ave.network.fdtx.FdTx.put" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a message containing a free form text message and an array of file
+descriptors.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The receiver must have been told beforehand, in a separate
+message or by convention, how many file descriptors it will receive.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.network.fdtx.FdTx.get">
+<tt class="descname">get</tt><big>(</big><em>max_msg_len</em>, <em>max_fds</em><big>)</big><a class="headerlink" href="#ave.network.fdtx.FdTx.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive a message containing a free form text message and an array of
+file descriptors.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A tuple containing the message and a list of file descriptors.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Common Subsystems</a><ul>
+<li><a class="reference internal" href="#ave-cmd">ave.cmd</a></li>
+<li><a class="reference internal" href="#ave-config">ave.config</a></li>
+<li><a class="reference internal" href="#ave-persona">ave.persona</a></li>
+<li><a class="reference internal" href="#ave-profile">ave.profile</a></li>
+<li><a class="reference internal" href="#ave-netwok-process">ave.netwok.process</a></li>
+<li><a class="reference internal" href="#ave-network-control">ave.network.control</a></li>
+<li><a class="reference internal" href="#ave-network-connection">ave.network.connection</a></li>
+<li><a class="reference internal" href="#ave-exceptions">ave.exceptions</a></li>
+<li><a class="reference internal" href="#ave-network-exceptions">ave.network.exceptions</a></li>
+<li><a class="reference internal" href="#ave-network-fdtx">ave.network.fdtx</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../../workspace/docs/config.html"
+                        title="previous chapter">Configuration Files</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../../utils/docs/index.html"
+                        title="next chapter">Utils</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/common/docs/api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../utils/docs/index.html" title="Utils"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../../workspace/docs/config.html" title="Configuration Files"
+             >previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

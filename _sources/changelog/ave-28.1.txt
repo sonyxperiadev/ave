@@ -1,0 +1,31 @@
+Version 28.1
+============
+
+* Add a New Attribute "duration" to .vcsjob Entries
+    :Tree: ave/vcsjob
+    :Commit: 70b923d9cc62662410265a556291c04a6764019d 
+
+* update pretty list and version number
+    :Tree: ave/handset
+    :Commit: 3c3b3fec2462756bfbb619aab8728418de1d0782 
+
+* add banner property in vcsjob file
+    :Tree: ave/handset
+    :Commit: bab8a37fc20603c37ae50751ed66239a8aaaa2f7 
+
+* Handle ampersands in Galatea parameters
+    :Tree: ave/handset
+    :Commit: f9e265e740db2c5247bad1c3a8d8cca26ed53612 
+
+* Bugfix: enable_package_verifier doesnot work on L Cookie
+    :Tree: ave/handset
+    :Commit: 277ce9f9c444f16848fb36c7ff2dad80a2e50b76 
+
+* Return UID together with "user" and "home" when load etc
+    :Tree: ave/common
+    :Commit: 73508549668aceb55d01097dbf8e12ac9d630e0b 
+
+* check the existence of the package before enable/disable it
+    :Tree: ave/handset
+    :Commit: 86dcb119f79c3420fa9f1e32c624dd979f7da4b4 
+

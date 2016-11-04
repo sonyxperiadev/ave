@@ -1,0 +1,120 @@
+Version 20
+==========
+
+* Hickup support. Send SIGUSR1 to broker's main process to generate trace files
+    :Tree: semctools/ave/broker
+    :Commit: a6899e2cb6d3834e0d3f29766f2e9f55bdf0dfd4
+
+* No timeouts on uploads
+    :Tree: semctools/ave/flocker
+    :Commit: 204c01a92a9099d4f1366f7122dc38640312cd11
+
+* Gort compiles against API level 19 (KitKat)
+    :Tree: semctools/ave/gort
+    :Commit: 0649f19dfe060b2ce395d1c4e015b14f0f788a4c
+
+* Set screen orientation
+    :Tree: semctools/ave/gort
+    :Commit: 2a9d2b4f9db80397007c038e0ecb0d2aa598680d
+
+* Follow positioning API changes in KitKat
+    :Tree: semctools/ave/gort
+    :Commit: e52eb40a16352da159e7ca303ea9752b2184468e
+    :Tree: secmtools/ave/handset
+    :Commit: a4efe06e77b0399ad71bf89c36d69df074979ff0
+
+* Enable keyguard support
+    :Tree: semctools/ave/gort
+    :Commit: 14576051bf326e0a3254b09256e876c16e99a1cf
+
+* Bug fix: disable_keyguard() broken on API LVL < 18
+    :Tree: semctools/ave/handset
+    :Commit: 4f61f1cb9665c013c7a4fe5130aee085b926f3b5
+
+* Fixed FirefoxHandset.launch()
+    :Tree: semctools/ave/handset
+    :Commit: 8a51a86dc1af9ad18d32765e2a10619c793a2f9d
+
+* Fixed FirefoxHandset.get_phone_number()
+    :Tree: semctools/ave/handset
+    :Commit: 01578fa762981476215ec437f3b125ba26dc5f72
+
+* Implemented AndroidHandset.restart_system()
+    :Tree: semctools/ave/handset
+    :Commit: cd2b23252d42d7b0c68274ea01ecb974eebe3825
+
+* Improved exception message when ``adb pull`` fails
+    :Tree: semctools/ave/handset
+    :Commit: 7f26bf08ea6fbeb04a44b020916715d3cabf9eda
+
+* Timeout option on APK (re)installation
+    :Tree: semctools/ave/handset
+    :Commit: c938a17ff91331feaf2a30585b385c456a3666e7
+
+* Disable package verifier when installing Gort & Galatea
+    :Tree: semctools/ave/handset
+    :Commit: ff38a7f72b5b936f1a5f8219d7e8a6f0ba9a9622
+
+* Bug fix: get/set locale did not work with newly flashed handset
+    :Tree: semctools/ave/handset
+    :Commit: 15111429fd37802e5e0e6f348f5cd502aaff1b14
+
+* Enable/disable upload reminder
+    :Tree: semctools/ave/handset
+    :Commit: 68cc0c73217cebecdadda58c7a7db0060a2d8952
+
+* Bugfix: Defaults for mandatory profile fields
+    :Tree: semctools/ave/handset
+    :Commit: 9e891327c16e206c5cef4b929f0eb785464f0e03
+
+* Fully testable implementations of enable/disable keyguard
+    :Tree: semctools/ave/handset
+    :Commit: c4323ef6c3987605e927b6334d6042aff86a8173
+
+* Fully testable implementations of enable/disable setup wizard
+    :Tree: semctools/ave/handset
+    :Commit: 5ce69b30b5db22c0a90079ee83dd5be7f9e06822
+
+* Improved auto-power-off handling
+    :Tree: semctools/ave/handset
+    :Commit: 11edf5fda50ee3fcdfef5264311ea2c7c2107292
+
+* Testable enable/disable data disclaimer
+    :Tree: semctools/ave/handset
+    :Commit: b11752f94edc713f7e736e1d9068372296b29dc4
+
+* Enable/disable waterproof popup
+    :Tree: semctools/ave/handset
+    :Commit: d863f0bca8a275659ad8228016160ca41584ee08
+
+* Enable/disable high headset volume warning
+    :Tree: semctools/ave/handset
+    :Commit: 5e81708b1d8bec9e6ffb7c61bca44ea461f9c499
+
+* Bug fix: Lister survives SIGUSR1 (hickups)
+    :Tree: semctools/ave/handset
+    :Commit: fe49116213488392a4a4b6e50704049634b6b8a4
+
+* Bug fix: AndroidHandset.is_mounted()
+    :Tree: semctools/ave/handset
+    :Commit: f911c02db82ccbd22da256e337284d8be1e88c8d
+
+* Bug fix: Use BlockingConnection, not Connection
+    :Tree: semctools/ave/positioning
+    :Commit: e337a9ccfb0beebac3a79df4b12411f132ad2336
+
+* Bug fix: Kernel module did not build on Linux 3.8
+    :Tree: semctools/ave/quancom
+    :Commit: d74b449f88fc8220f69bf08ec132a576232c82fa
+
+* Bug fix: Workspace.upload_goobug() sets current working directory
+    :Tree: semctools/ave/workspace
+    :Commit: 8fb7d8cfebaff700bec5f63b49a88ad9f2a24b78
+
+* Bug fix: Race condition in imager that broke image creation
+    :Tree: semctools/ave/workspace
+    :Commit: 35e74340db2d7ef57936db0f0ffd3c017e62b93d
+
+* Pass GUID to child process, if set
+    :Tree: semctools/ave/vcsjob
+    :Commit: 9509ff07a8498b8a2a3439fb30f5b3b4a23240ee

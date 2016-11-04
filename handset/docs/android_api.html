@@ -1,0 +1,1817 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Android Handset &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../../index.html" />
+    <link rel="up" title="Handset" href="index.html" />
+    <link rel="next" title="ADB Server" href="adb_server_api.html" />
+    <link rel="prev" title="ADB Handset" href="adb_api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="adb_server_api.html" title="ADB Server"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="adb_api.html" title="ADB Handset"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Handset</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="android-handset">
+<h1>Android Handset<a class="headerlink" href="#android-handset" title="Permalink to this headline">¶</a></h1>
+<p>Inherits from <tt class="docutils literal"><span class="pre">AdbHandset</span></tt>. Refer to separate document for a list of inherited
+functions.</p>
+<p>Although handset objects can be created explicitly, you should always allocate
+handsets through the broker instead (possibly with more attributes set in the
+allocation profile):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">ave.broker</span> <span class="kn">import</span> <span class="n">Broker</span>
+
+<span class="n">broker</span> <span class="o">=</span> <span class="n">Broker</span><span class="p">()</span>
+<span class="n">handset</span> <span class="o">=</span> <span class="n">broker</span><span class="o">.</span><span class="n">get</span><span class="p">({</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">,</span> <span class="s">&#39;platform&#39;</span><span class="p">:</span><span class="s">&#39;android&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>The returned handset implements the API that is documented here.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Many functions require super user privileges and will not work
+before a <tt class="docutils literal"><span class="pre">root()</span></tt> call has been made.</p>
+</div>
+<dl class="class">
+<dt id="ave.handset.android_handset.AndroidHandset">
+<em class="property">class </em><tt class="descclassname">ave.handset.android_handset.</tt><tt class="descname">AndroidHandset</tt><big>(</big><em>profile</em><big>)</big><a class="headerlink" href="#ave.handset.android_handset.AndroidHandset" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>profile</strong> &#8211; <p>A <tt class="docutils literal"><span class="pre">HandsetProfile</span></tt> instance that must contain at least
+the following members:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&#39;type&#39;</span>    <span class="p">:</span> <span class="s">&#39;handset&#39;</span><span class="p">,</span>
+    <span class="s">&#39;platform&#39;</span><span class="p">:</span> <span class="s">&#39;android&#39;</span><span class="p">,</span>
+    <span class="s">&#39;serial&#39;</span>  <span class="p">:</span> <span class="s">&#39;xxx&#39;</span> <span class="c"># the serial number of the handset</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<div class="section" id="power-states">
+<h2>Power States<a class="headerlink" href="#power-states" title="Permalink to this headline">¶</a></h2>
+<p>Android handsets can be in any of the following power states:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&#39;offline&#39;</span><span class="p">,</span>         <span class="c"># the handset is turned off or not connected</span>
+<span class="s">&#39;service&#39;</span><span class="p">,</span>         <span class="c"># the handset is in service mode</span>
+<span class="s">&#39;enumeration&#39;</span><span class="p">,</span>     <span class="c"># the handset&#39;s USB is set up and ready</span>
+<span class="s">&#39;adb&#39;</span><span class="p">,</span>             <span class="c"># the handset is available via adb</span>
+<span class="s">&#39;package_manager&#39;</span><span class="p">,</span> <span class="c"># the Android package manager is ready</span>
+<span class="s">&#39;boot_completed&#39;</span>   <span class="c"># the sys.boot_completed property is set to &quot;1&quot;</span>
+</pre></div>
+</div>
+<dl class="function">
+<dt id="get_power_state">
+<tt class="descname">get_power_state</tt><big>(</big><big>)</big><a class="headerlink" href="#get_power_state" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A string denoting the current power state.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If an error occured.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="wait_power_state">
+<tt class="descname">wait_power_state</tt><big>(</big><em>states</em>, <em>timeout=0</em><big>)</big><a class="headerlink" href="#wait_power_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait for the handset to reach a desired power state. The function returns
+when the first matching power state has been reached.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>states</strong> &#8211; A string or a list of strings denoting power states to wait
+for.</li>
+<li><strong>timeout</strong> &#8211; Number of seconds, as an integer, until a time out. Default
+is 0, meaning no time out is set.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The reached power state.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first last">If a state is invalid, an error or time out occurs.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>On a normal boot of a handset it will go through the power states in
+the following order:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">offline</span> <span class="o">&gt;</span> <span class="n">enumeration</span> <span class="o">&gt;</span> <span class="n">adb</span> <span class="o">&gt;</span> <span class="n">package_manager</span> <span class="o">&gt;</span> <span class="n">boot_completed</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="reboot">
+<tt class="descname">reboot</tt><big>(</big><em>service=False</em>, <em>timeout=30</em><big>)</big><a class="headerlink" href="#reboot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reboot the handset. The function returns when the handset enters the
+<em>offline</em> power state. Use e.g. <tt class="docutils literal"><span class="pre">wait_power_state('boot_completed')</span></tt> to
+wait for the handset to return to a fully booted state.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>service</strong> &#8211; If <em>True</em> enter service mode on reboot, else reboot normally.</li>
+<li><strong>timeout</strong> &#8211; Number of seconds to wait for the handset to go offline.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>Timeout</strong> &#8211; If the handset did not enter the <tt class="docutils literal"><span class="pre">offline</span></tt> power state
+in time.</li>
+<li><strong>Exception</strong> &#8211; On other errors.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="sim-card-handling">
+<h2>SIM Card Handling<a class="headerlink" href="#sim-card-handling" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="get_phone_number">
+<tt class="descname">get_phone_number</tt><big>(</big><big>)</big><a class="headerlink" href="#get_phone_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the phone number from SIM card.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The phone number, formatted as a string.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="networking">
+<h2>Networking<a class="headerlink" href="#networking" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="get_gsm_operator">
+<tt class="descname">get_gsm_operator</tt><big>(</big><big>)</big><a class="headerlink" href="#get_gsm_operator" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The name of the GSM operator, if any. Note that handsets in flight
+mode have no GSM operator even if they have a valid SIM card inserted.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="positioning">
+<h2>Positioning<a class="headerlink" href="#positioning" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="ui-manipulation">
+<h2>UI Manipulation<a class="headerlink" href="#ui-manipulation" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="press_key">
+<tt class="descname">press_key</tt><big>(</big><em>keycode</em><big>)</big><a class="headerlink" href="#press_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Press key with the given keycode. These are the same codes as appear in
+Android SDK documentation. E.g. <tt class="docutils literal"><span class="pre">3</span></tt> is the go-to-home-screen key.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keycode</strong> &#8211; The keycode of the key to press, an integer.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If the keypress failed.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="open_status_bar">
+<tt class="descname">open_status_bar</tt><big>(</big><big>)</big><a class="headerlink" href="#open_status_bar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the status bar.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>True</em> if successfully opened status bar, otherwise <em>False</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="id_visible">
+<tt class="descname">id_visible</tt><big>(</big><em>identity</em><big>)</big><a class="headerlink" href="#id_visible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether a view with the given identity is visible. View ID&#8217;s can be
+found by inspecting a running application with <tt class="docutils literal"><span class="pre">hierarchyviewer</span></tt>, which
+is included in the Android SDK.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>identity</strong> &#8211; A string. The identity of the view.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>True</em> if visible, else <em>False</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="is_checkbox_checked">
+<tt class="descname">is_checkbox_checked</tt><big>(</big><em>pattern</em><big>)</big><a class="headerlink" href="#is_checkbox_checked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether a checkbox with an ID that matches the given pattern is
+visible.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pattern</strong> &#8211; A string holding the ID to look for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>True</em> if visible, else <em>False</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="text_exact_visible">
+<tt class="descname">text_exact_visible</tt><big>(</big><em>pattern</em><big>)</big><a class="headerlink" href="#text_exact_visible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search for a visible view with text that is an exact match of the given
+pattern.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pattern</strong> &#8211; The exact match of the text in the view.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>True</em> if visible, else <em>False</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="text_regexp_visible">
+<tt class="descname">text_regexp_visible</tt><big>(</big><em>pattern</em><big>)</big><a class="headerlink" href="#text_regexp_visible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search for a visible view with text that is a match of the given regexp
+pattern.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pattern</strong> &#8211; The regexp pattern to search for. Note that this must be a
+<em>plain</em> regular expression, not a PCRE styled one.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>True</em> if visible, else <em>False</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="click_item_with_id">
+<tt class="descname">click_item_with_id</tt><big>(</big><em>identity</em><big>)</big><a class="headerlink" href="#click_item_with_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Click on an item with an ID that matches the given pattern.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>identity</strong> &#8211; A string holding the ID to look for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>True</em> if succeeded, else <em>False</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="click_item_with_text_exact">
+<tt class="descname">click_item_with_text_exact</tt><big>(</big><em>pattern</em><big>)</big><a class="headerlink" href="#click_item_with_text_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Click on the item with text that is an exact match of the given pattern.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pattern</strong> &#8211; The exact pattern of the text in the item.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>True</em> if succeeded, else <em>False</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="click_item_with_text_regexp">
+<tt class="descname">click_item_with_text_regexp</tt><big>(</big><em>pattern</em><big>)</big><a class="headerlink" href="#click_item_with_text_regexp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Click on the item with text that is a match of the given regexp pattern.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pattern</strong> &#8211; The regexp pattern of the text in the view.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>True</em> if succeeded, else <em>False</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="wait_id_visible">
+<tt class="descname">wait_id_visible</tt><big>(</big><em>identity</em>, <em>timeout=20</em><big>)</big><a class="headerlink" href="#wait_id_visible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait until a view with the given identity is visible.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>identity</strong> &#8211; The identity of the view.</li>
+<li><strong>timeout</strong> &#8211; Seconds before time out.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="wait_text_exact_visible">
+<tt class="descname">wait_text_exact_visible</tt><big>(</big><em>pattern</em>, <em>timeout=20</em><big>)</big><a class="headerlink" href="#wait_text_exact_visible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait until a view with text that is an exact match of the given pattern
+is visible.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pattern</strong> &#8211; The exact match of the text in the view.</li>
+<li><strong>timeout</strong> &#8211; Seconds before time out.</li>
+<li><strong>Timeout</strong> &#8211; If such occured.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="wait_text_regexp_visible">
+<tt class="descname">wait_text_regexp_visible</tt><big>(</big><em>pattern</em>, <em>timeout=20</em><big>)</big><a class="headerlink" href="#wait_text_regexp_visible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait until a view with text that is a match of the given regexp pattern
+is visible.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pattern</strong> &#8211; The exact match of the text in the view.</li>
+<li><strong>timeout</strong> &#8211; Seconds before time out.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises Timeout:</th><td class="field-body"><p class="first last">If such occured.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="get_display_bound">
+<tt class="descname">get_display_bound</tt><big>(</big><big>)</big><a class="headerlink" href="#get_display_bound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get handset display bound for current display orientation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first"><ul class="simple">
+<li>If unable to determine handset display bound.</li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Bound dictionary representing device display bound.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Example :</th><td class="field-body"><div class="first highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># Get handset display size</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bound</span> <span class="o">=</span> <span class="n">handset</span><span class="o">.</span><span class="n">get_display_bound</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">width</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;width&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">height</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;height&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># Get center point of display</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bound</span> <span class="o">=</span> <span class="n">handset</span><span class="o">.</span><span class="n">get_display_bound</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;center_x&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">bound</span><span class="o">.</span><span class="p">[</span><span class="s">&#39;center_y&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Following keys can be used on returned bound dictionary to fetch information</p>
+<table border="1" class="last docutils">
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">KEY</th>
+<th class="head">DESCRIPTION</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>x1</td>
+<td>Get Top-left X coordinate of display</td>
+</tr>
+<tr class="row-odd"><td>y1</td>
+<td>Get Top-left Y coordinate of display</td>
+</tr>
+<tr class="row-even"><td>x2</td>
+<td>Get Bottom-right X coordinate of display</td>
+</tr>
+<tr class="row-odd"><td>y2</td>
+<td>Get Bottom-right Y coordinate of display</td>
+</tr>
+<tr class="row-even"><td>width</td>
+<td>Get width of display</td>
+</tr>
+<tr class="row-odd"><td>height</td>
+<td>Get height of display</td>
+</tr>
+<tr class="row-even"><td>center_x</td>
+<td>Get Center X coordinate of display</td>
+</tr>
+<tr class="row-odd"><td>center_y</td>
+<td>Get Center Y coordinate of display</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="get_application_content_area_bound">
+<tt class="descname">get_application_content_area_bound</tt><big>(</big><big>)</big><a class="headerlink" href="#get_application_content_area_bound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get handset application content area bound. Application content area bound
+represents viewing area on the handset display except status bar and
+navigation bar.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first"><ul class="simple">
+<li>If content area bound can not be determined.</li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Bound dictionary representing application content area bound.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Example :</th><td class="field-body"><div class="first highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># Get application content area rectangle</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bound</span> <span class="o">=</span> <span class="n">handset</span><span class="o">.</span><span class="n">get_application_content_area_bound</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">top_left_x</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;x1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">top_left_y</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;y1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">width</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;width&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">height</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;height&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Following keys can be used on returned bound dictionary to fetch information</p>
+<table border="1" class="last docutils">
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">KEY</th>
+<th class="head">DESCRIPTION</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>x1</td>
+<td>Get Top-left X coordinate of content area</td>
+</tr>
+<tr class="row-odd"><td>y1</td>
+<td>Get Top-left Y coordinate of content area</td>
+</tr>
+<tr class="row-even"><td>x2</td>
+<td>Get Bottom-right X coordinate of content area</td>
+</tr>
+<tr class="row-odd"><td>y2</td>
+<td>Get Bottom-right Y coordinate of content area</td>
+</tr>
+<tr class="row-even"><td>width</td>
+<td>Get width of content area</td>
+</tr>
+<tr class="row-odd"><td>height</td>
+<td>Get height of content area</td>
+</tr>
+<tr class="row-even"><td>center_x</td>
+<td>Get Center X coordinate of content area</td>
+</tr>
+<tr class="row-odd"><td>center_y</td>
+<td>Get Center Y coordinate of content area</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="get_status_bar_bound">
+<tt class="descname">get_status_bar_bound</tt><big>(</big><big>)</big><a class="headerlink" href="#get_status_bar_bound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get handset status bar bound. Status bar bound represents area in display except application
+content area and navigation bar area.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first"><ul class="simple">
+<li>If display bound can not be determined.</li>
+<li>If content area bound can not be determined.</li>
+<li>If display orientation can not be determined.</li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Bound dictionary representing status bar area bound.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Example :</th><td class="field-body"><div class="first highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># Get status bar area rectangle</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bound</span> <span class="o">=</span> <span class="n">handset</span><span class="o">.</span><span class="n">get_status_bar_bound</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">top_left_x</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;x1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">top_left_y</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;y1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">width</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;width&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">height</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;height&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Following keys can be used on returned bound dictionary to fetch information</p>
+<table border="1" class="last docutils">
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">KEY</th>
+<th class="head">DESCRIPTION</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>x1</td>
+<td>Get Top-left X coordinate of status bar</td>
+</tr>
+<tr class="row-odd"><td>y1</td>
+<td>Get Top-left Y coordinate of status bar</td>
+</tr>
+<tr class="row-even"><td>x2</td>
+<td>Get Bottom-right X coordinate of status bar</td>
+</tr>
+<tr class="row-odd"><td>y2</td>
+<td>Get Bottom-right Y coordinate of status bar</td>
+</tr>
+<tr class="row-even"><td>width</td>
+<td>Get width of status bar</td>
+</tr>
+<tr class="row-odd"><td>height</td>
+<td>Get height of status bar</td>
+</tr>
+<tr class="row-even"><td>center_x</td>
+<td>Get Center X coordinate of status bar</td>
+</tr>
+<tr class="row-odd"><td>center_y</td>
+<td>Get Center Y coordinate of status bar</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="get_navigation_bar_bound">
+<tt class="descname">get_navigation_bar_bound</tt><big>(</big><big>)</big><a class="headerlink" href="#get_navigation_bar_bound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get handset navigation bar bound. Navigation bar represents area in display except application
+content area and status bar area.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first"><ul class="simple">
+<li>If display bound can not be determined.</li>
+<li>If content area bound can not be determined.</li>
+<li>If display orientation can not be determined.</li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Bound dictionary representing navigation bar area bound.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Example :</th><td class="field-body"><div class="first highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># Get navigation bar area rectangle</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bound</span> <span class="o">=</span> <span class="n">handset</span><span class="o">.</span><span class="n">get_navigation_bar_bound</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">top_left_x</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;x1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">top_left_y</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;y1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">width</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;width&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">height</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;height&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Following keys can be used on returned bound dictionary to fetch information</p>
+<table border="1" class="last docutils">
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">KEY</th>
+<th class="head">DESCRIPTION</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>x1</td>
+<td>Get Top-left X coordinate of navigation bar</td>
+</tr>
+<tr class="row-odd"><td>y1</td>
+<td>Get Top-left Y coordinate of navigation bar</td>
+</tr>
+<tr class="row-even"><td>x2</td>
+<td>Get Bottom-right X coordinate of navigation bar</td>
+</tr>
+<tr class="row-odd"><td>y2</td>
+<td>Get Bottom-right Y coordinate of navigation bar</td>
+</tr>
+<tr class="row-even"><td>width</td>
+<td>Get width of navigation bar</td>
+</tr>
+<tr class="row-odd"><td>height</td>
+<td>Get height of navigation bar</td>
+</tr>
+<tr class="row-even"><td>center_x</td>
+<td>Get Center X coordinate of navigation bar</td>
+</tr>
+<tr class="row-odd"><td>center_y</td>
+<td>Get Center Y coordinate of navigation bar</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="get_display_orientation">
+<tt class="descname">get_display_orientation</tt><big>(</big><big>)</big><a class="headerlink" href="#get_display_orientation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get handset display orientation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first"><ul class="simple">
+<li>If display orientation can not be determined.</li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>String representing handset display orientation. Possible return values are:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="24%" />
+<col width="76%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VALUE</th>
+<th class="head">MEANING</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>ORIENTATION_PORTRAIT_0_DEGREE</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>ORIENTATION_LANDSCAPE_90_DEGREE</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td>ORIENTATION_PORTRAIT_180_DEGREE</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>ORIENTATION_LANDSCAPE_270_DEGREE</td>
+</tr>
+</tbody>
+</table>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Example :</th><td class="field-body"><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># Check if display is in 180 degree rotation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rotation</span> <span class="o">=</span> <span class="n">handset</span><span class="o">.</span><span class="n">get_display_orientation</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_180_degree</span> <span class="o">=</span> <span class="n">rotation</span> <span class="o">==</span> <span class="s">&#39;2&#39;</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="is_orientation_portrait">
+<tt class="descname">is_orientation_portrait</tt><big>(</big><big>)</big><a class="headerlink" href="#is_orientation_portrait" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if handset display orientation is in portrait mode. Display is in portrait mode if display
+orientation is either 0 degree or 180 degree.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first"><ul class="simple">
+<li>If display orientation can not be determined.</li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Boolean value <tt class="docutils literal"><span class="pre">True</span></tt> if display orientation is in portrait mode else <tt class="docutils literal"><span class="pre">False</span></tt>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Example :</th><td class="field-body"><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># Check if handset display is in portrait mode</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">handset</span><span class="o">.</span><span class="n">is_orientation_portrait</span><span class="p">():</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">print</span> <span class="s">&quot;Display is in Portrait mode&quot;</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="is_orientation_landscape">
+<tt class="descname">is_orientation_landscape</tt><big>(</big><big>)</big><a class="headerlink" href="#is_orientation_landscape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if handset display orientation is in landscape mode. Display is in landscape mode if
+display orientation is either 90 degree or 270 degree.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first"><ul class="simple">
+<li>If display orientation can not be determined.</li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Boolean value <tt class="docutils literal"><span class="pre">True</span></tt> if display orientation is in landscape mode else <tt class="docutils literal"><span class="pre">False</span></tt>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Example :</th><td class="field-body"><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># Check if handset display is in landscape mode</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">handset</span><span class="o">.</span><span class="n">is_orientation_landscape</span><span class="p">():</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">print</span> <span class="s">&quot;Display is in Landscape mode&quot;</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="get_view_bound">
+<tt class="descname">get_view_bound</tt><big>(</big><em>key</em>, <em>value</em>, <em>index=0</em>, <em>matching=True</em><big>)</big><a class="headerlink" href="#get_view_bound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get bound for a view present in the device display.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first"><ul class="simple">
+<li>If key is not supported.</li>
+<li>If view is not located for specified key-value-index match.</li>
+<li>if view bound can not be determined.</li>
+<li>If handset ui hierarchy XML can not be obtained.</li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> &#8211; <p>It specifies the search type in device UI hierarchy.
+Following are acceptable key which represents an attribute for a view element of a running
+application. This can be inspected by <tt class="docutils literal"><span class="pre">uiautomatorviewer</span></tt>, which is included in the
+Android SDK.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="24%" />
+<col width="76%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">KEY</th>
+<th class="head">MEANING</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>text</td>
+<td>Search device ui hierarchy by &#8216;text&#8217; attribute</td>
+</tr>
+<tr class="row-odd"><td>type</td>
+<td>Search device ui hierarchy by &#8216;class&#8217; attribute</td>
+</tr>
+<tr class="row-even"><td>id</td>
+<td>Search device ui hierarchy by &#8216;resource-id&#8217; attribute</td>
+</tr>
+<tr class="row-odd"><td>desc</td>
+<td>Search device ui hierarchy by &#8216;content-desc&#8217; attribute</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><strong>value</strong> &#8211; It specifies what value to be searched for specified key. This can be inspected by
+<tt class="docutils literal"><span class="pre">uiautomatorviewer</span></tt>, which is included in the Android SDK.</li>
+<li><strong>index</strong> &#8211; It specifies N&#8217;th occurrence of view need to be searched for specified key/value
+pair. It is a zero based indexing system, that is, index of first view is zero.</li>
+<li><strong>matching</strong> &#8211; Boolean value <tt class="docutils literal"><span class="pre">True</span></tt> if specified <tt class="docutils literal"><span class="pre">value</span></tt> need to be matched in case
+insensitive way and a match will be positive if specified <tt class="docutils literal"><span class="pre">value</span></tt> is a substring
+of the original <tt class="docutils literal"><span class="pre">value</span></tt> with same <tt class="docutils literal"><span class="pre">key</span></tt>. Boolean value <tt class="docutils literal"><span class="pre">False</span></tt> if case sensitive
+exact match is required for the specified <tt class="docutils literal"><span class="pre">value</span></tt>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Bound dictionary for the matched view.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Example :</th><td class="field-body"><div class="first highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># Get rectangle for a view with id &quot;Album-Image&quot; and second occurrence in screen.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bound</span> <span class="o">=</span> <span class="n">handset</span><span class="o">.</span><span class="n">get_view_bound</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="s">&quot;album-image&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">top_left_x</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;x1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">top_left_y</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;y1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">width</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;width&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">height</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;height&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># Get center coordinate of the first view with type &quot;android.widget.ImageView&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bound</span> <span class="o">=</span> <span class="n">handset</span><span class="o">.</span><span class="n">get_view_bound</span><span class="p">(</span><span class="s">&quot;type&quot;</span><span class="p">,</span> <span class="s">&quot;imageview&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;center_x&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;center_y&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># Get bottom right coordinate for first view with exact text &quot;Hello World&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bound</span> <span class="o">=</span> <span class="n">handset</span><span class="o">.</span><span class="n">get_view_bound</span><span class="p">(</span><span class="s">&quot;text&quot;</span><span class="p">,</span> <span class="s">&quot;Hello World&quot;</span><span class="p">,</span> <span class="n">matching</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;x2&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;y2&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># Get width and height of 5&#39;th view with description &quot;item_image&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bound</span> <span class="o">=</span> <span class="n">handset</span><span class="o">.</span><span class="n">get_view_bound</span><span class="p">(</span><span class="s">&quot;desc&quot;</span><span class="p">,</span> <span class="s">&quot;item_image&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">width</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;width&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">height</span> <span class="o">=</span> <span class="n">bound</span><span class="p">[</span><span class="s">&#39;height&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Following keys can be used on returned bound dictionary to fetch information</p>
+<table border="1" class="last docutils">
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">KEY</th>
+<th class="head">DESCRIPTION</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>x1</td>
+<td>Get Top-left X coordinate of view</td>
+</tr>
+<tr class="row-odd"><td>y1</td>
+<td>Get Top-left Y coordinate of view</td>
+</tr>
+<tr class="row-even"><td>x2</td>
+<td>Get Bottom-right X coordinate of view</td>
+</tr>
+<tr class="row-odd"><td>y2</td>
+<td>Get Bottom-right Y coordinate of view</td>
+</tr>
+<tr class="row-even"><td>width</td>
+<td>Get width of view</td>
+</tr>
+<tr class="row-odd"><td>height</td>
+<td>Get height of view</td>
+</tr>
+<tr class="row-even"><td>center_x</td>
+<td>Get Center X coordinate of view</td>
+</tr>
+<tr class="row-odd"><td>center_y</td>
+<td>Get Center Y coordinate of view</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="popup-handling">
+<h2>Popup Handling<a class="headerlink" href="#popup-handling" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="disable_usb_mode_chooser">
+<tt class="descname">disable_usb_mode_chooser</tt><big>(</big><big>)</big><a class="headerlink" href="#disable_usb_mode_chooser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a dialog that asks the user to choose the usb mode.
+Caller must have called <tt class="docutils literal"><span class="pre">.root()</span></tt> beforehand.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="enable_usb_mode_chooser">
+<tt class="descname">enable_usb_mode_chooser</tt><big>(</big><big>)</big><a class="headerlink" href="#enable_usb_mode_chooser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enables a dialog that asks the user to choose the usb mode.
+Caller must have called <tt class="docutils literal"><span class="pre">.root()</span></tt> beforehand.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="disable_package_verifier">
+<tt class="descname">disable_package_verifier</tt><big>(</big><big>)</big><a class="headerlink" href="#disable_package_verifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disables the following security check that was introduced in Jelly
+Bean: A dialog appears when the user installs an APK from an unknown
+source (e.g. one installed with ADB). The user must accept or reject
+the installation to remove the dialog.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="enable_package_verifier">
+<tt class="descname">enable_package_verifier</tt><big>(</big><big>)</big><a class="headerlink" href="#enable_package_verifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enables the following security check that was introduced in Jelly
+Bean: A dialog appears when the user installs an APK from an unknown
+source (e.g. one installed with ADB). The user must accept or reject
+the installation to remove the dialog.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="application-management">
+<h2>Application Management<a class="headerlink" href="#application-management" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="list_packages">
+<tt class="descname">list_packages</tt><big>(</big><big>)</big><a class="headerlink" href="#list_packages" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all installed packages on the handset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list with all installed packages.</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If it was not possible to list packages.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="is_installed">
+<tt class="descname">is_installed</tt><big>(</big><em>package</em><big>)</big><a class="headerlink" href="#is_installed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the given package is installed on the handset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>package</strong> &#8211; The package to check.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>True</em> if the package is installed, <em>False</em> otherwise.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="install">
+<tt class="descname">install</tt><big>(</big><em>apk_path</em>, <em>timeout=30</em>, <em>args=None</em><big>)</big><a class="headerlink" href="#install" title="Permalink to this definition">¶</a></dt>
+<dd><p>Install an APK on the handset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>apk_path</strong> &#8211; The path to the package to install.</li>
+<li><strong>timeout</strong> &#8211; Execution time out.</li>
+<li><strong>args</strong> &#8211; The parameters of install, defalut to <tt class="docutils literal"><span class="pre">None</span></tt>,args also can be -lrtsdg,
+(-l: forward lock application)
+(-r: replace existing application)
+(-t: allow test packages)
+(-s: install application on sdcard)
+(-d: allow version code downgrade)
+(-g: grant all runtime permissions)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="uninstall">
+<tt class="descname">uninstall</tt><big>(</big><em>package</em><big>)</big><a class="headerlink" href="#uninstall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uninstall an APK from the handset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>package</strong> &#8211; The name of the package to uninstall.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="reinstall">
+<tt class="descname">reinstall</tt><big>(</big><em>apk_path</em><big>)</big><a class="headerlink" href="#reinstall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reinstall an APK on the handset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>apk_path</strong> &#8211; The path to the APK to reinstall.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="get_package_version">
+<tt class="descname">get_package_version</tt><big>(</big><em>package</em><big>)</big><a class="headerlink" href="#get_package_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the version code of the package.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>package</strong> &#8211; The package to check.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Version code of the package.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">If it was not possible to get the version code.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="list_permissions">
+<tt class="descname">list_permissions</tt><big>(</big><em>args</em><big>)</big><a class="headerlink" href="#list_permissions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints all known permissions. Defalut options are &#8216;-d -g&#8217;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> &#8211; -g: organize by group.
+-f: print all information.
+-s: short summary.
+-d: only list dangerous permissions.
+-u: list only the permissions users will see.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">permissions list string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="grant_permission">
+<tt class="descname">grant_permission</tt><big>(</big><em>package</em>, <em>permissions_name</em><big>)</big><a class="headerlink" href="#grant_permission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grant permissions to apps. The permissions must be declared as used
+in the app&#8217;s manifest, be runtime permissions (protection level dangerous),
+and the app targeting SDK greater than Lollipop MR1.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>package</strong> &#8211; app package name</li>
+<li><strong>permissions</strong> &#8211; The permissions name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first last">If an error occurs</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="revoke_permission">
+<tt class="descname">revoke_permission</tt><big>(</big><em>package</em>, <em>permissions_name</em><big>)</big><a class="headerlink" href="#revoke_permission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Revoke permissions to apps. The permissions must be declared as used
+in the app&#8217;s manifest, be runtime permissions (protection level dangerous),
+and the app targeting SDK greater than Lollipop MR1.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>package</strong> &#8211; app package name</li>
+<li><strong>permissions</strong> &#8211; The permissions name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first last">If an error occurs</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="properties">
+<h2>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="set_property">
+<tt class="descname">set_property</tt><big>(</big><em>key</em>, <em>value</em>, <em>local=False</em><big>)</big><a class="headerlink" href="#set_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a property.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Local properties are not supported if handset&#8217;s SDK version &gt; 15.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If <em>local=False</em> and the key doesn&#8217;t start with &#8220;persist.&#8221; the
+property will be reset when handset is rebooted.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If <em>local=True</em>, changes will only take effect upon reboot.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If <em>local=True</em>, properties will be persistent through rebooting
+until <tt class="docutils literal"><span class="pre">/data/local.prop</span></tt> is cleared and the handset is rebooted again.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> &#8211; The property name (a string).</li>
+<li><strong>value</strong> &#8211; The property value (a string).</li>
+<li><strong>local</strong> &#8211; If <em>True</em> the property is set by writing <em>key=value</em> into
+<tt class="docutils literal"><span class="pre">/data/local.prop</span></tt>, else the property is set with the <tt class="docutils literal"><span class="pre">setprop</span></tt>
+command.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">If the property was not set successfully.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="clear_local_properties">
+<tt class="descname">clear_local_properties</tt><big>(</big><big>)</big><a class="headerlink" href="#clear_local_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear all local properties by removing <tt class="docutils literal"><span class="pre">/data/local.prop</span></tt>. The change
+does not take effect until the handset is rebooted.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Local properties are not supported if handset&#8217;s SDK version &gt; 15.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="logging">
+<h2>Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="clear_logcat">
+<tt class="descname">clear_logcat</tt><big>(</big><em>args=''</em><big>)</big><a class="headerlink" href="#clear_logcat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Erase logcat logs from the handset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> &#8211; Arguments to logcat; e.g. <tt class="docutils literal"><span class="pre">&quot;-b</span> <span class="pre">main</span> <span class="pre">-b</span> <span class="pre">system&quot;</span></tt>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="start_logcat">
+<tt class="descname">start_logcat</tt><big>(</big><em>args=''</em>, <em>log_file=None</em><big>)</big><a class="headerlink" href="#start_logcat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start Logcat logging.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>args</strong> &#8211; Arguments to logcat; e.g. <tt class="docutils literal"><span class="pre">&quot;-v</span> <span class="pre">time</span> <span class="pre">-b</span> <span class="pre">main&quot;</span></tt>.</li>
+<li><strong>log_file</strong> &#8211; A path where the log file will be saved on the test host
+(not on the handset). It is not necessary to provide this parameter
+to retrieve the logs later.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A unique ID that can be used with <tt class="docutils literal"><span class="pre">get_log()</span></tt>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="stop_logcat">
+<tt class="descname">stop_logcat</tt><big>(</big><em>uid</em><big>)</big><a class="headerlink" href="#stop_logcat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop Logcat logging for the specified UID.</p>
+<p>Every call to start_logcat spawns a new Logcat logger thread which will
+remain active until the handset is deallocated. To preserve system
+resources, the caller should always call stop_logcat to free up
+system resources when the logcat associated with the specified UID
+is no longer needed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>uid</strong> &#8211; The unique id returned by <tt class="docutils literal"><span class="pre">start_logcat()</span></tt>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="get_logcat_log">
+<tt class="descname">get_logcat_log</tt><big>(</big><em>uid</em>, <em>timeout=10</em><big>)</big><a class="headerlink" href="#get_logcat_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the logcat log by UID.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>uid</strong> &#8211; The unique id returned by <tt class="docutils literal"><span class="pre">start_logcat()</span></tt>.</li>
+<li><strong>timeout</strong> &#8211; Seconds before time out.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The logcat log as a string.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="test-runners">
+<h2>Test Runners<a class="headerlink" href="#test-runners" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="get_instrumentation_runners">
+<tt class="descname">get_instrumentation_runners</tt><big>(</big><em>package</em><big>)</big><a class="headerlink" href="#get_instrumentation_runners" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the JUnit instrumentation runners of a package on the handset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>package</strong> &#8211; The target package.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list of all instrumentation runners included in the package.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="run_junit">
+<tt class="descname">run_junit</tt><big>(</big><em>output_path=None</em>, <em>test_package=None</em>, <em>runner=None</em>, <em>test_options=None</em>, <em>raw=None</em>, <em>timeout=0</em>, <em>timeout_kill=True</em><big>)</big><a class="headerlink" href="#run_junit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run JUnit tests on the handset.</p>
+<p>It&#8217;s possible to run full test scope of the junit instrumentation test
+or just a subset of it, depending on what parameters are given.
+Exactly one of apk, runner and raw must be given, i.e. they may not be
+combined. The possible parameter combinations can be found in the table
+below and more details can be found under Args.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="35%" />
+<col width="65%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">PARAMETERS</th>
+<th class="head">WHAT TO EXECUTE</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>test_package</td>
+<td>All tests in the package (all runners)</td>
+</tr>
+<tr class="row-odd"><td>runner</td>
+<td>All tests in the given runner</td>
+</tr>
+<tr class="row-even"><td>runner, test_options</td>
+<td>All tests that matches the parameters</td>
+</tr>
+<tr class="row-odd"><td>raw</td>
+<td>All tests that matches the raw parameters</td>
+</tr>
+</tbody>
+</table>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>output_path</strong> &#8211; The execution output data will be written to target
+output_path.</li>
+<li><strong>test_package</strong> &#8211; The package name of the test package, as a string. The
+value of the package attribute of the manifest element in the test
+package&#8217;s manifest file. If given, all tests of the given package will
+be executed. May <em>not</em> be combined with: extras, runner nor raw.</li>
+<li><strong>runner</strong> &#8211; The instrumentation test runner (&lt;test_package&gt;/&lt;runner_class&gt;)
+to run, as a string. If given without test_options, all tests of the
+given instrumentation test runner will be executed. May <em>not</em> be combined
+with: apk nor raw.</li>
+<li><strong>test_options</strong> &#8211; A dictionary containing key-value pairs that will be used
+with the -e flag on am instrumentation (-e &lt;key&gt; &lt;value&gt;). Requires
+runner to be given but may _not_ be combined with apk nor raw. Details
+about test options can be found at <a class="reference external" href="http://developer.android.com/tools/testing/testing_otheride.html#AMOptionsSyntax">http://developer.android.com/tools/testing/testing_otheride.html#AMOptionsSyntax</a></li>
+<li><strong>raw</strong> &#8211; A raw string containing all parameters to forward to ADB <tt class="docutils literal"><span class="pre">shell</span>
+<span class="pre">am</span> <span class="pre">instrument</span></tt> on execution. May <em>not</em> be combined with: apk, runner
+nor test_options.</li>
+<li><strong>timeout</strong> &#8211; Execution time out. No time out by default.</li>
+<li><strong>timeout_kill</strong> &#8211; If <em>True</em> an attempt to kill the test process will be
+conducted when a <em>Timeout</em> was raised. Default is <em>True</em>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first simple">
+<li><strong>Timeout</strong> &#8211; If the execution timed out.</li>
+<li><strong>RunError</strong> &#8211; <p>If the execution of <tt class="docutils literal"><span class="pre">am</span> <span class="pre">instrument</span></tt> failed or detected
+any of the folling conditions:</p>
+<ul>
+<li>Invalid runner: Unable to find instrumentation info</li>
+<li>Invalid test class: No such test class</li>
+<li>Invalid test case: No such test case</li>
+<li>Crash during instrumentation: Instrumentation test run crash</li>
+<li>Handset dumped during test: Instrumentation test run incomplete</li>
+</ul>
+</li>
+<li><strong>Exception</strong> &#8211; <p>If any of the following:</p>
+<ul>
+<li>Missing parameter</li>
+<li>Invalid combination of parameters</li>
+<li>Invalid parameter given</li>
+<li>No such test package</li>
+<li>No runners available</li>
+<li>No such runner available</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The instrumentation test output as a string.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="kill_junit_test">
+<tt class="descname">kill_junit_test</tt><big>(</big><em>package</em>, <em>timeout=10</em><big>)</big><a class="headerlink" href="#kill_junit_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to kill the process of a JUit test running from a specific package.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="list_gtest_tests">
+<tt class="descname">list_gtest_tests</tt><big>(</big><em>target</em><big>)</big><a class="headerlink" href="#list_gtest_tests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of GTest tests.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>target</strong> &#8211; The path on the handset to the GTest executable.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list of test names.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">If target is not an existing executable file on the
+handset.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="run_gtest">
+<tt class="descname">run_gtest</tt><big>(</big><em>target</em>, <em>result_path=None</em>, <em>args=</em><span class="optional">[</span><span class="optional">]</span>, <em>timeout=0</em><big>)</big><a class="headerlink" href="#run_gtest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a GTest runner on the handset. If <em>result_path</em> is given, the
+execution output file and GTest result XML file will be saved on the
+host in that directory (not on the handset).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>target</strong> &#8211; The path on the handset to the GTest executable.</li>
+<li><strong>result_path</strong> &#8211; A directory on the host where the result files are saved.</li>
+<li><strong>args</strong> &#8211; A list of arguments for the GTest execution, optional. See the
+&#8220;Supported Advanced Options&#8221; box below for a list of available options.</li>
+<li><strong>timeout</strong> &#8211; Seconds before execution time out.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>A 3-tuple containing the following items:</p>
+<ul class="simple">
+<li>The execution output as a string,</li>
+<li>Full path on host to the execution output data file or <em>None</em>,</li>
+<li>Full path on host to the GTest XML result file or <em>None</em></li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>Timeout</strong> &#8211; If the execution timed out.</li>
+<li><strong>RunError</strong> &#8211; If execution failed.</li>
+<li><strong>Exception</strong> &#8211; If any invalid parameter was found.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Advanced Options:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="o">--</span><span class="n">gtest_filter</span><span class="o">=</span><span class="n">POSTIVE_PATTERNS</span><span class="p">[</span><span class="o">-</span><span class="n">NEGATIVE_PATTERNS</span><span class="p">]</span>
+<span class="o">--</span><span class="n">gtest_also_run_disabled_tests</span>
+<span class="o">--</span><span class="n">gtest_repeat</span><span class="o">=</span><span class="p">[</span><span class="n">COUNT</span><span class="p">]</span>
+<span class="o">--</span><span class="n">gtest_shuffle</span>
+<span class="o">--</span><span class="n">gtest_random_seed</span><span class="o">=</span><span class="p">[</span><span class="n">NUMBER</span><span class="p">]</span>
+<span class="o">--</span><span class="n">gtest_color</span><span class="o">=</span><span class="p">(</span><span class="n">yes</span><span class="o">|</span><span class="n">no</span><span class="o">|</span><span class="n">auto</span><span class="p">)</span>
+<span class="o">--</span><span class="n">gtest_print_time</span><span class="o">=</span><span class="mi">0</span>
+<span class="o">--</span><span class="n">gtest_death_test_style</span><span class="o">=</span><span class="p">(</span><span class="n">fast</span><span class="o">|</span><span class="n">threadsafe</span><span class="p">)</span>
+<span class="o">--</span><span class="n">gtest_break_on_failure</span>
+<span class="o">--</span><span class="n">gtest_throw_on_failure</span>
+<span class="o">--</span><span class="n">gtest_catch_exceptions</span><span class="o">=</span><span class="mi">0</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>For more info about GTest execution options visit:</dt>
+<dd><a class="reference external" href="https://code.google.com/p/googletest/wiki/AdvancedGuide#Running_Test_Programs:_Advanced_Options">https://code.google.com/p/googletest/wiki/AdvancedGuide#Running_Test_Programs:_Advanced_Options</a></dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="miscelaneous">
+<h2>Miscelaneous<a class="headerlink" href="#miscelaneous" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="is_mounted">
+<tt class="descname">is_mounted</tt><big>(</big><em>mount_point</em><big>)</big><a class="headerlink" href="#is_mounted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if mount_point is mounted.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Args mount_point:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Mount point.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>True</em> if <em>mount_point</em> is mounted, else <em>False</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sdcard_mounted">
+<tt class="descname">sdcard_mounted</tt><big>(</big><big>)</big><a class="headerlink" href="#sdcard_mounted" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>True</em> if internal SD Card is mounted, else <em>False</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="extcard_mounted">
+<tt class="descname">extcard_mounted</tt><big>(</big><big>)</big><a class="headerlink" href="#extcard_mounted" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>True</em> if the external SD Card is mounted, else <em>False</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="set_libc_debug_malloc">
+<tt class="descname">set_libc_debug_malloc</tt><big>(</big><em>on</em>, <em>package</em>, <em>timeout=45</em><big>)</big><a class="headerlink" href="#set_libc_debug_malloc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience method to set/unset property <em>libc.debug.malloc</em> and execute
+&#8216;stop&#8217; and &#8216;start&#8217; on the handset (stop/start must be executed for the
+change to take effect). The property <em>libc.debug.malloc</em> must be set to be
+able to dump native heap with <tt class="docutils literal"><span class="pre">dump_heap(native=True)</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Application processes will be restarted and get new PIDs.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <em>libc.debug.malloc</em> property is reset on reboot.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>on</strong> &#8211; If <em>True</em> the property will be set to &#8216;1&#8217; otherwise it will be
+cleared.</li>
+<li><strong>package</strong> &#8211; The method waits for a process with name <em>package</em> to be
+started again after stop/start, before returning. (Preferably the same
+as the package provided to <tt class="docutils literal"><span class="pre">dump_heap()</span></tt> or a package that is known
+to be automatically started by the system.)</li>
+<li><strong>timeout</strong> &#8211; If &gt; 0, seconds before timing out when waiting for package&#8217;s
+process to be up and running.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><em>True</em> if the property was set before execution of this method,
+else <em>False</em>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>Timeout</strong> &#8211; If such occured.</li>
+<li><strong>Exception</strong> &#8211; On other errors.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="dump_heap">
+<tt class="descname">dump_heap</tt><big>(</big><em>directory</em>, <em>package</em>, <em>native=False</em>, <em>timeout=30</em><big>)</big><a class="headerlink" href="#dump_heap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dump heap for processes with name &#8216;package&#8217; (using <tt class="docutils literal"><span class="pre">am</span> <span class="pre">dumpheap</span></tt>) and
+save the resulting hprof-files to the <em>directory</em> on the host (not on the
+handset).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The property <em>libc.debug.malloc</em> must already be set if
+<em>native=True</em>. See <tt class="docutils literal"><span class="pre">set_libc_debug_malloc()</span></tt>.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>directory</strong> &#8211; A directory on the host where the hprof files will be saved.</li>
+<li><strong>package</strong> &#8211; Dump heap for all processes with a name that matches exactly.</li>
+<li><strong>native</strong> &#8211; If <em>True</em>, dump native heap instead of managed heap.</li>
+<li><strong>timeout</strong> &#8211; If timeout &gt; 0, seconds before time out.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with each generated hprof file&#8217;s full path on the host.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>Timeout</strong> &#8211; If such occured.</li>
+<li><strong>Exception</strong> &#8211; On other errors.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="thermal">
+<h2>Thermal<a class="headerlink" href="#thermal" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="doze-and-app-standby">
+<h2>Doze and App Standby<a class="headerlink" href="#doze-and-app-standby" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="set_inactive">
+<tt class="descname">set_inactive</tt><big>(</big><em>package</em>, <em>value</em><big>)</big><a class="headerlink" href="#set_inactive" title="Permalink to this definition">¶</a></dt>
+<dd><p>set the App Standby mode</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>package</strong> &#8211; the app package name</li>
+<li><strong>value</strong> &#8211; a string of true or false.
+true: force the app into idle;
+false: recover app from idle</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="get_inactive">
+<tt class="descname">get_inactive</tt><big>(</big><em>package</em><big>)</big><a class="headerlink" href="#get_inactive" title="Permalink to this definition">¶</a></dt>
+<dd><p>get the App Standby mode</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>package</strong> &#8211; the app package name</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the app mode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="dumpsys_battery">
+<tt class="descname">dumpsys_battery</tt><big>(</big><em>operate='unplug'</em><big>)</big><a class="headerlink" href="#dumpsys_battery" title="Permalink to this definition">¶</a></dt>
+<dd><p>set Battery Service state</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>operate</strong> &#8211; default is unplug, pretend device not to be charged</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="dumpsys_deviceidle">
+<tt class="descname">dumpsys_deviceidle</tt><big>(</big><em>command</em>, <em>para=None</em><big>)</big><a class="headerlink" href="#dumpsys_deviceidle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transition to Doze (Idle) mode</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>command</strong> &#8211; step: Immediately step to next state, without waiting for alarm.
+force-idle: Force directly into idle mode, regardless of other device state.Use &#8220;step&#8221; to get out.
+disable: Completely disable device idle mode.
+enable: Re-enable device idle mode after it had previously been disabled.
+enabled: Print 1 if device idle mode is currently enabled, else 0.
+whitelist: Print currently whitelisted apps.
+whitelist [package ...]: Add (prefix with +) or remove (prefix with -) packages.
+tempwhitelist [package ..]: Temporarily place packages in whitelist for 10 seconds</li>
+<li><strong>para</strong> &#8211; default is None. If the command is whiltelist or tempwhitelist,
+the para should be a package name.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Android Handset</a><ul>
+<li><a class="reference internal" href="#power-states">Power States</a></li>
+<li><a class="reference internal" href="#sim-card-handling">SIM Card Handling</a></li>
+<li><a class="reference internal" href="#networking">Networking</a></li>
+<li><a class="reference internal" href="#positioning">Positioning</a></li>
+<li><a class="reference internal" href="#ui-manipulation">UI Manipulation</a></li>
+<li><a class="reference internal" href="#popup-handling">Popup Handling</a></li>
+<li><a class="reference internal" href="#application-management">Application Management</a></li>
+<li><a class="reference internal" href="#properties">Properties</a></li>
+<li><a class="reference internal" href="#logging">Logging</a></li>
+<li><a class="reference internal" href="#test-runners">Test Runners</a></li>
+<li><a class="reference internal" href="#miscelaneous">Miscelaneous</a></li>
+<li><a class="reference internal" href="#thermal">Thermal</a></li>
+<li><a class="reference internal" href="#doze-and-app-standby">Doze and App Standby</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="adb_api.html"
+                        title="previous chapter">ADB Handset</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="adb_server_api.html"
+                        title="next chapter">ADB Server</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/handset/docs/android_api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="adb_server_api.html" title="ADB Server"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="adb_api.html" title="ADB Handset"
+             >previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" >Handset</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

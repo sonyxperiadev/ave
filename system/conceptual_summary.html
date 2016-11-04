@@ -1,0 +1,469 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Conceptual Summary &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../index.html" />
+    <link rel="up" title="System Documentation" href="index.html" />
+    <link rel="next" title="Lab Owner’s Guide" href="lab_owner.html" />
+    <link rel="prev" title="System Documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="lab_owner.html" title="Lab Owner’s Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="System Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">System Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="conceptual-summary">
+<span id="system-conceptual-summary"></span><h1>Conceptual Summary<a class="headerlink" href="#conceptual-summary" title="Permalink to this headline">¶</a></h1>
+<p>This document tries to explain the four major parts of AVE, what they are good
+for and how they fit together.</p>
+<div class="section" id="goals">
+<h2>Goals<a class="headerlink" href="#goals" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Support for test anatomy.</li>
+<li>Asset management of test jobs.</li>
+<li>Solve generic issues with allocation and control of test lab equipment.</li>
+<li>Enable more precise tests that require detailed control over equipment.</li>
+</ul>
+</div>
+<div class="section" id="illustrations-legend">
+<h2>Illustrations Legend<a class="headerlink" href="#illustrations-legend" title="Permalink to this headline">¶</a></h2>
+<p>A number of illustrations are used to symbolize the concepts and technologies
+discussed in this document:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Illustration</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><img alt="../_images/git.icon.png" class="first last" src="../_images/git.icon.png" />
+</td>
+<td><strong>Git</strong>: This is the mascot of the Git SCM project.</td>
+</tr>
+<tr class="row-odd"><td><img alt="../_images/worker.icon.png" class="first last" src="../_images/worker.icon.png" />
+</td>
+<td><strong>Test Job</strong>: A worker figure armed with a spade.</td>
+</tr>
+<tr class="row-even"><td><img alt="../_images/builder.icon.png" class="first last" src="../_images/builder.icon.png" />
+</td>
+<td><strong>Build Job</strong>: This was supposed to look like the vallet mascot of the
+Jenkins project.</td>
+</tr>
+<tr class="row-odd"><td><img alt="../_images/nascita.icon.png" class="first last" src="../_images/nascita.icon.png" />
+</td>
+<td><strong>Test Anatomy</strong>: Boticelli&#8217;s classic painting &#8220;La Nascita di Venere&#8221;,
+often used to symbolize anatomy.</td>
+</tr>
+<tr class="row-even"><td><img alt="../_images/broker.icon.png" class="first last" src="../_images/broker.icon.png" />
+</td>
+<td><strong>Broker</strong>: Performs allocation and reclamation of test lab equipment.</td>
+</tr>
+<tr class="row-odd"><td><img alt="../_images/workspace.icon.png" class="first last" src="../_images/workspace.icon.png" />
+</td>
+<td><strong>Workspace</strong>: Codifies test host properties and serves &#8220;scratch&#8221; space
+to test jobs.</td>
+</tr>
+<tr class="row-even"><td><img alt="../_images/cradle.icon.png" class="first last" src="../_images/cradle.icon.png" />
+</td>
+<td><strong>Cradle</strong>: Used in the widest possible meaning of the word. &#8220;Cradles&#8221;
+may be power cycling fixtures used to force handsets into service mode,
+or relays to control USB connectivity of a tested device, etc.</td>
+</tr>
+<tr class="row-odd"><td><img alt="../_images/satellite.icon.png" class="first last" src="../_images/satellite.icon.png" />
+</td>
+<td><strong>Network Simulator</strong>: Faraday cages with e.g. faked GPS satellites
+inside.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="terminology">
+<h2>Terminology<a class="headerlink" href="#terminology" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>Test case</strong>: Test cases execute on the device under test. Test cases are
+often written against <em>JUnit*or *gtest</em>. Test cases are stored in Git trees
+and are CM labeled together with the product.</li>
+<li><strong>Test job</strong>: Test jobs execute on a test host. They drive the execution of
+test cases and are typically used as the smallest unit in test scheduling.</li>
+</ul>
+</div>
+<div class="section" id="test-anatomy">
+<h2>Test Anatomy<a class="headerlink" href="#test-anatomy" title="Permalink to this headline">¶</a></h2>
+<p>So AVE uses Boticelli&#8217;s &#8220;La Nascita di Venere&#8221; to symbolize anatomy, but what
+is <em>test</em> anatomy?</p>
+<p>Test anatomy establishes orders of execution for tests. The goal is usually to
+execute simple tests before complex ones, to save time by skipping the complex
+tests if the simpler ones fail. Another common goal is to order tests so that a
+system&#8217;s fundament is verified before features that depend on the fundament.</p>
+<p>AVE supports test anatomy by using two concepts:</p>
+<ul class="simple">
+<li>Tagging. The <tt class="docutils literal"><span class="pre">.vcsjob</span></tt> interface for schedulers may select jobs in a Git
+tree by filtering on tags. Tag names may be controlled through governance so
+that a certain tag always signifies a certain scope level. E.g. &#8220;SMOKE&#8221; or
+&#8220;SANITY&#8221;.</li>
+<li>Asset management: By only working with resources that have been stored in a
+common CM system, a scheduler may build dependency trees of assets. The root
+of the dependency tree might be a set of tests that verify AVE and the test
+environment itself. Once the test environment is verified, platform tests can
+be executed, followed by application tests.</li>
+</ul>
+<div class="figure align-center">
+<img alt="../_images/anatomy.jpeg" src="../_images/anatomy.jpeg" />
+</div>
+</div>
+<div class="section" id="cm-labeling-of-test-jobs">
+<h2>CM Labeling of Test Jobs<a class="headerlink" href="#cm-labeling-of-test-jobs" title="Permalink to this headline">¶</a></h2>
+<p>Before the dependencies between test jobs can be established, we must know which
+test jobs are available. Each product should have a catalog that describes
+the purpose of each test job written for the product. This is very similar to
+writing documentation for an API, except the calls are made to jobs instead of
+functions.</p>
+<p>But there is a problem. The definition of a test job can escape cataloguing by
+being stored outside centralized delivery systems. Jenkins jobs is an example
+of this. Why? They are</p>
+<ul class="simple">
+<li><strong>Not version controlled</strong>: Changes are effective immediately and with no
+easy way to back out of a bad one. Developers often create new jobs that are
+just small variations of existing ones to mitigate this risk. Older jobs get
+silently abandoned when they are no longer used.</li>
+<li><strong>Not asset managed</strong>: Simply put, it is difficult to know what Jenkins jobs
+are used for, if anyone &#8220;owns&#8221; them (to use organization lingo), what steps
+are needed to migrate jobs between labs, or how to exchange jobs with external
+partners.</li>
+</ul>
+<div class="figure align-center">
+<img alt="../_images/jenkins_xor_assets.jpeg" src="../_images/jenkins_xor_assets.jpeg" />
+</div>
+<p>Governance can&#8217;t be based on something that loose. What we really want is to
+use an existing CM system for labeling to create a reliable mapping between
+jobs and their purposes:</p>
+<div class="figure align-center">
+<img alt="../_images/job_assets.jpeg" src="../_images/job_assets.jpeg" />
+</div>
+<div class="section" id="requirements-for-labeling">
+<h3>Requirements for Labeling<a class="headerlink" href="#requirements-for-labeling" title="Permalink to this headline">¶</a></h3>
+<p>To be handled as source code artifacts in a CM system, the basic requirement on
+test jobs is that they are written as proper programs, using API&#8217;s designed for
+this purpose.</p>
+<p>Returning to the example of Jenkins jobs, please note that they are generated
+from check boxes, selection menus and various input fields found in the
+configuration console for each job. The stored form of this configuration is not
+necessarily meant to be human readable and may take arbitrary forms that are not
+suitable for Git or other patch based versioning systems. As long as test jobs
+<em>are</em> Jenkins jobs, we can&#8217;t have asset management on the jobs and thus no test
+anatomy.</p>
+<div class="figure align-center">
+<img alt="../_images/jenkins_xor_anatomy.jpeg" src="../_images/jenkins_xor_anatomy.jpeg" />
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Jenkins is a tremendously useful tool. It is just that it should not
+be used to <em>directly</em> represent test jobs.</p>
+</div>
+</div>
+<div class="section" id="course-of-action">
+<h3>Course of Action<a class="headerlink" href="#course-of-action" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>We need API&#8217;s that test jobs use to configure themselves,</li>
+<li>so that test jobs can be written as proper programs,</li>
+<li>so that test jobs can be CM labeled,</li>
+<li>so that test jobs can be asset managed,</li>
+<li>so that test anatomy can be implemented.</li>
+</ul>
+<p>Alright? So everything hinges on some collection of API&#8217;s designed for test job
+configuration. What are these API&#8217;s?</p>
+<ul class="simple">
+<li><strong>Workspace API&#8217;s</strong>: A test job needs some &#8220;scratch&#8221; space to store artifacts
+from the build system, C2D packages, etc. A workspace API must also be able
+to answer queries about the test host. E.g. if there is a WLAN in the lab
+and how to connect to it.</li>
+<li><strong>Broker API&#8217;s</strong>: Most test jobs need to allocate handsets and sometimes other
+kinds of test lab equipment. The resources are allocated by a &#8220;broker&#8221;.</li>
+<li><strong>Equipment API&#8217;s</strong>: The broker returns resource handles for handsets, relays,
+positioning equipment, power meters, etc. All of these must be controllable
+by the test job.</li>
+<li><strong>Anatomy API&#8217;s</strong>: Developers should be able to browse the global catalog of
+test jobs, pick useful dependencies from it and refer to them from their own
+test jobs.</li>
+<li><strong>Reporting API&#8217;s</strong>: It should be easy and convenient to report test results
+against a well defined configuration of the product.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="allocation-control-of-test-equipment">
+<h2>Allocation &amp; Control of Test Equipment<a class="headerlink" href="#allocation-control-of-test-equipment" title="Permalink to this headline">¶</a></h2>
+<p>As mentioned, we need test job API&#8217;s for brokers and resources, to support
+allocation and control of equipment.</p>
+<div class="section" id="broker-basics">
+<h3>Broker Basics<a class="headerlink" href="#broker-basics" title="Permalink to this headline">¶</a></h3>
+<p>The broker is a networked service that is installed on each test host. It owns
+all equipment connected to the host and uses a host specific configuration to
+keep track of how different pieces of equipment can be combined. It presents an
+API that test jobs use to allocate &#8220;stacks&#8221; of equipment.</p>
+<p>An advanced example would be a handset whose battery connection is controlled
+by a relay and monitored by a power meter, on a test host that has a unique
+tool installed.</p>
+<div class="figure align-center">
+<img alt="../_images/broker_with_equipment.png" src="../_images/broker_with_equipment.png" />
+</div>
+</div>
+<div class="section" id="broker-configuration">
+<h3>Broker Configuration<a class="headerlink" href="#broker-configuration" title="Permalink to this headline">¶</a></h3>
+<p>AVE lets lab owners control the host specific configuration details that are
+unique to each lab, while the test job developer controls only the job specific
+configuration details. This gives lab owners a governed space that only they
+control, which is important for lab development and maintenance. It also
+facilitates exchange of test jobs between labs because the jobs only use well
+defined API&#8217;s to query the host specific configurations.</p>
+</div>
+<div class="section" id="distributed-and-centralized">
+<h3>Distributed and Centralized<a class="headerlink" href="#distributed-and-centralized" title="Permalink to this headline">¶</a></h3>
+<p>The networking of the broker means that test jobs can be executed on one host,
+while all equipment manipulation happens on another host (where the broker is
+running). This lets developers execute test jobs manually on their own
+workstations during test job development.</p>
+<p>The system is designed with lab owners in mind. It must be easy to cluster a
+couple of brokers and give test job developers directions for how to connect to
+the lab. Of course, individual developers can also use this to set up their own
+miniature labs on their workstations. All you need is the broker and some
+equipment.</p>
+</div>
+<div class="section" id="broker-goals">
+<h3>Broker Goals<a class="headerlink" href="#broker-goals" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Make it cost effective to set up centralized labs that offer load balanced
+access to large equipment parks.</li>
+<li>Allow people to work in a decentralized, distributed fashion where they can
+control a private lab in minute detail.</li>
+<li>Govern the broker API&#8217;s so that job schedulers can freely choose whether to
+run a job against a private lab or a centralized one.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="advanced-equipment-state-tracking">
+<h2>Advanced Equipment State Tracking<a class="headerlink" href="#advanced-equipment-state-tracking" title="Permalink to this headline">¶</a></h2>
+<p>Test jobs need to track the state of equipment. On the very low level, this is
+about power cycling handsets in and out of service mode. On the very high level,
+this is about coordination of multiple pieces of equipment.</p>
+<div class="section" id="low-level">
+<h3>Low Level<a class="headerlink" href="#low-level" title="Permalink to this headline">¶</a></h3>
+<p>Most equipment is not hard to control once the allocation mechanism is in place
+but SoMC&#8217;s own handsets make an exception. Why? Because they have two properties
+that are frequently in conflict:</p>
+<ul class="simple">
+<li>They are unstable during development. This is just the way it is with new
+products.</li>
+<li>They are part of the verification environment and as such are expected to
+&#8220;just work&#8221;.</li>
+</ul>
+<p>Especially, the handset&#8217;s ability to power cycle between service mode and normal
+Android mode is critical. Unstable handsets can easily be lost at this boundary
+and end up in a &#8220;draining state&#8221; where they have to be manually recovered. This
+has consequences for test automation:</p>
+<ul class="simple">
+<li>Brokers can&#8217;t use equipment that do not work well enough to support their own
+testability. E.g. the handset is caught in a boot crash loop and there is no
+way of figuring this out by asking it.</li>
+<li>Lack of control over misbehaving equipment means that fine grained test can&#8217;t
+be written against some forms of power cycling. Because handsets are part of
+the test environment, this means that a crucial aspect of the environment is
+itself untestable.</li>
+<li>The root in the test anatomy should verify the environment before allowing
+other tests to execute. If such a test cannot reliably recover bad product
+configuations, then we must expect lab owners to spend much time baby sitting
+their handsets.</li>
+</ul>
+<div class="figure align-center">
+<img alt="../_images/anatomy.broken.jpeg" src="../_images/anatomy.broken.jpeg" />
+</div>
+<p>To handle this, three things should be done:</p>
+<ul class="simple">
+<li>The product must support its own recoverability. This should include purely
+electrical means of bringing the product into a state where it accepts a new
+configuration for flashing. SONY handsets support this by changing its boot
+sequence if extra electrical resistence is detected on the USB connection.</li>
+<li>The lab must stack the products together with trusted auxiliary equipment that
+can be used to exploit the product&#8217;s recoverability. E.g. relays that control
+the battery connection to force cold boots.</li>
+<li>Fine control over many aspects of power cycling must be exposed as API&#8217;s so
+that a failing test can pinpoint exactly where and how power cycling failed.
+E.g. a RAM dumping handset does not expose any USB device descriptor and is
+indistinguishable from a physically disconnected handset.</li>
+</ul>
+</div>
+<div class="section" id="high-level">
+<h3>High Level<a class="headerlink" href="#high-level" title="Permalink to this headline">¶</a></h3>
+<p>Product often do not expose API&#8217;s to tell developers what is going on inside.
+Android in particular does not have many testability API&#8217;s. AVE solves this by
+shipping various support APK&#8217;s that can be installed during testing. Such APK&#8217;s
+can implement missing testability API&#8217;s.</p>
+<p>Another problem is that system testing is often not meaningful if the product
+is the only available observer of itself. The list of auxiliary equipment needed
+for different kinds of system tests can be made very long:</p>
+<ul class="simple">
+<li>Companion products</li>
+<li>Relays</li>
+<li>Power meters</li>
+<li>MHL/HDMI sniffers</li>
+<li>High speed cameras</li>
+<li>Microphones</li>
+<li>Network simulators</li>
+<li>etc</li>
+</ul>
+</div>
+</div>
+<div class="section" id="a-strategy-against-waste">
+<h2>A Strategy Against Waste<a class="headerlink" href="#a-strategy-against-waste" title="Permalink to this headline">¶</a></h2>
+<p>AVE is designed to support processes and strategies that significantly improve
+the ability to track progress in product projects:</p>
+<ul class="simple">
+<li>Tests that have no expectation to pass should be skipped automatically when
+dependencies fail. This helps developers avoid wasteful root cause analysis.</li>
+<li>The verification environment itself becomes testable, which can be used to
+write exit criteria for platform and cookie bring-up.</li>
+<li>Test jobs can be developed, delivered and deployed with the same efficiency
+and CM rigor as the rest of the product.</li>
+<li>Branching of products and their tests is done in the same CM environment.</li>
+<li>Test jobs can reliably be migrated between various lab environments. E.g.
+from a centralized one to a &#8220;satelite lab&#8221; with access to real operator
+networks.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Conceptual Summary</a><ul>
+<li><a class="reference internal" href="#goals">Goals</a></li>
+<li><a class="reference internal" href="#illustrations-legend">Illustrations Legend</a></li>
+<li><a class="reference internal" href="#terminology">Terminology</a></li>
+<li><a class="reference internal" href="#test-anatomy">Test Anatomy</a></li>
+<li><a class="reference internal" href="#cm-labeling-of-test-jobs">CM Labeling of Test Jobs</a><ul>
+<li><a class="reference internal" href="#requirements-for-labeling">Requirements for Labeling</a></li>
+<li><a class="reference internal" href="#course-of-action">Course of Action</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#allocation-control-of-test-equipment">Allocation &amp; Control of Test Equipment</a><ul>
+<li><a class="reference internal" href="#broker-basics">Broker Basics</a></li>
+<li><a class="reference internal" href="#broker-configuration">Broker Configuration</a></li>
+<li><a class="reference internal" href="#distributed-and-centralized">Distributed and Centralized</a></li>
+<li><a class="reference internal" href="#broker-goals">Broker Goals</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#advanced-equipment-state-tracking">Advanced Equipment State Tracking</a><ul>
+<li><a class="reference internal" href="#low-level">Low Level</a></li>
+<li><a class="reference internal" href="#high-level">High Level</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#a-strategy-against-waste">A Strategy Against Waste</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">System Documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="lab_owner.html"
+                        title="next chapter">Lab Owner&#8217;s Guide</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/system/conceptual_summary.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="lab_owner.html" title="Lab Owner’s Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="System Documentation"
+             >previous</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" >System Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

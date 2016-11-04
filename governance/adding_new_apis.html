@@ -1,0 +1,155 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Adding New API’s &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="adding-new-api-s">
+<h1>Adding New API&#8217;s<a class="headerlink" href="#adding-new-api-s" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This document does not cover smaller improvements on existing features.
+That kind of change can normally be handled with ordinary code review in
+Gerrit and some consultation with members of the <a class="reference external" href="email:dl-ww-ave-gb&#64;sonymobile.com">DL-WW-AVE-GB</a> mailing list.</p>
+</div>
+<p>Changes to public AVE API&#8217;s are handled by a governance process. Especially if
+the changes are large or involve entirely new functionality. The process is as
+follows:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p class="first">Contact the governance board and check if you need to follow this process.</p>
+</li>
+<li><p class="first">Describe the new API. Do not add too much detail. Focus
+on the primary use cases and provide pseudo code examples of how the feature
+would be used in real test jobs. A template is available <a class="reference external" href="https://wiki.sonyericsson.net/androiki/ave/template">here</a>.</p>
+</li>
+<li><p class="first">The governance board considers the proposal and either rejects it or gives
+it a tentative approval. In case of approval, the board will also</p>
+<blockquote>
+<div><ul class="simple">
+<li>Put formal requirements on a full solution.</li>
+<li>Ensure that a PM is assigned to handle the development. The PM is then
+responsible to present a time plan, secure resources and the long term
+maintenance of the new feature.</li>
+</ul>
+</div></blockquote>
+<p><em>Note that this is a neither a formal approval of the API nor a commitment
+to offer it as an AVE component. It is simply a statement of interest and
+acknowledgement that the feature would be valuable.</em></p>
+</li>
+<li><p class="first">The assigned team gets to work to create a working example.</p>
+</li>
+<li><p class="first">The team presents the demo and a fuller API description to the board. The
+implementation and documentation must follow AVE&#8217;s <a class="reference external" href="structure_guidelines.html">structural guidelines</a> and <a class="reference external" href="source_code_style_rules.html">source code style rules</a>.</p>
+</li>
+<li><p class="first">The board either approves or rejects. If rejected, iterate from (3) or (4),
+depending on the severity of identified issues.</p>
+</li>
+<li><p class="first">SWD Tools prepares a beta release and makes it available for wider testing.
+If problems are found during testing, iterate from (3) or (4), depending on
+the severity of the problems.</p>
+</li>
+<li><p class="first">The board updates any impacted process documents.</p>
+</li>
+<li><p class="first">SWD Tools includes the new feature in a stable release.</p>
+</li>
+<li><p class="first">The feature is delivered according to the handshaked maintenance plan (3).</p>
+</li>
+</ol>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Sometimes conceptual errors cannot be not seen until actual code can be
+tried out or at least reviewed. It is better to fail many &#8220;small&#8221; times at
+(5) than to fail once but big.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/governance/adding_new_apis.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

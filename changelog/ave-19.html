@@ -1,0 +1,559 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Version 19 &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="version-19">
+<h1>Version 19<a class="headerlink" href="#version-19" title="Permalink to this headline">¶</a></h1>
+<ul>
+<li><dl class="first docutils">
+<dt>Include stack trace in RPC exceptions</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/common</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">4b069226ab19aa49948de071f55558227a77bc92</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Non-blocking sockets in all server-side RPC handling</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/common</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">b30b4a1cf007e26c4ab3488ef445cd532c751499</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Hickup support. Let all Control objects dump traces and state on SIGUSR1</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/common</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">a328044c831c7da20546600e3d4aef30bc47478c</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Handle unprintable characters in RPC parameters and return values</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/common</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">a7450127d3cf8c07918ef89d6afe73c8f46d9acc</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Panotti logging</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/common</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">0293ccd262331ac3efec5493beda82d0541c5ae0</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/vcsjob</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">f44d47ba25455e8965b2997fcd6e005d5e0d3155</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Stop broker on deinstallation, minor init integration fixes</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/broker</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">057e00ced7c549f2ef4338c5c3a7beea7af42ecf</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Fixed the Freeze Bug (or so it seems)</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/broker</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">04759807ff806bc0a6874b3f50db672c3f0a83e4</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/flocker</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">f4be4ffc03cc18718bc2ac51fb1bef47eeb5003a</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/quancom</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">6f040e0c0fc55b23a3f1849f0183830a044adc62</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/workspace</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">44ea4d7667c4da7905eb70a64c3fd8a3653e2b31</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Reset relays on deallocation instead of closing them</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/broker</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">c0ccb18197112cd6b15552963f95b96a9e20447a</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Append when pushing strings to existing Flocker session</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/flocker</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">f7b6b10be5edf8b63a16cfeb00c44c46e648b21e</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Store non-ASCII characters correctly when pushing strings to Flocker</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/flocker</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">45fe3b5709205bfceccb9a5119b81dce7a119453</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>JB MR2 support in UI navigation</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/galatea</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">102b992b011591119413b6d72005b6b546dfaeb1</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>KitKat support in UI navigation</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/galatea</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">a0e663cb51a40f91d0a64ff83a74e64a0773346a</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>JB MR2 support in telephony handling</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/gort</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">e85f6b31a0145c530a734762982bd46f8d4c24d2</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Turn screen on/off</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/gort</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">3b4a787673b7ce423df0b18aeee31e2985afefd8</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>KitKat support in telephony handling</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/gort</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">5c0bfcb6d0d9c786fd9d083a8750cd8160bcaf91</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>FireFox get/set locale</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/handset</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">8ef6423f2270d9e6248bdddf5771e5bc32c9b30e</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>JB MR2 support for reading phone number from SIM card</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/handset</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">1a6e40e9a60cabaaaae89251a16969e73f39d1d9</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Identify more handset models</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/handset</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">0378d82edefecb33200481a7b079405b72a9c847</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Commit:</th><td class="field-body">f2766747f6d91d9c5179e9ec3b3df0f355a560f2</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">90729fac712f2e77a24a5310582f52491b3de151</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Commit:</th><td class="field-body">ee0e9c08dddd029c81a8407c35002bdff06a98e1</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Relaxed GTest argument validation to support more use cases</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/handset</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">319da313e57f42735a4e2ea32cdbfe3388174683</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Make reboot optional when flashing handset. Needed in automated recovery</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/handset</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">4735440ed0e2fec52d430c1810267535c2a863b3</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Updated Marionette client to version 0.6.2</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/handset</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">3346683b8c5eef009920dd1c781b7792d031f10d</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>New popup removers: Data disclaimer, Power off in 15 minutes</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/handset</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">f8a4f31e4b8b0a7393996429fdc6c41b783368d0</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Reliability improvements to Spirent GPS simulator support</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/positioning</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">727f45292019940280a974603786903c0e7fad22</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Make default relay state configurable</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/quancom</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">8599775f775dff43e5456ff33cbc303d1f81c2a4</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Discard invalid images at startup of imager (bugfix)</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/workspace</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">9d202c454bee62b72be250d10bfa54d602229744</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Use <tt class="docutils literal"><span class="pre">ionice</span></tt> to avoid overloading the machine while making a flashable image</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/workspace</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">462b519a70c0f5edfd772254e13909b0f0fd0114</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Reliability improvements in the use of Goobug</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/workspace</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">e91d0f5089c5933861f3733514f5cc1d421df1d4</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Commit:</th><td class="field-body">f9b824cd16cae1087f5e628e159e6bd1354e3cb9</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Do not try to kill dead imaging processes (bugfix)</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/workspace</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">618259a9da67156a4aea4b181199d61d218da6e3</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Functions to traverse the PC&#8217;s file system from test jobs</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Tree:</th><td class="field-body">semctools/ave/workspace</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Commit:</th><td class="field-body">a0d6b6cc2a7084d754e9aaf2b882491cf62de15a</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/changelog/ave-19.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

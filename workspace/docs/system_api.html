@@ -1,0 +1,226 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>System API &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../../index.html" />
+    <link rel="up" title="Workspaces" href="index.html" />
+    <link rel="next" title="Configuration Files" href="config.html" />
+    <link rel="prev" title="Client API" href="client_api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="config.html" title="Configuration Files"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="client_api.html" title="Client API"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Workspaces</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="system-api">
+<h1>System API<a class="headerlink" href="#system-api" title="Permalink to this headline">¶</a></h1>
+<p>These API&#8217;s are only usable by system implementations that use the AVE class
+library directly (instead of going through the broker), such as schedulers or
+tools that supervise labs.</p>
+<div class="section" id="workspace">
+<h2>Workspace<a class="headerlink" href="#workspace" title="Permalink to this headline">¶</a></h2>
+<p>This is the resource class allocated to sessions by the broker. The complete
+system API consitst of the following, plus all methods exposed in the
+<a class="reference internal" href="client_api.html#workspace-client-api"><em>client API</em></a>. I.e. all client exposed methods can
+also be called directly on the actual workspace object.</p>
+<dl class="class">
+<dt id="ave.workspace.Workspace">
+<em class="property">class </em><tt class="descclassname">ave.workspace.</tt><tt class="descname">Workspace</tt><big>(</big><em>uid=None</em>, <em>cfg_path=None</em>, <em>config=None</em>, <em>home=None</em><big>)</big><a class="headerlink" href="#ave.workspace.Workspace" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>uid</strong> &#8211; If <em>uid</em> is set and a workspace with the same unique ID exists
+in the file system, then that workspace will be reused. Otherwise a new
+workspace is created.</li>
+<li><strong>cfg_path</strong> &#8211; Only used by AVE&#8217;s own test cases. If used, <em>cfg_path</em> must
+be an absolute path pointing at a valid workspace configuration file.
+If not used, the path defaults to <tt class="docutils literal"><span class="pre">.ave/config/workspace.json</span></tt>.</li>
+<li><strong>config</strong> &#8211; Only used by AVE&#8217;s own test cases. If used, &#8216;config&#8217; overrides
+all values found in the configuration file.</li>
+<li><strong>home</strong> &#8211; Only used by AVE&#8217;s own test cases. If used and &#8216;config&#8217; is not
+used, all configuration data will be read from .ave/config under &lt;home&gt;.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">If an error occured.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="ave.workspace.WorkspaceProfile">
+<em class="property">class </em><tt class="descclassname">ave.workspace.</tt><tt class="descname">WorkspaceProfile</tt><big>(</big><em>values</em><big>)</big><a class="headerlink" href="#ave.workspace.WorkspaceProfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Primarily used by networked brokers to communicate about currently existing
+workspaces.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>values</strong> &#8211; A dictionary that contains profile data. All keys must be
+strings.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="ave.workspace.WorkspaceProfile.match">
+<tt class="descname">match</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#ave.workspace.WorkspaceProfile.match" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if this WorkspaceProfile is a match to the given profile, <em>other</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> &#8211; The profile to match against.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>True</em> if it is a match, otherwise <em>False</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ave.workspace.WorkspaceProfile.minimize">
+<tt class="descname">minimize</tt><big>(</big><em>profile=None</em><big>)</big><a class="headerlink" href="#ave.workspace.WorkspaceProfile.minimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reduces <em>self</em> to whatever is in <em>profile</em>, plus the fields that are
+mandatory for the broker to set:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&#39;type&#39;</span><span class="p">,</span> <span class="s">&#39;root&#39;</span><span class="p">,</span> <span class="s">&#39;tools&#39;</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises Exception:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">If <em>self</em> is not complete enough to be minimized.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function is used by the broker to ensure that profiles
+that are thrown around the system contain enough information to
+let the system maintain a fully usable state (other profiles are
+caught as error indications during testing).</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">System API</a><ul>
+<li><a class="reference internal" href="#workspace">Workspace</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="client_api.html"
+                        title="previous chapter">Client API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="config.html"
+                        title="next chapter">Configuration Files</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/workspace/docs/system_api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="config.html" title="Configuration Files"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="client_api.html" title="Client API"
+             >previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" >Workspaces</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

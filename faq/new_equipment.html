@@ -1,0 +1,738 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Implement New Equipment Support &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../index.html" />
+    <link rel="up" title="Frequently Asked Questions" href="index.html" />
+    <link rel="prev" title="Scheduling" href="schedulers.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="schedulers.html" title="Scheduling"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Frequently Asked Questions</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="implement-new-equipment-support">
+<h1>Implement New Equipment Support<a class="headerlink" href="#implement-new-equipment-support" title="Permalink to this headline">¶</a></h1>
+<p>This document describes how to write and integrate new equipment classes into
+AVE:</p>
+<ul class="simple">
+<li>Requirements on the equipment itself.</li>
+<li>How equipment profiles work and how they are used by the broker.</li>
+<li>Changes to make in the broker.</li>
+<li>What the equipment class&#8217; <tt class="docutils literal"><span class="pre">__init__(self)</span></tt> function must and must not do.</li>
+<li>Requirements on all public equipment API&#8217;s.</li>
+<li>Recommended way to debug code.</li>
+<li><em>udev</em> event based equipment listers.</li>
+<li>Configuration file based equipment listers.</li>
+<li>How to write tests that demonstrate that the equipment support works.</li>
+<li>Specific broker tests that must pass.</li>
+<li>Specific equipment lister tests that must pass.</li>
+<li>How to write API documentation.</li>
+</ul>
+<p>Note that these are generic guidelines. Equipment sometimes has exotic features
+or limitations that require more work for full and seamless integration.</p>
+<p>Also see the <a class="reference external" href="../governance/structure_guidelines.html">Structural Guidelines</a> for requirements on the new module&#8217;s file
+and directory structure.</p>
+<p>Code examples are given for a hypothetical washing machine device that may be
+controlled over a USB connection.</p>
+<div class="section" id="equipment-requirements">
+<h2>Equipment Requirements<a class="headerlink" href="#equipment-requirements" title="Permalink to this headline">¶</a></h2>
+<p>Equipment fall into three broad categories:</p>
+<ul class="simple">
+<li>USB equipment.</li>
+<li>TCP/IP networked equipment.</li>
+<li>Intrinsic features of the test host.</li>
+</ul>
+<div class="section" id="usb-equipment-serial-numbers">
+<h3>USB Equipment Serial Numbers<a class="headerlink" href="#usb-equipment-serial-numbers" title="Permalink to this headline">¶</a></h3>
+<p>The equipment must have a globally unique serial number (or similar attribute)
+that can be read without claiming the device. This is necessary to monitor the
+equipment&#8217;s basic connected/disconnected state in the broker after another
+process has claimed the device (i.e. a test job).</p>
+<p>You can check if a piece of equipment passes this requirement by inspecting it
+with:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">lsusb</span> <span class="o">-</span><span class="n">v</span>
+</pre></div>
+</div>
+<p>This lists <em>all</em> USB equipment on the host. A SoMC handset entry will look
+something like this:</p>
+<div class="highlight-python"><pre>Bus 002 Device 009: ID 0fce:5189 Sony Ericsson Mobile Communications AB
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               2.00
+  bDeviceClass            0 (Defined at Interface level)
+  bDeviceSubClass         0
+  bDeviceProtocol         0
+  bMaxPacketSize0        64
+  idVendor           0x0fce Sony Ericsson Mobile Communications AB
+  idProduct          0x5189
+  bcdDevice            2.28
+  iManufacturer           1 Sony
+  iProduct                2 C6503
+  iSerial                 3 CB5121X6KM
+
+  # 80 lines of output removed for clarity</pre>
+</div>
+<p>The device descriptor field <tt class="docutils literal"><span class="pre">iSerial</span></tt> is set to <tt class="docutils literal"><span class="pre">&quot;CB5121X6KM&quot;</span></tt>. This field
+may be read by any program at any time, without claiming the device.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If the equipment does not expose a unique serial number, then it
+may be very hard or impossible to support more than one device per host
+machine. The equipment vendor can tell you if it uses unique serial numbers.</p>
+</div>
+</div>
+<div class="section" id="usb-equipment-vid-pid-values">
+<h3>USB Equipment VID/PID Values<a class="headerlink" href="#usb-equipment-vid-pid-values" title="Permalink to this headline">¶</a></h3>
+<p>The device descriptor&#8217;s <tt class="docutils literal"><span class="pre">idVendor</span></tt> and <tt class="docutils literal"><span class="pre">idProduct</span></tt> values should identify
+the equipment&#8217;s type. (Other options may exist depending on the equipment. See
+<tt class="docutils literal"><span class="pre">iManufacturer</span></tt> and <tt class="docutils literal"><span class="pre">iProduct</span></tt> in the previous example.) This is normally
+not a problem, but some equipment will be based on Arduino boards (or similar)
+and have the VID/PID of that product rather than the fully developed equipment.
+In such cases it may be very difficult to tell apart two units that are based
+on the same development board.</p>
+</div>
+<div class="section" id="tcp-ip-equipment">
+<h3>TCP/IP Equipment<a class="headerlink" href="#tcp-ip-equipment" title="Permalink to this headline">¶</a></h3>
+<p>An implementation <em>may</em> perform very limited network host/port scans to detect
+this kind of equipment. However, it may be easier and safer to just record the
+identity statically in a configuration file under <tt class="docutils literal"><span class="pre">.ave/config</span></tt>. Networked
+equipment has its own set of problems because they are normally not allowed on
+the common intranet and must be walled off in special lab networks.</p>
+<p>The equipment host normally runs some sort of server software that came with
+the equipment. It is very valuable if this server can answer questions about
+the current state of the equipment, without claiming it for the caller. This
+can then be used to improve the equipment listing in the broker. Often this
+kind of equipment can be used manually and the broker needs a way to determine
+this before allocating the equipment to a test job.</p>
+<p class="rubric">Example</p>
+<p>The Spirent GPS simulator is handled this way. The lab owner records the host
+name of the simulator host in <tt class="docutils literal"><span class="pre">.ave/config/spirent.json</span></tt>. The equipment is
+listed based on that and a globally unique identifier (also selected by the lab
+owner).</p>
+<p>The equipment host runs a server called <em>TestDrive</em> that controls the simulator.
+This server can <em>not</em> answer questions about equipment state without claiming
+the equipment for the caller. This has negative consequences:</p>
+<ul class="simple">
+<li>Any ongoing manual use is evicted. The user looses all his work.</li>
+<li>The broker must assume that the equipment is never busy with manual work
+(obviously not true).</li>
+<li>If the lab owner disconnects the network cable before running manual tests,
+it just looks like a network configuration error to the broker.</li>
+</ul>
+<p>Of course this simulator is so valuable that it is supported anyway, but with
+limitations on use. A <em>TestDrive</em> host that is linked into a DUST lab can never
+be used for manual work. Conversely a host that is used for manual work cannot
+be linked into a DUST lab.</p>
+</div>
+<div class="section" id="intrinsic-host-features">
+<h3>Intrinsic Host Features<a class="headerlink" href="#intrinsic-host-features" title="Permalink to this headline">¶</a></h3>
+<p>Examples:</p>
+<ul class="simple">
+<li>The workspace resource is used to allocate private work directories to jobs,
+but there are no limitations on how many can be allocated. Instead the
+allocation record is needed to automatically delete the work directory when
+the job exits.</li>
+<li>Some host computations may be so CPU intensive that the API must be wrapped
+in a resource that can only be used after allocation. This lets the broker
+limit the number of instances. Computer vision analysis of high speed and/or
+high resolution video falls into this category.</li>
+<li>The WLAN support in a laptop could be considered a broker resource that only
+one job at a time can hold.</li>
+</ul>
+<p>Implementing listers for this kind of resource needs special solutions. E.g.
+the broker does not list a workspace until it has been allocated/created. If
+a job asks for a workspace that already exists, the broker will check that the
+session actually owns the wanted workspace. A built in WLAN interface would
+have to be listed based on <tt class="docutils literal"><span class="pre">ifconfig</span></tt> output (or similar) rather than USB
+device descriptors (which can be used for WLAN dongles).</p>
+</div>
+</div>
+<div class="section" id="equipment-profiles">
+<h2>Equipment Profiles<a class="headerlink" href="#equipment-profiles" title="Permalink to this headline">¶</a></h2>
+<p>The broker deals only in resource profiles and has very little other knowledge
+about the equipment. All profiles must tell the broker <em>what</em> it is, which <em>one</em>
+it is (even when there can only be one device per host) and if the equipment is
+currently connected.</p>
+<p>The minimum profile for the hypothetical USB <tt class="docutils literal"><span class="pre">Washer</span></tt> equipment could look like
+this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;type&quot;</span>       <span class="p">:</span> <span class="s">&quot;washer&quot;</span><span class="p">,</span>
+    <span class="s">&quot;uid&quot;</span>        <span class="p">:</span> <span class="s">&quot;washer-1&quot;</span><span class="p">,</span>
+    <span class="s">&quot;power_state&quot;</span><span class="p">:</span> <span class="s">&quot;online&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Profiles may reveal other information about the equipment by adding more fields.</p>
+<p>The profile class must inherit from <tt class="docutils literal"><span class="pre">ave.profile.Profile</span></tt> and implement this
+API:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">ave.profile</span> <span class="kn">import</span> <span class="n">Profile</span>
+
+<span class="k">class</span> <span class="nc">WasherProfile</span><span class="p">(</span><span class="n">Profile</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">dict</span> <span class="ow">or</span> <span class="s">&#39;type&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">profile</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;invalid profile: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">values</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">values</span><span class="p">[</span><span class="s">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;washer&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;not a washer profile: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">values</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s">&#39;uid&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">values</span>
+        <span class="ow">or</span>  <span class="nb">type</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="s">&#39;uid&#39;</span><span class="p">])</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">unicode</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;invalid washer profile: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">values</span><span class="p">)</span>
+        <span class="n">Profile</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s">&#39;uid&#39;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="s">&#39;uid&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">other</span><span class="p">[</span><span class="s">&#39;uid&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="c"># mandatory fields:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;type&#39;</span> <span class="p">:</span> <span class="s">&#39;washer&#39;</span><span class="p">,</span>
+            <span class="s">&#39;uid&#39;</span>  <span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s">&#39;uid&#39;</span><span class="p">]</span>
+        <span class="p">}</span>
+        <span class="c"># allocation profile fields:</span>
+        <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">HandsetProfile</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">):</span>
+        <span class="n">Profile</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Notes</strong></p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Profile</span></tt> is a subclass of <tt class="docutils literal"><span class="pre">dict</span></tt> and implements all the same methods.
+This is why attributes can be accessed as <tt class="docutils literal"><span class="pre">self[&quot;&lt;attribute&gt;&quot;]</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">__hash__()</span></tt>, <tt class="docutils literal"><span class="pre">__eq__()</span></tt> and <tt class="docutils literal"><span class="pre">__ne__()</span></tt> let the broker use the profile
+as an index into hash tables.</li>
+<li><tt class="docutils literal"><span class="pre">minimize()</span></tt> is used by the broker to reduce the equipment profile to
+only contain mandatory fields and the fields that were included in an
+allocation profile.</li>
+<li><tt class="docutils literal"><span class="pre">minimize()</span></tt> may include more mandatory fields if this is required for
+correct initialization of the equipment.</li>
+<li>The default implementation of <tt class="docutils literal"><span class="pre">match()</span></tt> simply compares attribues. A
+subclass may implement more sophisticated schemes that e.g. check a wanted
+value against a list of possible values that the equipment supports.</li>
+</ul>
+<div class="section" id="brokers-and-profiles">
+<h3>Brokers and Profiles<a class="headerlink" href="#brokers-and-profiles" title="Permalink to this headline">¶</a></h3>
+<p>When a client lists equipment, it passes a profile to match (the allocation
+profile) and the broker uses <tt class="docutils literal"><span class="pre">match()</span></tt> on all profiles it has received from
+any equipment lister. The returned result is a list of full profiles (not
+minimized).</p>
+<div class="figure align-center">
+<img alt="../_images/profile_1.jpg" src="../_images/profile_1.jpg" />
+</div>
+<p>When a client allocates equipment, the same matching happens again, but this
+time the selected equipment profile is minimized against the allocation profile
+and the result is added to the client&#8217;s session. An instance of the correct
+equipment class is created by the session which passes the instance profile to
+the class&#8217; constructor.</p>
+<div class="figure align-center">
+<img alt="../_images/profile_2.jpg" src="../_images/profile_2.jpg" />
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The lister, broker and session are all separate processes. This is a
+design chosen for address space safety, but adds the requirement that listers
+must be able to create correct profiles without claiming the equipment
+(because it may be claimed already by a session).</p>
+</div>
+</div>
+</div>
+<div class="section" id="broker-changes">
+<h2>Broker Changes<a class="headerlink" href="#broker-changes" title="Permalink to this headline">¶</a></h2>
+<p>Small but important changes:</p>
+<ul class="simple">
+<li>Import the equipment profile class in <tt class="docutils literal"><span class="pre">ave.broker.profile</span></tt> and use it in
+the <tt class="docutils literal"><span class="pre">factory()</span></tt> function.</li>
+<li>Import the lister class and start a new instance when the broker starts. See
+e.g. <tt class="docutils literal"><span class="pre">Broker.make_handset_lister()</span></tt> and where it is called. If the lister
+class is not implemented (because only static equipment lists are supported),
+then the broker should use some other method to produce the equipment list
+once when the broker starts. E.g. see how <tt class="docutils literal"><span class="pre">TestDriveInterface</span></tt> is used in
+the <tt class="docutils literal"><span class="pre">LocalAllocator</span></tt> class in <tt class="docutils literal"><span class="pre">ave.broker.allocator</span></tt>.</li>
+<li>Add knowledge about the type of the equipment. The broker rejects profiles
+with unknown <tt class="docutils literal"><span class="pre">type</span></tt> values.</li>
+<li>Patch the allocation profile very early in <tt class="docutils literal"><span class="pre">Broker.get()</span></tt> so that it has
+default values where the user did not specify any. This is normally only used
+to make sure that the user does not accidentally allocate equipment with
+<tt class="docutils literal"><span class="pre">{</span> <span class="pre">&quot;power_state&quot;:</span> <span class="pre">&quot;offline&quot;</span> <span class="pre">}</span></tt>.</li>
+<li>Import the equipment class in <tt class="docutils literal"><span class="pre">ave.broker.session</span></tt> and use it in
+<tt class="docutils literal"><span class="pre">Session.add_resource()</span></tt>. Pass the profile and <tt class="docutils literal"><span class="pre">self.home</span></tt> to the
+constructor.</li>
+<li>Create a <tt class="docutils literal"><span class="pre">Remote&lt;Equipment&gt;</span></tt> class in <tt class="docutils literal"><span class="pre">ave.broker.resource</span></tt>. This is used
+on the client side to properly address the session after allocation. The class
+is normally very small. See existing code in the broker.</li>
+<li>Import the resource class in <tt class="docutils literal"><span class="pre">ave.broker._broker</span></tt> and use it in the
+<tt class="docutils literal"><span class="pre">RemoteBroker.get()</span></tt> method. See existing code for examples.</li>
+</ul>
+</div>
+<div class="section" id="equipment-class">
+<h2>Equipment Class<a class="headerlink" href="#equipment-class" title="Permalink to this headline">¶</a></h2>
+<p>The mandatory API that supports broker integration is concentrated into the
+equipment class&#8217; constructor. The constructor <em>must</em> accept a profile and a
+home directory path. If the home directory is not set, then the constructor
+must find it by calling <tt class="docutils literal"><span class="pre">ave.config.load_etc()</span></tt>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">ave.config</span>
+
+<span class="kn">from</span> <span class="nn">ave.washer.profile</span> <span class="kn">import</span> <span class="n">WasherProfile</span>
+
+<span class="k">class</span> <span class="nc">Washer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">profile</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">home</span>    <span class="o">=</span> <span class="bp">None</span>
+
+<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">,</span> <span class="n">home</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span> <span class="o">!=</span> <span class="n">WasherProfile</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;complaints, always complaints&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">home</span><span class="p">:</span>
+        <span class="n">home</span> <span class="o">=</span> <span class="n">ave</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">load_etc</span><span class="p">()[</span><span class="s">&#39;home&#39;</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">profile</span> <span class="o">=</span> <span class="n">profile</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">home</span>    <span class="o">=</span> <span class="n">home</span>
+
+<span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c"># clean up. especially terminate any started processes.</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The constructor must <em>not</em> perform other kinds of IO, start
+processes or do anything that adds uncertainty to its time complexity. The
+broker&#8217;s call to <tt class="docutils literal"><span class="pre">Session.add_resource()</span></tt> blocks until the constructor
+returns. This means no other client can make broker calls in the meantime.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The lister may include fields in the profile that are needed by the
+equipment class to implement &#8220;behind the scenes&#8221; mechanisms. E.g. it may
+include the device node path in the profile so that the equipment class may
+know which device to actually open. Just make sure this field is included
+among the mandatory ones in your <tt class="docutils literal"><span class="pre">Profile.minimize()</span></tt> method.</p>
+</div>
+<p>There are also some rules that must be observed when implementing the rest of
+the equipment class:</p>
+<ul class="simple">
+<li>The value of <tt class="docutils literal"><span class="pre">self.home</span></tt> must be used when loading configuration files. E.g.
+<tt class="docutils literal"><span class="pre">ave.config.load(os.path.join(self.home,</span> <span class="pre">'.ave',</span> <span class="pre">'config',</span> <span class="pre">'washer.json'))</span></tt>.</li>
+<li>Never <em>read</em> environment variables for any purpose. Assume that <tt class="docutils literal"><span class="pre">os.environ</span></tt>
+contains no keys. The class may however <em>set</em> an environment variable before
+calling an external tool if this is necessary. Please make effort to avoid
+this even though it is permitted.</li>
+<li>Do not implement signal handlers. The signal will be sent to the session that
+holds the class instance. If another equipment class handles the same signal,
+then it is undefined which handler will be called. (Processes started by the
+equipment class can however implement any wanted signal handler.)</li>
+<li>The instance profile tells the equipment class what the user allocated. This
+should sometimes be used to limit what the user can do with the equipment.
+If the equipment can only assume a few of many possible roles, then switching
+to a role should not be allowed unless the user requested this role. It does
+not matter that the equipment supports it if the user did not ask for it.</li>
+<li>Do not modify <tt class="docutils literal"><span class="pre">self.profile</span></tt> outside the constructor. The profile does not
+reflect the user&#8217;s manipulation of the equipment&#8217;s state.</li>
+<li>All use of Python&#8217;s <tt class="docutils literal"><span class="pre">threading</span></tt> module is forbidden. No exception will ever
+be granted. Remember that your equipment class is used exclusively by a
+single-threaded state machine (the broker session). It is not possible for
+the object to receive concurrent method calls and so threading is not needed.</li>
+<li>Singleton patterns are not permitted. Assume that the broker only allocates
+one instance if such a limitation is needed.</li>
+<li>Public method names should not use upper case letters.</li>
+</ul>
+<p>Also see the <a class="reference external" href="../governance/source_code_style_rules.html">Source Code Style Rules</a>.</p>
+</div>
+<div class="section" id="equipment-listers">
+<h2>Equipment Listers<a class="headerlink" href="#equipment-listers" title="Permalink to this headline">¶</a></h2>
+<p>Common requirements on listers:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Should be based on <em>udev</em> event handling when possible.</li>
+<li>Must be implemented as a full process. The class must then inherit from
+<tt class="docutils literal"><span class="pre">ave.network.process.Process</span></tt>. (Exception made for Spirent simulator lister
+which only reads a static configuration file. The equipment does not support
+any form of automated detection.)</li>
+<li>Must post created profiles to the broker using <tt class="docutils literal"><span class="pre">Broker.add_equipment()</span></tt>.</li>
+<li>Must be startable from the broker.</li>
+<li>Must permit multiple parallel instances. No singleton patterns.</li>
+<li>Must not claim the equipment. If a unique identifier cannot be read without
+claiming the equipment, then please do not add support for it. Note that
+paths under <tt class="docutils literal"><span class="pre">/dev</span></tt> change when the device is unplugged and replugged, so
+these are useless for identification.</li>
+<li>Must handle <tt class="docutils literal"><span class="pre">SIGUSR1</span></tt> for diagnostic and debugging purposes.</li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Skip this chapter if your equipment is limited to static listing.</p>
+</div>
+<p>There is no common base class for listers. There <em>should</em> be one, but for now
+an existing implementation will have to do as example:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">git:</th><td class="field-body">review.sonyericsson.net/semctools/ave/handset</td>
+</tr>
+<tr class="field-even field"><th class="field-name">file:</th><td class="field-body">src/ave/handset/lister.py</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="init-self-port-authkey-paths-none">
+<h3><tt class="docutils literal"><span class="pre">__init__(self,</span> <span class="pre">port,</span> <span class="pre">authkey,</span> <span class="pre">paths=None)</span></tt><a class="headerlink" href="#init-self-port-authkey-paths-none" title="Permalink to this headline">¶</a></h3>
+<p>Listers must accept the <em>port</em> and <em>authkey</em> parameters. They will be passed by
+the broker and are used by the lister to &#8220;call back&#8221; to the broker with admin
+privileges. The port number and authentication key are not read from files in
+<tt class="docutils literal"><span class="pre">.ave/config/</span></tt> because test cases must be able to set these to alternative
+values.</p>
+<p>The handset lister also accepts <em>paths</em> for testing purposes. It allows a test
+case to create a lister that only looks at devices whose <em>sysfs</em> paths appear
+in the list of paths.</p>
+</div>
+<div class="section" id="load-library">
+<h3><tt class="docutils literal"><span class="pre">load_library()</span></tt><a class="headerlink" href="#load-library" title="Permalink to this headline">¶</a></h3>
+<p>Use <tt class="docutils literal"><span class="pre">ctypes</span></tt> to load <tt class="docutils literal"><span class="pre">libudev.so</span></tt>. Python 2 has no standard library module
+to interface with <em>udev</em> so we implement a wrapper ourselves. The assignments
+found in this method declare the C types for parameters and return values of
+all functions we need to use in <tt class="docutils literal"><span class="pre">libudev</span></tt>. Python then handles translation of
+Python parameter types to their C equivalents automatically.</p>
+</div>
+<div class="section" id="set-signal-handlers">
+<h3><tt class="docutils literal"><span class="pre">set_signal_handlers()</span></tt><a class="headerlink" href="#set-signal-handlers" title="Permalink to this headline">¶</a></h3>
+<p>Set handlers for <tt class="docutils literal"><span class="pre">SIGTERM</span></tt> (terminate the process without running Python exit
+handlers) and <tt class="docutils literal"><span class="pre">SIGUSR1</span></tt> (ignored, but you may dump whatever state you want,
+in any way you want).</p>
+<p>Note the call to <tt class="docutils literal"><span class="pre">set_PDEATHSIG()</span></tt> which causes <tt class="docutils literal"><span class="pre">SIGTERM</span></tt> to be sent to the
+process when its parent dies. The broker <em>should</em> terminate listers gracefully,
+but in case of a crash this makes sure the lister does not live on. It will
+automatically reparent to the <em>init</em> process if this is not done.</p>
+</div>
+<div class="section" id="run">
+<h3><tt class="docutils literal"><span class="pre">run()</span></tt><a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h3>
+<p>First function to run in the new lister process. Set up signal handlers, create
+the <tt class="docutils literal"><span class="pre">ctypes</span></tt> wrapper and list all equipment once. Then enter a select loop
+that reacts on <em>udev</em> events.</p>
+</div>
+<div class="section" id="begin">
+<h3><tt class="docutils literal"><span class="pre">begin()</span></tt><a class="headerlink" href="#begin" title="Permalink to this headline">¶</a></h3>
+<p>Modify these as needed:</p>
+<ul class="simple">
+<li>List all USB devices with <tt class="docutils literal"><span class="pre">set_enum_filter(enum,</span> <span class="pre">'usb')</span></tt>. Almost any
+pluggable equipment can be handled.</li>
+<li>Check the device vendor ID with <tt class="docutils literal"><span class="pre">get_sysattr(dev,</span> <span class="pre">'idVendor')</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="setup-monitor">
+<h3><tt class="docutils literal"><span class="pre">setup_monitor()</span></tt><a class="headerlink" href="#setup-monitor" title="Permalink to this headline">¶</a></h3>
+<p>Modify this if your equipment is not a USB device:</p>
+<ul class="simple">
+<li>Monitor changes in USB devices with <tt class="docutils literal"><span class="pre">set_monitor_filter(mon,</span> <span class="pre">'usb',</span>
+<span class="pre">'usb_device')</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="select-on-fd">
+<h3><tt class="docutils literal"><span class="pre">select_on_fd()</span></tt><a class="headerlink" href="#select-on-fd" title="Permalink to this headline">¶</a></h3>
+<p>Copy as is.</p>
+</div>
+<div class="section" id="make-udev-profile">
+<h3><tt class="docutils literal"><span class="pre">make_udev_profile()</span></tt><a class="headerlink" href="#make-udev-profile" title="Permalink to this headline">¶</a></h3>
+<p>Note the handling of <tt class="docutils literal"><span class="pre">action==&quot;remove&quot;</span></tt>. The lister must tell the broker which
+device went offline by posting a profile that contains <tt class="docutils literal"><span class="pre">{</span> <span class="pre">&quot;power_state&quot;:</span>
+<span class="pre">&quot;offline&quot;</span> <span class="pre">}</span></tt> and the uniquely identifying attribute (the serial number).
+Unfortunately, the profile can&#8217;t be built because the device was just unplugged
+and can&#8217;t be inspected. Instead recover the serial number from a dictionary that
+maps <em>sysfs</em> paths to serial numbers. The <em>sysfs</em> path is determined entirely by
+the physical USB port the device was connected to. It only changes if the device
+is plugged into a different port, or if a USB hub is inserted or removed in
+between the host and the device.</p>
+<p>Remember to delete the indexed serial number (or whatever state you stored)
+at the end of handling <tt class="docutils literal"><span class="pre">action==&quot;remove&quot;</span></tt>.</p>
+</div>
+<div class="section" id="start-reporting">
+<h3><tt class="docutils literal"><span class="pre">start_reporting()</span></tt><a class="headerlink" href="#start-reporting" title="Permalink to this headline">¶</a></h3>
+<p>The handset lister spawns a new process for each handset. Each process calls
+the broker with updates whenever an important attribute of the handset changes.
+The use of processes is not normally necessary but some handset attributes can
+take very long to settle (e.g which GSM network is signed on to). A lister that
+builds the profiles quickly can just make the call to <tt class="docutils literal"><span class="pre">Broker.add_equipment()</span></tt>
+from the lister&#8217;s main process and be done with it. See use of <tt class="docutils literal"><span class="pre">RemoteControl</span></tt>
+in <tt class="docutils literal"><span class="pre">report_to_broker()</span></tt> for how to perform the RPC.</p>
+</div>
+</div>
+<div class="section" id="self-tests">
+<h2>Self Tests<a class="headerlink" href="#self-tests" title="Permalink to this headline">¶</a></h2>
+<p>Self tests are required for both the equipment class and the lister class. Test
+cases for the equipment class should of course cover all public API&#8217;s. Listers
+must also have tests that check for broker integration problems.</p>
+<p>For concrete examples, please check the existing lister and broker tests for
+e.g. relays, power meters and handsets.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The tests described here should of course all fail if no equipment is
+connected to the test host.</p>
+</div>
+<div class="section" id="lister-tests">
+<h3>Lister Tests<a class="headerlink" href="#lister-tests" title="Permalink to this headline">¶</a></h3>
+<p>Automated tests:</p>
+<ul class="simple">
+<li>Check that the constructor and basic initialization doesn&#8217;t crash.</li>
+<li>Check that configuration files are read correctly and that suitable errors
+are written to the log if the configuration is invalid.</li>
+<li>Check that the lister can read the equipment&#8217;s unique identifier after some
+other process has claimed the equipment.</li>
+<li>Check that many listers can run concurrently without interfering with each
+other.</li>
+<li>Check that basic process control works. Start and stop the liter a couple of
+times.</li>
+</ul>
+<p>Semi-automated tests:</p>
+<ul class="simple">
+<li>Check that plugging and unplugging the equipment causes the lister to send
+correctly updated profiles. This test should be implemented like a normal
+automated test job that also gives manual instructions to the tester to plug
+and unplug equipment.</li>
+</ul>
+</div>
+<div class="section" id="broker-tests">
+<h3>Broker Tests<a class="headerlink" href="#broker-tests" title="Permalink to this headline">¶</a></h3>
+<p>These tests require a version of the broker that has already been patched to
+support the new equipment class. Implement the tests in the equipment class&#8217;
+git tree, not in the broker&#8217;s.</p>
+<p>Automated tests:</p>
+<ul class="simple">
+<li>Check that the broker validates equipment profiles.</li>
+<li>Check that <tt class="docutils literal"><span class="pre">Broker.list_equipment()</span></tt> lists connected equipment.</li>
+<li>Check that equipment profiles can be used in stacks.</li>
+<li>Check that the equipment can be allocated and that the object returned by
+<tt class="docutils literal"><span class="pre">Broker.get()</span></tt> can be used to manipulate the equipment (by calling a few
+functions on the equipment class&#8217; public API).</li>
+</ul>
+</div>
+</div>
+<div class="section" id="development-shortcuts">
+<h2>Development Shortcuts<a class="headerlink" href="#development-shortcuts" title="Permalink to this headline">¶</a></h2>
+<p>All AVE modules must generate their own Debian packages but it is a hassle to
+have to make and install these and restart the broker every time a change is
+made to the equipment class. The developer can avoid all of this by replacing
+an RPC handle from <tt class="docutils literal"><span class="pre">Broker.get()</span></tt> with the real equipment class in the test
+cases. This trick is used in all of AVE&#8217;s equipment support modules. Consider
+this simplified handset example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># runners.py</span>
+
+<span class="kn">from</span> <span class="nn">ave.broker</span> <span class="kn">import</span> <span class="n">Broker</span>
+<span class="kn">from</span> <span class="nn">ave.handset.handset</span> <span class="kn">import</span> <span class="n">Handset</span>
+<span class="kn">from</span> <span class="nn">ave.handset.profile</span> <span class="kn">import</span> <span class="n">HandsetProfile</span>
+
+<span class="k">def</span> <span class="nf">all_tests</span><span class="p">(</span><span class="n">local</span><span class="p">):</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">Broker</span><span class="p">()</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">get</span><span class="p">({</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;handset&#39;</span><span class="p">})</span>
+
+    <span class="k">if</span> <span class="n">local</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">HandsetProfile</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">profile</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">Handset</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+    <span class="n">result</span>  <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">result</span> <span class="o">&amp;=</span> <span class="n">t1</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">&amp;=</span> <span class="n">t2</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">&amp;=</span> <span class="n">t3</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+<p>You should have two versions of every test job: One that calls <tt class="docutils literal"><span class="pre">run_tests()</span></tt>
+with <em>local</em> set to <em>False</em> and one that sets it to <em>True</em>. The second version
+must also manipulate Python&#8217;s search paths to prefer your working tree over the
+system installed version of the package. Example executable:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/python2</span>
+
+<span class="c"># only import non-AVE modules here:</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c"># manipulate python&#39;s search paths:</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">)))</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&#39;src&#39;</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+    <span class="c"># must not import runners or *any* module that imports an AVE module</span>
+    <span class="c"># before the search paths have been manipulated. otherwise all system</span>
+    <span class="c"># installed versions of all AVE packages are preferred over the local</span>
+    <span class="c"># tree implementation.</span>
+
+    <span class="kn">import</span> <span class="nn">vcsjob</span>
+    <span class="kn">import</span> <span class="nn">runners</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">runners</span><span class="o">.</span><span class="n">all_tests</span><span class="p">(</span><span class="n">local</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">vcsjob</span><span class="o">.</span><span class="n">OK</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">vcsjob</span><span class="o">.</span><span class="n">FAILURES</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">e</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">vcsjob</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Check the notes about <tt class="docutils literal"><span class="pre">src/ave/__init__.py</span></tt> in the <a class="reference external" href="../governance/structure_guidelines.html">Structural Guidelines</a>
+to complete this setup.</p>
+</div>
+<div class="section" id="api-documentation">
+<h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
+<p>API&#8217;s must be documented in dedicated files under the Git tree&#8217;s <tt class="docutils literal"><span class="pre">docs/</span></tt>
+folder and must be written in reStructuredText. Do <em>not</em> generate doc strings
+from source code comments. There are several examples to download and take
+guidance from.</p>
+<p>To include the new documents in the user&#8217;s guide, download and patch the Git
+<tt class="docutils literal"><span class="pre">semctools/ave/documentation</span></tt>:</p>
+<ul>
+<li><p class="first">Create a symlink that points to the new module&#8217;s root directory (which must
+be &#8220;neighbours&#8221; with the documentation tree in a common superdirectory).</p>
+</li>
+<li><p class="first">Include the new document in the user&#8217;s guide&#8217;s master <tt class="docutils literal"><span class="pre">index.rst</span></tt>. Use an
+include path that traverses the symlink.</p>
+</li>
+<li><p class="first">Build everything by running <tt class="docutils literal"><span class="pre">make</span></tt> without arguments:</p>
+<div class="highlight-python"><pre>cd documentation
+make
+chromium-browser _build/html/index.html &amp;</pre>
+</div>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Implement New Equipment Support</a><ul>
+<li><a class="reference internal" href="#equipment-requirements">Equipment Requirements</a><ul>
+<li><a class="reference internal" href="#usb-equipment-serial-numbers">USB Equipment Serial Numbers</a></li>
+<li><a class="reference internal" href="#usb-equipment-vid-pid-values">USB Equipment VID/PID Values</a></li>
+<li><a class="reference internal" href="#tcp-ip-equipment">TCP/IP Equipment</a></li>
+<li><a class="reference internal" href="#intrinsic-host-features">Intrinsic Host Features</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#equipment-profiles">Equipment Profiles</a><ul>
+<li><a class="reference internal" href="#brokers-and-profiles">Brokers and Profiles</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#broker-changes">Broker Changes</a></li>
+<li><a class="reference internal" href="#equipment-class">Equipment Class</a></li>
+<li><a class="reference internal" href="#equipment-listers">Equipment Listers</a><ul>
+<li><a class="reference internal" href="#init-self-port-authkey-paths-none"><tt class="docutils literal"><span class="pre">__init__(self,</span> <span class="pre">port,</span> <span class="pre">authkey,</span> <span class="pre">paths=None)</span></tt></a></li>
+<li><a class="reference internal" href="#load-library"><tt class="docutils literal"><span class="pre">load_library()</span></tt></a></li>
+<li><a class="reference internal" href="#set-signal-handlers"><tt class="docutils literal"><span class="pre">set_signal_handlers()</span></tt></a></li>
+<li><a class="reference internal" href="#run"><tt class="docutils literal"><span class="pre">run()</span></tt></a></li>
+<li><a class="reference internal" href="#begin"><tt class="docutils literal"><span class="pre">begin()</span></tt></a></li>
+<li><a class="reference internal" href="#setup-monitor"><tt class="docutils literal"><span class="pre">setup_monitor()</span></tt></a></li>
+<li><a class="reference internal" href="#select-on-fd"><tt class="docutils literal"><span class="pre">select_on_fd()</span></tt></a></li>
+<li><a class="reference internal" href="#make-udev-profile"><tt class="docutils literal"><span class="pre">make_udev_profile()</span></tt></a></li>
+<li><a class="reference internal" href="#start-reporting"><tt class="docutils literal"><span class="pre">start_reporting()</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#self-tests">Self Tests</a><ul>
+<li><a class="reference internal" href="#lister-tests">Lister Tests</a></li>
+<li><a class="reference internal" href="#broker-tests">Broker Tests</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#development-shortcuts">Development Shortcuts</a></li>
+<li><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="schedulers.html"
+                        title="previous chapter">Scheduling</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/faq/new_equipment.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="schedulers.html" title="Scheduling"
+             >previous</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" >Frequently Asked Questions</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,128 @@
+#! /usr/bin/python2
+
+import os
+import sys
+import psutil
+import json
+import time
+
+import ave.cmd
+import ave.config
+import ave.persona
+import ave.relay.config
+
+BROKER_PID_PATH = '/var/tmp/ave-broker.pid'
+RELAY_PID_PATH = '/var/tmp/ave-relay.pid'
+
+def create_ave_etc():
+    # create /etc/ave/user
+    try:
+        user = ave.config.create_etc()
+    except Exception, e:
+        print('ERROR: Installation failed: %s' % e)
+        return 1
+
+    # start the service if it wasn't already running. other do nothing
+    # as a restart of the ADB server would interfere with all running
+    # test jobs that communicate with handsets. the user has to do a
+    # restart manually if this is neccessary.
+    if not os.path.exists('/var/tmp/ave-adb-server.pid'):
+        ave.cmd.run(['/usr/bin/ave-adb-server', '--start'])
+
+    # become the run-as user before checking/generating config files
+    try:
+        home = ave.persona.become_user(user) # manipulates $HOME
+    except Exception, e:
+        print('ERROR: Could not become user %s' % user)
+        return 2
+
+    etc  = ave.config.load_etc()
+    home = etc['home']
+    path = os.path.join(home, '.ave','config','adb_server.json')
+    if not os.path.exists(path):
+        os.makedirs(os.path.dirname(path))
+        with open(path, 'w') as f:
+            config = { 'demote':False, 'persist':True }
+            json.dump(config, f)
+            os.chown(path, etc['uid'], -1) # let user own the file
+
+    # create the default AVE configuration
+    try:
+        ave.config.create_default(home)
+    except Exception, e:
+        print(
+            'Could not create configuration files for user %s: %s'
+             % (user, str(e))
+            )
+        return 3
+
+def patch_config():
+    user = '/etc/ave/user'
+    if os.path.exists(user):
+        try:
+            f = open(user, 'r')
+            j = json.load(f)
+            if 'uid' not in j:
+                uid = ave.pwd.getpwnam_uid(j['name'])
+                j['uid'] = uid
+                f = open(user, 'w')
+                f.write(json.dumps(j, indent=4))
+        except Exception, e:
+            raise Exception('could not get current uid %s' % e)
+
+def broker_is_running():
+    if not os.path.exists(BROKER_PID_PATH):
+        return False
+    try:
+        return True
+    except psutil.error.NoSuchProcess:
+        return False
+
+def relay_is_running():
+    if not os.path.exists(RELAY_PID_PATH):
+        return False
+    try:
+        pid  = int(open(RELAY_PID_PATH).read())
+        proc = psutil.Process(pid)
+    except:
+        return False
+    return True
+
+def write_default_config():
+    etc = ave.config.load_etc()
+    try:
+        path = ave.relay.config.write_devantech_config(etc['home'])
+    except Exception, e:
+        if 'will not overwrite' in str(e):
+            return
+        raise
+    os.chown(path, etc['uid'], -1)
+
+def main():
+    if len(sys.argv) > 1:
+        if sys.argv[1] in ['configure']:
+            create_ave_etc()
+            patch_config()
+
+            try:
+                write_default_config()
+            except Exception, e:
+                print('WARNING: could not write default config file: %s' % e)
+
+            # start or restart the service through init.d
+            if broker_is_running():
+                ave.cmd.run(['/usr/bin/ave-broker', '--restart'])
+            else:
+                ave.cmd.run(['/usr/bin/ave-broker', '--start', '--force'])
+
+            # start or restart the service
+            if relay_is_running():
+                ave.cmd.run(['/usr/bin/ave-relay', '--restart'])
+            else:
+                ave.cmd.run(['/usr/bin/ave-relay', '--start', '--force'])
+
+
+    return 0
+
+if __name__ == '__main__':
+    sys.exit(main())

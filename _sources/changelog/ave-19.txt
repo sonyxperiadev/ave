@@ -1,0 +1,130 @@
+Version 19
+==========
+
+* Include stack trace in RPC exceptions
+    :Tree: semctools/ave/common
+    :Commit: 4b069226ab19aa49948de071f55558227a77bc92
+
+* Non-blocking sockets in all server-side RPC handling
+    :Tree: semctools/ave/common
+    :Commit: b30b4a1cf007e26c4ab3488ef445cd532c751499
+
+* Hickup support. Let all Control objects dump traces and state on SIGUSR1
+    :Tree: semctools/ave/common
+    :Commit: a328044c831c7da20546600e3d4aef30bc47478c
+
+* Handle unprintable characters in RPC parameters and return values
+    :Tree: semctools/ave/common
+    :Commit: a7450127d3cf8c07918ef89d6afe73c8f46d9acc
+
+* Panotti logging
+    :Tree: semctools/ave/common
+    :Commit: 0293ccd262331ac3efec5493beda82d0541c5ae0
+    :Tree: semctools/ave/vcsjob
+    :Commit: f44d47ba25455e8965b2997fcd6e005d5e0d3155
+
+* Stop broker on deinstallation, minor init integration fixes
+    :Tree: semctools/ave/broker
+    :Commit: 057e00ced7c549f2ef4338c5c3a7beea7af42ecf
+
+* Fixed the Freeze Bug (or so it seems)
+    :Tree: semctools/ave/broker
+    :Commit: 04759807ff806bc0a6874b3f50db672c3f0a83e4
+    :Tree: semctools/ave/flocker
+    :Commit: f4be4ffc03cc18718bc2ac51fb1bef47eeb5003a
+    :Tree: semctools/ave/quancom
+    :Commit: 6f040e0c0fc55b23a3f1849f0183830a044adc62
+    :Tree: semctools/ave/workspace
+    :Commit: 44ea4d7667c4da7905eb70a64c3fd8a3653e2b31
+
+* Reset relays on deallocation instead of closing them
+    :Tree: semctools/ave/broker
+    :Commit: c0ccb18197112cd6b15552963f95b96a9e20447a
+
+* Append when pushing strings to existing Flocker session
+    :Tree: semctools/ave/flocker
+    :Commit: f7b6b10be5edf8b63a16cfeb00c44c46e648b21e
+
+* Store non-ASCII characters correctly when pushing strings to Flocker
+    :Tree: semctools/ave/flocker
+    :Commit: 45fe3b5709205bfceccb9a5119b81dce7a119453
+
+* JB MR2 support in UI navigation
+    :Tree: semctools/ave/galatea
+    :Commit: 102b992b011591119413b6d72005b6b546dfaeb1
+
+* KitKat support in UI navigation
+    :Tree: semctools/ave/galatea
+    :Commit: a0e663cb51a40f91d0a64ff83a74e64a0773346a
+
+* JB MR2 support in telephony handling
+    :Tree: semctools/ave/gort
+    :Commit: e85f6b31a0145c530a734762982bd46f8d4c24d2
+
+* Turn screen on/off
+    :Tree: semctools/ave/gort
+    :Commit: 3b4a787673b7ce423df0b18aeee31e2985afefd8
+
+* KitKat support in telephony handling
+    :Tree: semctools/ave/gort
+    :Commit: 5c0bfcb6d0d9c786fd9d083a8750cd8160bcaf91
+
+* FireFox get/set locale
+    :Tree: semctools/ave/handset
+    :Commit: 8ef6423f2270d9e6248bdddf5771e5bc32c9b30e
+
+* JB MR2 support for reading phone number from SIM card
+    :Tree: semctools/ave/handset
+    :Commit: 1a6e40e9a60cabaaaae89251a16969e73f39d1d9
+
+* Identify more handset models
+    :Tree: semctools/ave/handset
+    :Commit: 0378d82edefecb33200481a7b079405b72a9c847
+    :Commit: f2766747f6d91d9c5179e9ec3b3df0f355a560f2
+    :Commit: 90729fac712f2e77a24a5310582f52491b3de151
+    :Commit: ee0e9c08dddd029c81a8407c35002bdff06a98e1
+
+* Relaxed GTest argument validation to support more use cases
+    :Tree: semctools/ave/handset
+    :Commit: 319da313e57f42735a4e2ea32cdbfe3388174683
+
+* Make reboot optional when flashing handset. Needed in automated recovery
+    :Tree: semctools/ave/handset
+    :Commit: 4735440ed0e2fec52d430c1810267535c2a863b3
+
+* Updated Marionette client to version 0.6.2
+    :Tree: semctools/ave/handset
+    :Commit: 3346683b8c5eef009920dd1c781b7792d031f10d
+
+* New popup removers: Data disclaimer, Power off in 15 minutes
+    :Tree: semctools/ave/handset
+    :Commit: f8a4f31e4b8b0a7393996429fdc6c41b783368d0
+
+* Reliability improvements to Spirent GPS simulator support
+    :Tree: semctools/ave/positioning
+    :Commit: 727f45292019940280a974603786903c0e7fad22
+
+* Make default relay state configurable
+    :Tree: semctools/ave/quancom
+    :Commit: 8599775f775dff43e5456ff33cbc303d1f81c2a4
+
+* Discard invalid images at startup of imager (bugfix)
+    :Tree: semctools/ave/workspace
+    :Commit: 9d202c454bee62b72be250d10bfa54d602229744
+
+* Use ``ionice`` to avoid overloading the machine while making a flashable image
+    :Tree: semctools/ave/workspace
+    :Commit: 462b519a70c0f5edfd772254e13909b0f0fd0114
+
+* Reliability improvements in the use of Goobug
+    :Tree: semctools/ave/workspace
+    :Commit: e91d0f5089c5933861f3733514f5cc1d421df1d4
+    :Commit: f9b824cd16cae1087f5e628e159e6bd1354e3cb9
+
+* Do not try to kill dead imaging processes (bugfix)
+    :Tree: semctools/ave/workspace
+    :Commit: 618259a9da67156a4aea4b181199d61d218da6e3
+
+* Functions to traverse the PC's file system from test jobs
+    :Tree: semctools/ave/workspace
+    :Commit: a0d6b6cc2a7084d754e9aaf2b882491cf62de15a

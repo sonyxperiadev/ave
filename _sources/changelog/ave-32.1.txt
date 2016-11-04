@@ -1,0 +1,86 @@
+Version 32.1
+===============
+
+* AVE-199 flash blank sim lock file as default
+    :Tree: semctools/ave/flash
+    :Commit: de2fad9c7ef9fe5928d102b85e8b57433e08711a
+
+* AVE-199 Update method flash_directory to remove simlock
+    :Tree: semctools/ave/handset
+    :Commit: 33a829685bf356818f6ab7348d6d1661b43b8a68
+
+* AVE-200 Add parameter to set timeout for vcsjob fetch
+    :Tree: semctools/ave/vcsjob
+    :Commit:  c1ace4891cd61a8cb2a0e1537dbe193567c81e37
+
+* AVE-27 Build Galatea with Gradle
+    :Tree: semctools/ave/gort
+    :Commit: 8f982bc37d6d0e54d45d66f84ef4153339430301
+
+* Merge gort to Android Studio structure
+    :Tree: semctools/ave/gort
+    :Commit: 6b42e972264c12e00e357be1f22dbbfd58407192
+
+* AVE-28 Changes to build gort for Consumer Hero
+    :Tree: semctools/ave/gort
+    :Commit: 8f982bc37d6d0e54d45d66f84ef4153339430301
+
+* AVE-181 Add support for download_crimson in workspace
+    :Tree: semctools/ave/workspace
+    :Commit: 3ceb0b6286b2cee593c948fe3adbbbf26d1e455d
+
+* Adding two APIs of handling crashes on device.
+    :Tree: semctools/ave/handset
+    :Commit: d662252156d45cef74f643d56c0573a6a5b1abd3
+
+* AVE-56,AVE-202 Multipel allocation
+    :Tree: semctools/ave/broker
+    :Commit: 503dc163457e0b3ab1bd29fb9884ba2dff676408
+
+* Image Analyzer contribution
+    :Tree: semctools/ave/workspace
+    :Commit: 383340660ff8f899050fa7d1c40975eed3360f3a
+
+* Image Analyzer contribution.(Resize & Crop)
+    :Tree: semctools/ave/vision
+    :Commit: 0bf65c36de3c84534c1ce7c4bc98894d1f943268
+
+* add http config
+    :Tree: semctools/ave/workspace
+    :Commit: ea7365b2598b2e32a753f60b73032c81376d2eb8
+
+* AVE-197 remove .git from /usr/share/ave/handset
+    :Tree: semctools/ave/handset
+    :Commit: 04b6fe6f6e7c66e5de8365f515392075babfce29
+
+* solve the cycle import error
+    :Tree: semctools/ave/handset
+    :Commit: e5268ba82f5c6dd67bef0d6dd00d3c1f207402e3
+
+* AVE-204 Handle libudev dependence for Ubuntu 14.04
+    :Tree: semctools/ave/handset
+    :Commit: bf8ddc97e014619d80471e0e6235a2ce735a44da
+
+* AVE-205 Add uid into /etc/ave/user
+    :Tree: semctools/ave/common
+    :Commit: fc4a26839c0976fcdd44f76c1a48119944915f07
+
+* AVE-206 bugfix for lost outputs when calling ave.cmd.run
+    :Tree: semctools/ave/common
+    :Commit: 3e5c2fb41f37dd8b1d32aed826615d4005fa7f10
+
+* AVE-217 Fix 505 error to create a existing directory
+    :Tree: semctools/ave/workspace
+    :Commit: 379a7847258c104b2e8d0137e0d7370bd5672c34
+
+* add http config 
+    :Tree: semctools/ave/workspace
+    :Commit: ea7365b2598b2e32a753f60b73032c81376d2eb8
+
+* Same type resources cofigured in stack
+    :Tree: semctools/ave/broker
+    :Commit: 435115d58e1ed168d1711ea09022920412efebcb
+
+* bugfix for multi allocation
+    :Tree: semctools/ave/broker
+    :Commit: ab5a8993c8b889e2f466f2f78cd4fd22ad28de56

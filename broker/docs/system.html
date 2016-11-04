@@ -1,0 +1,174 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Broker &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../../index.html" />
+    <link rel="up" title="System Documentation" href="../../system/index.html" />
+    <link rel="next" title="Equipment Stacking" href="stacking.html" />
+    <link rel="prev" title="Logging" href="../../system/logging.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="stacking.html" title="Equipment Stacking"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../../system/logging.html" title="Logging"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="../../system/index.html" accesskey="U">System Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="broker">
+<h1>Broker<a class="headerlink" href="#broker" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="stacking.html">Equipment Stacking</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="stacking.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stacking.html#terminology">Terminology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stacking.html#equipment-detection">Equipment Detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stacking.html#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stacking.html#client-usage">Client Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stacking.html#implementation">Implementation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="stacking.html#allocators">Allocators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="stacking.html#allocations">Allocations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="restart.html">Restart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="restart.html#overview">Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="restart.html#terminology">Terminology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="restart.html#implementation-details">Implementation Details</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="restart.html#broker-class"><tt class="docutils literal"><span class="pre">Broker</span></tt> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="restart.html#restarting-class"><tt class="docutils literal"><span class="pre">Restarting</span></tt> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="restart.html#allocator-class"><tt class="docutils literal"><span class="pre">Allocator</span></tt> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="restart.html#adoptedsession-class"><tt class="docutils literal"><span class="pre">AdoptedSession</span></tt> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="restart.html#debian-package">Debian Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="restart.html#control-class"><tt class="docutils literal"><span class="pre">Control</span></tt> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="restart.html#fdtx-class"><tt class="docutils literal"><span class="pre">FdTx</span></tt> class</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="restart.html#future-work">Future Work</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="allocation.html">Networked Allocation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="allocation.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allocation.html#terminology">Terminology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allocation.html#scenarios">Scenarios</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="allocation.html#local-success">Local Success</a></li>
+<li class="toctree-l3"><a class="reference internal" href="allocation.html#local-failure">Local Failure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="allocation.html#forward-success">Forward Success</a></li>
+<li class="toctree-l3"><a class="reference internal" href="allocation.html#forward-failure">Forward Failure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="allocation.html#share-success">Share Success</a></li>
+<li class="toctree-l3"><a class="reference internal" href="allocation.html#share-failure">Share Failure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="allocation.html#notes-on-workspaces">Notes on Workspaces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="allocation.html#notes-on-concurrency">Notes on Concurrency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="allocation.html#miscellaneous-notes">Miscellaneous Notes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allocation.html#known-limitations">Known Limitations</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../../system/logging.html"
+                        title="previous chapter">Logging</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="stacking.html"
+                        title="next chapter">Equipment Stacking</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/broker/docs/system.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="stacking.html" title="Equipment Stacking"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../../system/logging.html" title="Logging"
+             >previous</a> |</li>
+        <li><a href="../../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="../../system/index.html" >System Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

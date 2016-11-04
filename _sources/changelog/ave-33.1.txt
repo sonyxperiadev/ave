@@ -1,0 +1,31 @@
+Version 33.1
+==========
+* Bugfix for the issues caused by the latest adb
+    :Tree: semctools/ave/handset
+    :Commit: 886bc8b209e30e3bbc44ad06ff45937e6f9fdda5
+
+* Bugfix for adb forward
+    :Tree: semctools/ave/handset
+    :Commit: bdb59af881527ccdd3ecc1680f2a9f8cd0f16f36
+
+* Update test case for adb logcat
+    :Tree: semctools/ave/handset
+    :Commit: 57924c97de00989d2e23b950c811ab03907e26ca
+
+* Update enable setup wizard method for Android M
+    :Tree: semctools/ave/handset
+    :Commit: f41836015cfe7314efdddd050d600625b319d515
+
+* Bugfix for checking sdcard mounted status on Android M
+    :Tree: semctools/ave/handset
+    :Commit: f06df986e1a175e45176330714bdce87d1a2e332
+
+* M-cookie bringup
+    :Tree: semctools/ave/gort
+    :Commit: 508e7166efdd3764eee705936eda5adc7829e3dc
+
+* flocker: Set-up a FTP server at jptolx11427
+    :Tree: semctools/ave/workspace
+    :Commit: 13b7451357376a8a82a89fa009c83ade5d3c909b
+
+

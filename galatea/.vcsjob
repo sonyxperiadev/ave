@@ -1,0 +1,6 @@
+{
+    "executables": [
+        { "path":"jobs/galatea_unit",     "tags":["ANDROID", "UNIT"] },
+        { "path":"jobs/galatea_accept",     "tags":["ANDROID", "ACCEPTANCE"] }
+    ]
+}

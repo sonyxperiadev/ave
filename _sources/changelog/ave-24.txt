@@ -1,0 +1,42 @@
+Version 24
+==========
+
+* Integration of refactored relay server
+    :Tree: ave/broker
+    :Commit: 4310ed4854e7cffdcb7030b1b7333b83c8235142
+
+* Do not install files owned by ave-relay package
+    :Tree: ave/common
+    :Commit: d857f961b514649e771ab5fe9acf7c5b8cfd4d87
+
+* Updating android_handset pull_crashes with better timeout
+    :Tree: ave/handset
+    :Commit: 22555b03571465a3140f55f51bb51c86cdd22d6f
+
+* Run ADB server as root by default
+    :Tree: ave/handset
+    :Commit: 474ab2707ea389cc88e8bb43bdf69b1746fe9b6b
+
+* Do not start processes in constructor
+    :Tree: ave/handset
+    :Commit: bb2e0b1b16c865c14f797c1b6a8f50ffb43c0ac5
+
+* Buf fix: self.phone_events = None is needed for AndroidHandset
+    :Tree: ave/handset
+    :Commit: 7a0ca22944c49bee5a6ef705a385b61edd5db874
+
+* Thermal race condition with sysmon
+    :Tree: ave/handset
+    :Commit: 4900d618238632c2e3b8bdc9506fc413e9abf38b
+
+* Cleaning up build system for User's Guide
+    :Tree: ave/documentation
+    :Commit: 978ff96b07eb0c1a788fc4fff765b2c5d014ed87
+
+* System documentation of AVE's logging facilities
+    :Tree: ave/documentation
+    :Commit: 1f7ac9b870993b21267d763200399530f2564411
+
+* update ave dependencies
+    :Tree: ave/deployment
+    :Commit: 3a267ce42f411abad3c2d39a74e5d3cbecbb2197

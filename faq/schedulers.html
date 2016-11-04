@@ -1,0 +1,182 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Scheduling &mdash; AVE User&#39;s Guide  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="AVE User&#39;s Guide  documentation" href="../index.html" />
+    <link rel="up" title="Frequently Asked Questions" href="index.html" />
+    <link rel="next" title="Implement New Equipment Support" href="new_equipment.html" />
+    <link rel="prev" title="Verifying Customized Products" href="customized_sw.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="new_equipment.html" title="Implement New Equipment Support"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="customized_sw.html" title="Verifying Customized Products"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Frequently Asked Questions</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="scheduling">
+<h1>Scheduling<a class="headerlink" href="#scheduling" title="Permalink to this headline">¶</a></h1>
+<p>There is no explicit job scheduler in AVE. Some reasons for this:</p>
+<ul class="simple">
+<li>Any node that runs any job is implicitly a scheduler. It would be very hard
+to enforce a scheduling policy across all nodes because they can have very
+loose relationships, yet need access to the same common resource pool.</li>
+<li>Jobs should be runnable even when a node is fully disconnected if enough
+equipment is available locally.</li>
+<li>It is anticipated that different groups will want to set up automation based
+on (very) different economic calculations, resulting in (very) different
+scheduling. It is hard to envision a centralized job scheduler that can handle
+arbitrary requirements.</li>
+<li>Centralized job scheduling often implies that resources will be allocated in
+advance to secure that a scheduled job will be able to run. A centralized
+mechanism would need detailed information about all jobs&#8217; resource needs.
+Adding such tags <em>helps</em> but cannot <em>guarantee</em> an allocation. The scheduler
+is not the only actor in the system, equipment might fail, etc.</li>
+</ul>
+<p>The following solution seems more robust:</p>
+<ul class="simple">
+<li>Put a declarative interface on all jobs to help schedulers. AVE&#8217;s interface
+is the <tt class="docutils literal"><span class="pre">.vcsjob</span></tt>. This interface is kept as small as possible to keep both
+job and scheduler complexity low.</li>
+<li>Match jobs&#8217; needs with resources centrally but don&#8217;t try to <em>schedule</em> the
+allocations. An allocation attempt must always succeed or fail immediately,
+with an option to retry the job later. DUST is implemented this way.</li>
+<li>Allow brokers to set conditions for allocation of specific handsets. E.g.
+deny allocation unless the request includes properties that don&#8217;t matter to
+most jobs but are critical to some.</li>
+<li>Prevent jobs from looping on resource allocations until they succeed. This
+is done by letting the broker reclaim <em>all</em> equipment allocated to that job
+immediately if one allocation fails. Users are not able to prevent this.</li>
+<li>Reuse network security on IP level as much as possible. Often it is good
+enough to simply move a sensitive lab into a restricted network.</li>
+</ul>
+<p>This way, the problem of finding a workable schedule is moved to the users of
+the system. Then scheduling can be solved as one or several fully separated
+problems. Separation of concerns is its own reward.</p>
+<div class="section" id="jenkins">
+<h2>Jenkins<a class="headerlink" href="#jenkins" title="Permalink to this headline">¶</a></h2>
+<p>How to schedule jobs from Jenkins? The typical scenario is that test results
+are wanted to go together with the state of a build job. Can this be done?</p>
+<p>The asynchronous nature of allocation in AVE makes this tricky. If the Jenkins
+job is kept open for test results but there is no available equipment to run
+on, the job ends with a failure. If the Jenkins job solves this by looping on
+a <tt class="docutils literal"><span class="pre">vcsjob</span> <span class="pre">execute</span></tt> statement, it may not be possible to get a test result for
+a very long time. In the meantime, the Jenkins job cannot be started again.</p>
+<p>One solution is to enable the parallel flag on a Jenkins job, but that invites
+problems with overuse of RAM and CPU as any number of expensive build jobs can
+then be triggered in parallel. A cleaner solution is to fully separate building
+and testing and to use a dedicated test scheduler such as DUST. So instead of
+running the tests directly in the build job, push a job ticket to DUST. Help
+with setting this up can be gotten from the <a class="reference external" href="mailto:DL-WW-DUST-Support&#37;&#52;&#48;sonymobile&#46;com">DUST team</a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Scheduling</a><ul>
+<li><a class="reference internal" href="#jenkins">Jenkins</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="customized_sw.html"
+                        title="previous chapter">Verifying Customized Products</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="new_equipment.html"
+                        title="next chapter">Implement New Equipment Support</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/faq/schedulers.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="new_equipment.html" title="Implement New Equipment Support"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="customized_sw.html" title="Verifying Customized Products"
+             >previous</a> |</li>
+        <li><a href="../index.html">AVE User&#39;s Guide  documentation</a> &raquo;</li>
+          <li><a href="index.html" >Frequently Asked Questions</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, Sony Mobile Communications Inc..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

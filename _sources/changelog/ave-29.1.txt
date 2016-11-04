@@ -1,0 +1,20 @@
+Version 29.1
+=============
+
+* Improve handset.run_junit to write output log simultaneously
+    :Tree: semctools/ave/handset
+    :Commit: c5a094af523094e6c215c25384af08000a36105d
+
+* Look /storage/sdcard1/ for crash if /ext_card/ is missing
+    :Tree: semctools/ave/handset
+    :Commit: bbc14cb326ce8b9510f932f47167ec1096eb65eb
+
+* Improve ave.cmd.run to support writing output log simultaneously
+    :Tree: semctools/ave/common
+    :Commit: 9a5d7df801217883891a0492ff5571cda2f9ea3a
+
+* Fix the problem of making image in l-kitakami
+    :Tree: semctools/ave/workspace
+    :Commit: c9e9afe8ee983a224fcfade26950c55d800443a9
+
+

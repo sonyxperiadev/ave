@@ -1,0 +1,58 @@
+Version 31.1
+=============
+
+* Revert "Revert "AVE-165 Add gnuplot into workspace config""
+    :Tree: semctools/ave/common
+    :Commit: c4689da7e4d858b38e7e259dc2011e4f73208399
+
+* Revert "Revert "AVE-165 Gnuplot support""
+    :Tree: semctools/ave/workspace
+    :Commit: 99073e71da765b48dd357462788f6022ccde5bbb
+
+* AVE-188: Add support for file promotion in workspace
+    :Tree: semctools/ave/workspace
+    :Commit: c02e2f88d3c5c2ce97b1ac3a5b2fba75ac9d961b
+
+* AVE-189: Disable handset.push() for tmp-files
+    :Tree: semctools/ave/handset
+    :Commit: 7162eb09267457ebfd5f75e0d59b9ffccedb2fef
+
+* modify file for AVE-189
+    :Tree: semctools/ave/positioning
+    :Commit: 47bf90bea82bafac23587d3b6572bb7dbeade235
+
+* modify test case for AVE-189
+    :Tree: semctools/ave/handset
+    :Commit: eb8b8a22f72018245e57d6d0466861d2efd28e02
+
+* Re-sign gort apk for hero project
+    :Tree: semctools/ave/gort
+    :Commit: d6517e801986a39d9c5383d2294d7b3f4ab50a09
+
+* Update gort and galatea installation to adapt hero project
+    :Tree: semctools/ave/handset
+    :Commit: 6ef803252e61eedde8bd47d60e7d1d2883fd548d
+
+* Update sdk version and re-sign galatea apk for hero project
+    :Tree: semctools/ave/galatea
+    :Commit: f885a13cb7b545038e9923ba203727e9a523aa7b
+
+* AVE-157 Add performance test cases for flocker
+    :Tree: semctools/ave/workspace
+    :Commit: 99c749677134018dd9f7322493dbca8344d83401
+
+* FTP client implementation
+    :Tree: semctools/ave/workspace
+    :Commit: 21b5b851378b311ad60cb8d0d3d7a41dc71476e7
+
+* update the default workspace config
+    :Tree: semctools/ave/common
+    :Commit: 85f8d1c5244c9b093aaa1aafa6c4e75d55c47078
+
+* Update the method get to get sw label for hero project
+    :Tree: semctools/ave/handset
+    :Commit: a0cdcaf93a6856ad3fd045a1da532bd8ad446856
+
+* Push file or string from different workspace
+    :Tree: semctools/ave/workspace
+    :Commit: e6d1009018db8a422bdfada6e3ed5a614bcbdd51
