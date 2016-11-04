@@ -1,0 +1,4 @@
+*.deb
+*.pyc
+packaging/usr
+.idea

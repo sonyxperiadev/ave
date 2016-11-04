@@ -1,0 +1,13 @@
+#! /usr/bin/env python
+
+import os
+import sys
+
+if __name__ == '__main__':
+    # make sure the test module can find its imports
+    path = os.path.dirname(os.path.dirname(__file__))
+    path = os.path.join(path, 'src')
+    sys.path.insert(0, path)
+
+    import runners
+    runners.all_spirent()

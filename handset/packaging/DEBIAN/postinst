@@ -1,0 +1,36 @@
+#! /usr/bin/python2
+
+# Copyright (C) 2014 Sony Mobile Communications AB.
+# All rights, including trade secret rights, reserved.
+
+import os
+import sys
+import json
+import errno
+import shutil
+
+import ave.cmd
+import ave.config
+
+def main():
+    if len(sys.argv) > 1:
+        if sys.argv[1] in ['configure']:
+            etc  = ave.config.load_etc()
+            home = etc['home']
+            path = os.path.join(home, '.ave','config','adb_server.json')
+            if not os.path.exists(path):
+                with open(path, 'w') as f:
+                    config = { 'demote':False, 'persist':True }
+                    json.dump(config, f)
+                os.chown(path, etc['uid'], -1) # let user own the file
+
+            # start the service if it wasn't already running. other do nothing
+            # as a restart of the ADB server would interfere with all running
+            # test jobs that communicate with handsets. the user has to do a
+            # restart manually if this is neccessary.
+            if not os.path.exists('/var/tmp/ave-adb-server.pid'):
+                ave.cmd.run(['/usr/bin/ave-adb-server', '--start'])
+    return 0
+
+if __name__ == '__main__':
+    sys.exit(main())

@@ -1,0 +1,13 @@
+#! /bin/sh
+
+case "$1" in
+    remove)
+        /usr/bin/ave-relay --stop
+        /usr/bin/ave-broker --stop
+        update-rc.d -f ave-broker remove
+        ;;
+esac
+
+kernel=`uname -r`
+
+exit 0

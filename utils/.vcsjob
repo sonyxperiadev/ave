@@ -1,0 +1,21 @@
+{
+    "executables": [
+        {
+            "path": "jobs/logger_unit",
+            "tags": ["UNIT", "LOGGER"]
+        },
+        {
+            "path": "jobs/logger_accept",
+            "tags": ["ACCEPTANCE", "LOGGER"]
+        },
+        {
+            "path": "jobs/testjob_accept",
+            "tags": ["ACCEPTANCE", "TESTJOB"]
+        },
+        {
+            "path": "jobs/testjob_unit",
+            "tags": ["UNIT", "TESTJOB"]
+        }
+    ]
+}
+

@@ -1,0 +1,13 @@
+#! /bin/sh
+
+# Copyright (C) 2013 Sony Mobile Communications AB.
+# All rights, including trade secret rights, reserved.
+
+case "$1" in
+    remove)
+        /usr/bin/ave-broker --stop
+        update-rc.d -f ave-broker remove
+        ;;
+esac
+
+exit 0

@@ -1,0 +1,24 @@
+#! /usr/bin/python2
+
+# Copyright (C) 2013 Sony Mobile Communications AB.
+# All rights, including trade secret rights, reserved.
+
+import os
+import sys
+
+# code coverage is meaningless for this test runner because the main driver
+# is exercised and there isn't a good way to get code coverage for that since
+# the executable is not an importable module. also, all the modules imported
+# by the main driver will be invisible to the coverage module, so it's really
+# quite pointless.
+
+if __name__ == '__main__':
+    # make sure the test module can find its imports
+    path = os.path.dirname(os.path.dirname(__file__))
+    sources = os.path.join(path, 'src')
+    sys.path.insert(0, sources)
+
+    import runners
+
+    runners.all_cli(os.path.join(path, 'bin', 'vcsjob'), [sources])
+

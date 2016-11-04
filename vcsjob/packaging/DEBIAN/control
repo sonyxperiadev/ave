@@ -1,0 +1,23 @@
+Package:      vcsjob
+Version:      96.0
+Architecture: all
+Depends:      python (>=2.6.5), python-coverage (>=2.85), git (>=1:1.7),
+              ave-workspace (>=104.0), ave-common (>=86.1)
+Maintainer:   Klas Lindberg <klas.lindberg@sonyericsson.com>
+Description:  Download and execute strictly version controlled job definitions
+ vcsjob is a tool to use for job control in environments where both the job
+ itself and the inputs to the job should be version controlled. Problems that
+ tend to show up without VCS handling of both:
+ .
+ * Automated testing: Users tend to forget to tell each other exactly what
+   the conditions are for successful independent validation of test results.
+   This typically happens because the job needs configuration parameters,
+   but those parameters are not themselves version controlled and part of
+   the job definition.
+ .
+ * Continuous integration: Jobs are global and can be triggered by any user
+   of the system. This typically means that no one is allowed to change a
+   job configuration because that would cause problems for all other users
+   of the same job. Version control of the job configuration would give the
+   users freedom to experiment without introducing risk for other users.
+

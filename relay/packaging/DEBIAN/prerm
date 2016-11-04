@@ -1,0 +1,14 @@
+#! /bin/sh
+
+# Copyright (C) 2014 Sony Mobile Communications AB.
+# All rights, including trade secret rights, reserved.
+
+case "$1" in
+    remove)
+        /usr/bin/ave-relay --stop
+        ;;
+esac
+
+kernel=`uname -r`
+
+exit 0

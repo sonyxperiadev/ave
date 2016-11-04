@@ -1,0 +1,127 @@
+#! /usr/bin/python2
+
+# Copyright (C) 2014 Sony Mobile Communications AB.
+# All rights, including trade secret rights, reserved.
+
+import os
+import sys
+import getopt
+import traceback
+
+import ave.config
+import ave.persona
+
+from ave.relay.daemon import RelayServerDaemon, PID_PATH
+
+usage = '''
+Syntax: ave-relay <action> [options]
+
+Actions:
+    --help             Display this message
+    --start [--force]  Start the relay server
+    --restart          Restart the relay server
+    --stop             Stop the relay server
+    --hickup           Dump stack traces in .ave/hickup
+
+Options:
+    --admin=<authkey>  Combine with --restart or --stop to force authentication
+                       of the "admin" account with a known authentication key
+
+ave-relay reads other options from <home>/.ave/config/relay-server.json and
+<home>/.ave/config/devantech.json, where the value of <home> is read from
+/etc/ave/user.
+'''
+
+# extract the admin authkey (if any) from the configuration files found in
+# ~/.ave/config/authkeys.json
+def get_admin_authkey():
+    try:
+        home = ave.config.load_etc()['home']
+        return ave.config.load_authkeys(home)['admin']
+    except:
+        return None
+
+def get_user_name():
+    try:
+        return ave.config.load_etc()['name']
+    except:
+        return None
+
+def main(argv):
+    action    = None
+    authkey   = None
+    force     = False
+
+    try:
+        (opts, args) = getopt.getopt(
+            argv[1:], 'h', ['help', 'start', 'restart', 'stop', 'force']
+        )
+    except Exception, e:
+        print(usage)
+        return 1
+
+    for o in opts:
+        if   o[0] in ['-h', '--help']:
+            print(usage)
+            return 0
+        elif o[0] in ['--start', '--restart', '--stop']:
+            if action:
+                print(usage)
+                print('ERROR: cannot combine %s and %s' % (o[0], action))
+                return 3
+            action = o[0]
+        elif o[0] == '--force':
+            force = True
+        else:
+            print(usage)
+            return 2
+
+    if not action:
+        print(usage)
+        print('ERROR: no action specified')
+        return 3
+
+    # do this as early as possible as the other options may be affected by
+    # contents of files found in <home>/.ave
+    try:
+       ave.persona.become_user(get_user_name())
+    except Exception, e:
+       print('ERROR: %s' % e)
+       return 5
+    # sanity: are we still running with effective user ID as root? bad!
+    if os.geteuid() == 0:
+        print('ERROR: cannot execute as root. set /etc/ave/user properly')
+        return 6
+
+    # start and daemonize
+    daemon = RelayServerDaemon()
+    try:
+        if action == '--start':
+            if force and os.path.exists(PID_PATH):
+                daemon.stop()
+            if os.path.exists(PID_PATH):
+                raise Exception('pid file %s exists' % PID_PATH)
+            daemon.start()
+        elif action == '--restart':
+            if not os.path.exists(PID_PATH):
+                raise Exception('pid file %s does not exist' % PID_PATH)
+            # use admin authkey in interactions with previously running server
+            daemon.restart(get_admin_authkey())
+        elif action == '--stop':
+            daemon.stop()
+        elif action == '--hickup':
+            daemon.hickup()
+        else:
+            print('ERROR: unknown action: %s' % action)
+            return 7
+    except Exception, e:
+        print('ERROR: could not %s: %s' % (action[2:], e))
+        return 8
+
+    return 0
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main(sys.argv))
+    except KeyboardInterrupt:
+        pass

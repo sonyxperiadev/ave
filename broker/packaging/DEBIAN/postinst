@@ -1,0 +1,35 @@
+#! /usr/bin/python2
+
+# Copyright (C) 2013 Sony Mobile Communications AB.
+# All rights, including trade secret rights, reserved.
+
+import os
+import sys
+import psutil
+
+import ave.cmd
+
+from ave.broker.daemon import PID_PATH
+
+def is_running():
+    if not os.path.exists(PID_PATH):
+        return False
+    try:
+        return True
+    except psutil.NoSuchProcess:
+        return False
+
+def main():
+    if len(sys.argv) > 1:
+        if sys.argv[1] in ['configure']:
+
+            # start or restart the service through init.d
+            if is_running():
+                ave.cmd.run(['/usr/bin/ave-broker', '--restart'])
+            else:
+                ave.cmd.run(['/usr/bin/ave-broker', '--start', '--force'])
+
+    return 0
+
+if __name__ == '__main__':
+    sys.exit(main())

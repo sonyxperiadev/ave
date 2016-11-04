@@ -1,0 +1,73 @@
+#! /usr/bin/python2
+
+# Copyright (C) 2013 Sony Mobile Communications AB.
+# All rights, including trade secret rights, reserved.
+
+import os
+import sys
+import shutil
+import re
+import subprocess
+import glob
+
+def run(cmd):
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = proc.communicate()
+    if proc.returncode:
+        print(out)
+        print(err)
+        sys.exit(1)
+
+if __name__ == '__main__':
+    root = os.path.dirname(os.path.realpath(__file__))
+
+    # clean out old staging material
+    for entry in os.listdir(root + '/packaging'):
+        if entry == 'DEBIAN':
+            continue
+        dst = root + '/packaging/' + entry
+        if os.path.isfile(dst):
+            os.unlink(dst)
+        else:
+            shutil.rmtree(dst)
+
+    # copy binaries to /usr/bin
+    src = root + '/bin/vcsjob'
+    dst = root + '/packaging/usr/bin'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    shutil.copy(src, dst)
+
+    # copy package & modules to /usr/lib/pymodules/python2.6/vcsjob
+    src = glob.glob(root + '/src/vcsjob/*.py')
+    dst = root + '/packaging/usr/lib/pymodules/python2.6/vcsjob'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    for s in src:
+        shutil.copy(s, dst)
+
+    # copy package & modules to /usr/lib/pymodules/python2.7/vcsjob
+    dst = root + '/packaging/usr/lib/pymodules/python2.7/vcsjob'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    for s in src:
+        shutil.copy(s, dst)
+
+    # extract version information from the package control file
+    f = open(root + '/packaging/DEBIAN/control')
+    version = None
+    for line in f.readlines():
+        m = re.match('Version:\s*(?P<version>.*)', line)
+        if m:
+            version = m.group('version')
+            break
+    if not version:
+        print('ERROR: Could not find the version field in DEBIAN/control file')
+        sys.exit(1)
+
+    # generate the Debian package
+    src = root + '/packaging'
+    run(['fakeroot', 'dpkg-deb', '--build', src,
+         '%s/vcsjob-%s.deb' % (root, version)])
+    print('created %s/vcsjob-%s.deb' % (root, version))
+

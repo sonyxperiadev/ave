@@ -1,0 +1,76 @@
+#! /usr/bin/python2
+
+# Copyright (C) 2013 Sony Mobile Communications AB.
+# All rights, including trade secret rights, reserved.
+
+import os
+import sys
+import pwd
+import getopt
+import traceback
+
+usage = '''
+Syntax: ave-config <action> [options]
+
+Actions:
+    --help             Display this message
+    --bootstrap=<user> Create default configuration files for <user>. This may
+                       require superuser privileges if run on behalf of another
+                       user.
+
+Options:
+    --src-path=<dirs>  Manipulate the Python include paths. Developers only
+'''
+
+def main(argv):
+    src_paths = []
+    bootstrap = None
+
+    try:
+        (opts, args) = getopt.getopt(
+            argv[1:], 'h', ['help', 'src-paths=', 'bootstrap=']
+        )
+    except Exception, e:
+        print(usage)
+        return 1
+
+    for o in opts:
+        if   o[0] in ['-h', '--help']:
+            print(usage)
+            return 0
+        elif o[0] == '--src-paths':
+            src_paths = [os.path.realpath(path) for path in o[1].split(',')]
+            for path in src_paths:
+                path = os.path.realpath(os.path.expanduser(path))
+                if not os.path.isdir(path):
+                    print('ERROR: No such directory: %s' % path)
+                    return 2
+                sys.path.insert(0, path)
+        elif o[0] == '--bootstrap':
+            bootstrap = o[1]
+
+    # imports are done here rather than at the top of the file because it has
+    # to happen *after* the manipulation of Python import paths. i.e. if the
+    # user called "ave-broker --src-paths=...". note that use of this option
+    # only makes sense during test of the full ave-broker executable.
+    import ave.persona
+    import ave.config
+
+    if bootstrap:
+        try: # create the special system account "ave" to run ave-broker
+            ave.persona.become_user(bootstrap)
+            c,s = ave.config.create_default(pwd.getpwnam(bootstrap).pw_dir)
+            for skipped in s:
+                print('WARNING: %s exists, skipped' % skipped)
+            for created in c:
+                print('Created %s' % created)
+            return 0
+        except Exception, e:
+            print('ERROR: could not bootstrap: %s' % str(e))
+            return 3
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main(sys.argv))
+    except KeyboardInterrupt:
+        pass

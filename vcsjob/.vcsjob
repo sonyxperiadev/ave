@@ -1,0 +1,26 @@
+{
+    "executables": [
+        { "path": "jobs/demo_job.sh",      "tags": ["DEMO"] },
+        { "path": "jobs/demo_job.py",      "tags": ["DEMO"] },
+        { "path": "jobs/demo_exit_0.sh",   "tags": ["DEMO"] },
+        { "path": "jobs/demo_exit_100.sh", "tags": ["DEMO"] },
+        { "path": "jobs/demo_suicide.py",  "tags": ["DEMO"] },
+        { "path": "jobs/code_coverage",  "tags": ["COVERAGE"] },
+        { "path": "jobs/cli_unit",       "tags": ["CLI", "UNIT"] },
+        { "path": "jobs/cli_accept",     "tags": ["CLI", "ACCEPTANCE"] },
+        { "path": "jobs/fetch_unit",     "tags": ["FETCH", "UNIT"] },
+        { "path": "jobs/fetch_accept",   "tags": ["FETCH", "ACCEPTANCE"] },
+        { "path": "jobs/execute_unit",   "tags": ["EXECUTE", "UNIT"] },
+        { "path": "jobs/execute_accept", "tags": ["EXECUTE", "ACCEPTANCE"] },
+        { "path": "jobs/list_jobs_unit",  "tags": ["LIST_JOBS", "UNIT"] },
+        { "path": "jobs/list_jobs_accept","tags": ["LIST_JOBS", "ACCEPTANCE"] },
+        { "path": "jobs/logging_unit",    "tags": ["LOGGING", "UNIT"] },
+        { "path": "jobs/logging_accept",  "tags": ["LOGGING", "ACCEPTANCE"] },
+        { "path": "jobs/profiles_unit",   "tags": ["PROFILES", "UNIT"] },
+        { "path": "jobs/profiles_accept", "tags": ["PROFILES", "ACCEPTANCE"] },
+        { "path": "jobs/guid_unit",       "tags": ["GUID", "UNIT"] },
+        { "path": "jobs/guid_accept",     "tags": ["GUID", "ACCEPTANCE"] },
+        { "path": "jobs/duration_unit",     "tags": ["DURATION", "UNIT"]},
+        { "path": "jobs/duration_accept",   "tags": ["DURATION", "ACCEPTANCE"]}
+    ]
+}

@@ -1,0 +1,29 @@
+#! /usr/bin/python2
+
+import os
+import sys
+import time
+import errno
+import signal
+
+home       = sys.argv[1]
+hickup_dir = os.path.join(home, '.ave', 'hickup')
+print hickup_dir, os.getpid()
+
+def handle_SIGUSR1(signum, frame):
+    # create the trace file
+    path = os.path.join(hickup_dir, 'hickup_catch_sigusr1')
+    with open(path, 'w') as f:
+        pass
+    sys.exit(0)
+
+# make the dump directory if it doesn't exist
+try:
+    os.makedirs(hickup_dir)
+except OSError, e:
+    if e.errno != errno.EEXIST:
+       print('ERROR: could not create %s: %s' % (hickup_dir, e))
+
+signal.signal(signal.SIGUSR1, handle_SIGUSR1)
+while True:
+    time.sleep(1)

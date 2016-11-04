@@ -1,0 +1,8 @@
+This component uses source code from Mozilla's Marionette client library,
+located in src/ave/handset/marionette, which is licensed under the Apache 2.0
+license.
+
+The rest of the material is copyright Sony Mobile Communications AB:
+
+    Copyright (C) 2013 Sony Mobile Communications AB.
+    All rights, including trade secret rights, reserved.

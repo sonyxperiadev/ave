@@ -1,0 +1,9 @@
+{
+ "end": "2013-09-06 14:35:36.260980",
+ "failed": 0,
+ "failures": [],
+ "passed": 1,
+ "start": "2013-09-06 14:35:36.261006",
+ "test_name": "t01",
+ "url": "chrome://browser/content/shell.xul"
+}

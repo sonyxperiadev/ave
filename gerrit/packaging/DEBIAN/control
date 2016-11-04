@@ -1,0 +1,8 @@
+Package:      ave-gerrit
+Version:      17.0
+Architecture: all
+Depends:      python (>=2.6.5),
+              openssh-client,
+              ave-common (>=86.0)
+Maintainer:   Klas Lindberg <klas.lindberg@sonyericsson.com>
+Description:  Programmatic interaction with Gerrit

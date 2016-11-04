@@ -1,0 +1,63 @@
+#! /usr/bin/python2
+
+# Copyright (C) 2013 Sony Mobile Communications AB.
+# All rights, including trade secret rights, reserved.
+
+import os
+import sys
+import getopt
+
+usage = '''
+Syntax:
+    vcsjob [-s|--src-paths] fetch -s <url> -d <path> -r <refspec> -t <timeout>
+    vcsjob [-s|--src-paths] execute -j <path> [-t <tags>] [-e <env vars>]
+
+Complete documentation can be found in <vcsjob's Git tree>/README, or in
+/usr/doc/vcsjob/README.
+'''
+
+def main(argv):
+    src_paths = []
+
+    # the first non-dashed argument is the sub-command. dashed arguments seen
+    # before the sub-command are consumed by getopt as arguments to vcsjob.
+    # the rest are consumed as options and can be consumed again as arguments
+    # to the sub-command:
+    try:
+        (opts, args) = getopt.getopt(argv[1:], 'hs:', ['help', 'src-paths='])
+    except Exception, e:
+        print(usage)
+        return 1
+
+    for o in opts:
+        if   o[0] in ['-h', '--help']:
+            print(usage)
+            return 0
+        elif o[0] in ['-s', '--src-paths']:
+            src_paths = [os.path.realpath(path) for path in o[1].split(',')]
+            for path in src_paths:
+                path = os.path.realpath(os.path.expanduser(path))
+                if not os.path.isdir(path):
+                    print('ERROR: No such directory: %s' % path)
+                    return 1
+                sys.path.insert(0, path)
+
+    if not args:
+        print(usage)
+        return 1
+
+    cmd = args[0]
+
+    if   cmd == 'fetch':
+        import vcsjob.vcs
+        return 0 if vcsjob.vcs.main(args[1:]) == vcsjob.OK else 1
+    elif cmd == 'execute':
+        import vcsjob.job
+        return 0 if vcsjob.job.main(args[1:]) == vcsjob.OK else 1
+
+    print('ERROR: No command executed')
+    return 1 # nothing done. must be wrong
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv))
+

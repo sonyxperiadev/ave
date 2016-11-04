@@ -1,0 +1,45 @@
+#! /usr/bin/python2
+
+# Copyright (C) 2013 Sony Mobile Communications AB.
+# All rights, including trade secret rights, reserved.
+
+import os
+import sys
+import errno
+import shutil
+import subprocess
+
+import ave.config  # part of Pre-Depend ave-common
+import ave.persona # part of Pre-Depend ave-common
+
+def main():
+    if len(sys.argv) > 1:
+        if sys.argv[1] in ['install', 'upgrade']:
+
+            # create /etc/ave/user if it doesn't exist
+            try:
+                user = ave.config.create_etc()
+            except Exception, e:
+                print('ERROR: Installation failed: %s' % e)
+                return 1
+
+            # become the run-as user before checking/generating config files
+            try:
+                home = ave.persona.become_user(user)
+            except Exception, e:
+                print('ERROR: Could not become user %s' % user)
+                return 2
+
+            # create the default AVE configuration
+            try:
+                ave.config.create_default(home)
+            except Exception, e:
+                print(
+                    'ERROR: Could not create configuration files for %s: %s'
+                    % (user, str(e))
+                )
+                return 3
+    return 0
+
+if __name__ == '__main__':
+    sys.exit(main())

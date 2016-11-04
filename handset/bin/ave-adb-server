@@ -1,0 +1,74 @@
+#! /usr/bin/python2
+
+import os
+import sys
+import traceback
+
+import ave.config
+import ave.persona
+
+from ave.adb.server     import AdbServer
+from ave.network.daemon import Daemon
+
+PID_PATH = '/var/tmp/ave-adb-server.pid'
+LOG_PATH = '/var/tmp/ave-adb-server.log'
+
+def get_user_name():
+    try:
+        return ave.config.load_etc()['name']
+    except:
+        return None
+
+class AdbServerDaemon(Daemon):
+
+    def __init__(self):
+        log = open(LOG_PATH, 'a+', 0) # append/update without buffering
+        Daemon.__init__(self, PID_PATH, log, stdout=log, stderr=log)
+
+    def run(self):
+        srv = AdbServer()
+        srv.run()
+
+    def rerun(self):
+        self.run()
+
+if __name__ == '__main__':
+    home    = ave.config.load_etc()['home']
+    config  = AdbServer.load_config(home)
+    actions = sys.argv[1:]
+
+    if '--force' in actions and '--start' in actions:
+        if os.path.exists(PID_PATH):
+            os.unlink(PID_PATH)
+
+    # do this as early as possible as the other options may be affected by
+    # contents of files found in <home>/.ave
+    if config['demote'] == True:
+        try:
+            ave.persona.become_user(get_user_name())
+        except Exception, e:
+            with open(LOG_PATH, 'a+') as f:
+                f.write('ERROR: %s\n' % str(e))
+            sys.exit(1)
+        # sanity: are we still running with effective user ID as root? bad!
+        if os.geteuid() == 0:
+            with open(LOG_PATH, 'a+') as f:
+                f.write('ERROR: must not execute as root. fix your config\n')
+            sys.exit(2)
+
+    try:
+        if  '--start' in actions:
+            AdbServerDaemon().start()
+        elif '--restart' in actions:
+            AdbServerDaemon().stop()
+            AdbServerDaemon().start()
+        elif '--stop' in actions:
+            AdbServerDaemon().stop()
+            AdbServer.kill_all_servers()
+    except Exception, e:
+        with open(LOG_PATH, 'a+') as f:
+            f.write('ERROR: could not "%s"\n' % ' '.join(actions))
+            f.write(traceback.format_exc())
+        sys.exit(3)
+
+    sys.exit(0)

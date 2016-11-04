@@ -1,0 +1,12 @@
+simple gtest example, used here for self testing of AVE.
+the example source code has been compiled for targets defined below and the
+gtest binary can be found under "bin/".
+
+PLATFORM_VERSION_CODENAME=REL
+PLATFORM_VERSION=4.1.2
+TARGET_PRODUCT=odin
+TARGET_BUILD_VARIANT=userdebug
+TARGET_BUILD_TYPE=release
+TARGET_BUILD_APPS=
+TARGET_ARCH=arm
+TARGET_ARCH_VARIANT=armv7-a-neon

@@ -1,0 +1,4 @@
+*.dia~
+*.pyc
+_build
+source

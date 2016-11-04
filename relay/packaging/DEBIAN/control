@@ -1,0 +1,12 @@
+Package:      ave-relay
+Version:      17.0
+Architecture: all
+Depends:      libudev0 (>=151-12.3) | libudev1
+Pre-Depends:  python (>=2.6.5),
+              linux-headers,
+              gcc,
+              make,
+              ave-common (>=86.1),
+              python-psutil
+Maintainer:   Klas Lindberg <klas.lindberg@sonymobile.com>,
+Description:  Relay server with support for Devantech equipment

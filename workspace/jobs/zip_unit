@@ -1,0 +1,34 @@
+#! /usr/bin/python2
+
+# Copyright (C) 2016 Sony Mobile Communications Inc.
+# All rights, including trade secret rights, reserved.
+
+import os
+import sys
+
+try:
+    import coverage
+except:
+    print(
+        'ERROR: module "coverage" not found. please install the package '
+        '"python-coverage". (The exact name depends on the distribution '
+        'you use.)'
+    )
+    sys.exit(1)
+
+if __name__ == '__main__':
+    # make sure the test module can find its imports
+    path = os.path.dirname(os.path.dirname(__file__))
+    path = os.path.join(path, 'src')
+    sys.path.insert(0, path)
+
+    coverage.use_cache(False)
+    coverage.start()
+
+    import ave.workspace
+    import runners
+    runners.all_zip()
+
+    coverage.stop()
+    coverage.report([ave.workspace], file=None)
+    sys.exit(0)

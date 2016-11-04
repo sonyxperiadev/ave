@@ -1,0 +1,42 @@
+{
+  "executables": [
+     { "path": "jobs/code_coverage",          "tags": ["COVERAGE"] },
+     { "path": "jobs/smoke",                  "tags": ["SMOKE"] },
+     { "path": "jobs/stress",                 "tags": ["STRESS"] },
+
+     { "path": "jobs/config_unit",            "tags": ["CONFIG", "UNIT"] },
+     { "path": "jobs/config_accept",          "tags": ["CONFIG","ACCEPTANCE"] },
+     { "path": "jobs/documentation_unit",     "tags": ["DOCS", "UNIT"] },
+     { "path": "jobs/documentation_accept",   "tags": ["DOCS", "ACCEPTANCE"] },
+     { "path": "jobs/cmd_unit",               "tags": ["CMD", "UNIT"] },
+     { "path": "jobs/cmd_accept",             "tags": ["CMD", "ACCEPTANCE"] },
+     { "path": "jobs/spool_unit",             "tags": ["SPOOL", "UNIT"] },
+     { "path": "jobs/spool_accept",           "tags": ["SPOOL", "ACCEPTANCE"] },
+     { "path": "jobs/connection_unit",    "tags": ["CONNECTION","UNIT"] },
+     { "path": "jobs/connection_accept",  "tags": ["CONNECTION","ACCEPTANCE"] },
+     { "path": "jobs/pipe_unit",          "tags": ["PIPE", "UNIT"] },
+     { "path": "jobs/pipe_accept",        "tags": ["PIPE", "ACCEPTANCE"] },
+     { "path": "jobs/process_unit",       "tags": ["PROCESS", "UNIT"] },
+     { "path": "jobs/process_accept",     "tags": ["PROCESS", "ACCEPTANCE"] },
+     { "path": "jobs/control_unit",       "tags": ["CONTROL", "UNIT"] },
+     { "path": "jobs/control_accept",     "tags": ["CONTROL", "ACCEPTANCE"] },
+     { "path": "jobs/async_rpc_unit",     "tags": ["ASYNC_RPC", "UNIT"] },
+     { "path": "jobs/async_rpc_accept",   "tags": ["ASYNC_RPC", "ACCEPTANCE"] },
+     { "path": "jobs/fdtx_unit",          "tags": ["FDTX", "UNIT"] },
+     { "path": "jobs/fdtx_accept",        "tags": ["FDTX", "ACCEPTANCE"] },
+     { "path": "jobs/exception_unit",     "tags": ["EXCEPTION", "UNIT"] },
+     { "path": "jobs/exception_accept",   "tags": ["EXCEPTION", "ACCEPTANCE"] },
+     { "path": "jobs/hickup_unit",        "tags": ["HICKUP", "UNIT"] },
+     { "path": "jobs/hickup_accept",      "tags": ["HICKUP", "ACCEPTANCE"] },
+     { "path": "jobs/panotti_unit",       "tags": ["PANOTTI", "UNIT"] },
+     { "path": "jobs/panotti_accept",     "tags": ["PANOTTI", "ACCEPTANCE"] },
+
+     { "path": "jobs/daemon_unit",        "tags": ["DAEMON", "UNIT"] },
+     { "path": "jobs/daemon_accept",      "tags": ["DAEMON", "ACCEPTANCE"] },
+
+     { "path": "jobs/defjoin_unit",
+       "tags": ["DEFJOIN", "CONTROL", "UNIT"] },
+     { "path": "jobs/defjoin_accept",
+       "tags": ["DEFJOIN", "CONTROL", "ACCEPTANCE"] }
+   ]
+}

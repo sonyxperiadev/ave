@@ -1,0 +1,8 @@
+#! /usr/bin/python2
+
+import os
+import sys
+
+if __name__ == '__main__':
+    import runners
+    runners.all_hickup()

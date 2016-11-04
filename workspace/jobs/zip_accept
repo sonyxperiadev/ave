@@ -1,0 +1,15 @@
+#! /usr/bin/python2
+
+# Copyright (C) 2016 Sony Mobile Communications Inc.
+# All rights, including trade secret rights, reserved.
+
+import sys
+import vcsjob
+
+import runners
+
+if __name__ == '__main__':
+    result = runners.all_zip()
+    if result == False:
+        sys.exit(vcsjob.FAILURES)
+    sys.exit(vcsjob.OK)

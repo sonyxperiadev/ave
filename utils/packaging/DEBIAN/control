@@ -1,0 +1,13 @@
+Package:      ave-utils
+Version:      13.0
+Architecture: all
+Depends:      python-apt,
+              ave-broker      (>=114.0),
+              ave-common      (>=86.1),
+              ave-handset     (>=110.1),
+              ave-workspace   (>=104.0),
+              vcsjob          (>=89.1)
+Pre-Depends:  python(>=2.6.5), ave-common (>=86.1)
+Maintainer:   Klas Lindberg <klas.lindberg@sonymobile.com>
+Description:  Support for writing test jobs to be executed
+              with schedulers such as DUST

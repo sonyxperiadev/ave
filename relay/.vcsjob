@@ -1,0 +1,18 @@
+{
+    "executables": [
+        { "path": "jobs/config_debug",  "tags": ["config","debug"] },
+        { "path": "jobs/broker_debug",  "tags": ["broker","debug"] },
+        { "path": "jobs/restart_debug", "tags": ["restart","debug"] },
+        { "path": "jobs/process_debug", "tags": ["process","debug"] },
+
+        { "path": "jobs/config_accept", "tags": ["config","ACCEPTANCE"] },
+        { "path": "jobs/broker_accept", "tags": ["broker","ACCEPTANCE"] },
+        { "path": "jobs/restart_accept","tags": ["restart","ACCEPTANCE"] },
+
+        { "path": "jobs/usb_power_accept",
+          "tags": ["usb_power", "ACCEPTANCE"],
+          "profiles": [
+            {"type":"relay","circuits":["usb.pc.vcc"]},
+            {"type":"handset"} ] }
+    ]
+}

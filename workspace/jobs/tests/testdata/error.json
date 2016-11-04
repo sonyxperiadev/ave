@@ -1,0 +1,9 @@
+{
+ "end": "2013-09-06 14:35:36.209817",
+ "error": true,
+ "exception": "ave.handset.marionette.errors.ScriptTimeoutException",
+ "message": "timed out",
+ "start": "2013-09-06 14:35:36.209853",
+ "test_name": "t03",
+ "url": "chrome://browser/content/shell.xul"
+}

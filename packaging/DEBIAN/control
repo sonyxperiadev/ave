@@ -1,0 +1,17 @@
+Package:      ave
+Version:      1.0
+Architecture: all
+Depends:      python-profiler,
+              python-apt,
+              python-coverage (>=2.85),
+              procps (>=1:3.2.8-1),
+              git (>=1:1.7),
+              linux-headers,
+              gcc,
+              make,
+              libudev0 (>=151-12.3) | libudev1
+Pre-Depends:  python            (>=2.6.5),
+              python-couchdb (>=0.6-1),
+              python-psutil     (>=0.1.2-2)
+Maintainer:   Klas Lindberg <klas.lindberg@sonymobile.com>
+Description:  Allocation and reclamation of AVE devices and other resouces

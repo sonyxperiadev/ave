@@ -1,0 +1,38 @@
+{
+  "executables": [
+     { "path": "jobs/code_coverage",          "tags": ["COVERAGE"] },
+     { "path": "jobs/smoke",                  "tags": ["SMOKE"] },
+
+     { "path": "jobs/download_git_unit",      "tags": ["GIT", "UNIT"] },
+     { "path": "jobs/download_git_accept",    "tags": ["GIT", "ACCEPTANCE"] },
+
+     { "path": "jobs/apk_unit",               "tags": ["APK", "UNIT"] },
+     { "path": "jobs/apk_accept",             "tags": ["APK", "ACCEPTANCE"] },
+
+     { "path": "jobs/download_jenkins_unit",  "tags": ["JENKINS", "UNIT"] },
+     { "path": "jobs/download_jenkins_accept","tags": ["JENKINS","ACCEPTANCE"]},
+
+     { "path": "jobs/config_unit",            "tags": ["CONFIG", "UNIT"] },
+     { "path": "jobs/config_accept",          "tags": ["CONFIG", "ACCEPTANCE"]},
+
+     { "path": "jobs/documentation_unit",     "tags": ["DOCS", "UNIT"] },
+     { "path": "jobs/documentation_accept",   "tags": ["DOCS", "ACCEPTANCE"] },
+
+     { "path": "jobs/flocker_unit",           "tags": ["FLOCKER","UNIT"] },
+     { "path": "jobs/flocker_accept",         "tags": ["FLOCKER","ACCEPTANCE"]},
+     { "path": "jobs/flocker_performance",    "tags": ["FLOCKER","PERFORMANCE"]},
+
+
+     { "path": "jobs/marionette_unit",         "tags": ["MARIONETTE", "UNIT"] },
+     { "path": "jobs/marionette_accept",       "tags": ["MARIONETTE", "ACCEPTANCE"]},
+
+     { "path": "jobs/filesystem_unit",         "tags": ["FILESYSTEM", "UNIT"] },
+     { "path": "jobs/filesystem_accept",       "tags": ["FILESYSTEM", "ACCEPTANCE"]},
+
+     { "path": "jobs/apk_code_coverage_unit",   "tags": ["APKCODECOVERAGE", "UNIT"] },
+     { "path": "jobs/apk_code_coverage_accept", "tags": ["APKCODECOVERAGE", "ACCEPTANCE"]},
+
+     { "path": "jobs/zip_unit",         "tags": ["ZIP", "UNIT"] },
+     { "path": "jobs/zip_accept",       "tags": ["ZIP", "ACCEPTANCE"]}
+  ]
+}

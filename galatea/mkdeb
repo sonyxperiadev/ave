@@ -1,0 +1,68 @@
+#! /usr/bin/python2
+
+# Copyright (C) 2013 Sony Mobile Communications AB.
+# All rights, including trade secret rights, reserved.
+
+import os
+import sys
+import shutil
+import re
+import subprocess
+
+def run(cmd):
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = proc.communicate()
+    if proc.returncode:
+        print(out)
+        print(err)
+        sys.exit(1)
+
+def make_apk(root, branch):
+    cwd = os.getcwd()
+    os.chdir(root)
+
+    run(['sdkdownload', '-b', branch])
+    os.environ['ANDROID_HOME'] = os.getenv('HOME') + '/sdk/' + branch
+
+    run(['./gradlew', 'clean', 'assemble'])
+
+    src = root+'/galatea-main/build/outputs/apk/galatea-main-release.apk'
+    dst = root+'/packaging/usr/share/ave/galatea/galatea.apk'
+    if not os.path.exists(os.path.dirname(dst)):
+        os.makedirs(os.path.dirname(dst))
+    shutil.copy(src, dst)
+
+    os.chdir(cwd)
+
+if __name__ == '__main__':
+    root = os.path.dirname(os.path.realpath(__file__))
+
+    # clean out old staging material
+    for entry in os.listdir(root + '/packaging'):
+        if entry == 'DEBIAN':
+            continue
+        dst = root + '/packaging/' + entry
+        if os.path.isfile(dst):
+            os.unlink(dst)
+        else:
+            shutil.rmtree(dst)
+
+    make_apk(root, 'm-kitakami')
+
+    # extract version information from the package control file
+    f = open(root + '/packaging/DEBIAN/control')
+    version = None
+    for line in f.readlines():
+        m = re.match('Version:\s*(?P<version>.*)', line)
+        if m:
+            version = m.group('version')
+            break
+    if not version:
+        print('ERROR: Could not find the version field in DEBIAN/control file')
+        sys.exit(1)
+
+    # generate the Debian package
+    src = root + '/packaging'
+    run(['fakeroot', 'dpkg-deb', '--build', src,
+         '%s/ave-galatea-%s.deb' % (root, version)])
+    print('created %s/ave-galatea-%s.deb' % (root, version))

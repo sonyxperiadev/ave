@@ -1,0 +1,13 @@
+Package:      ave-broker
+Version:      122.0
+Architecture: all
+Depends:      ave-relay         (>=9.0),
+              ave-workspace     (>=104.0),
+              python-profiler
+Pre-Depends:  ave-common        (>=86.1),
+              python            (>=2.6.5),
+              ave-handset       (>=110.1),
+              python-psutil     (>=0.1.2-2)
+Conflicts:    ave-handset       (<=51)
+Maintainer:   Klas Lindberg <klas.lindberg@sonymobile.com>
+Description:  Allocation and reclamation of AVE devices and other resouces

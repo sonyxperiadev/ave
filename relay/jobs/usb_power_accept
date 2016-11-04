@@ -1,0 +1,13 @@
+#! /usr/bin/python2
+
+# Copyright (C) 2014 Sony Mobile Communications AB.
+# All rights, including trade secret rights, reserved.
+
+if __name__ == '__main__':
+    import os, sys
+    path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    path = os.path.join(path, 'release', 'broker', 'src')
+    sys.path.insert(0, path)
+
+    import runners
+    runners.all_usb_power()

@@ -1,0 +1,116 @@
+{
+    "executables": [
+        { "path":"jobs/code_coverage",     "tags":["COVERAGE"] },
+
+        { "path":"jobs/lister_unit",
+          "tags":["LISTER","UNIT"],
+          "profiles":[{"type":"handset"}] },
+
+        { "path":"jobs/lister_accept",
+          "tags":["LISTER","ACCEPTANCE"],
+          "profiles":[{"type":"handset"}] },
+
+        { "path":"jobs/galatea_unit",
+          "tags":["GALATEA","ANDROID","UNIT"],
+          "profiles":[
+            {"type":"handset", "platform":"android"}] },
+
+        { "path":"jobs/galatea_accept",
+          "tags":["GALATEA","ANDROID","ACCEPTANCE","DUST"],
+          "profiles":[
+            {"type":"handset", "platform":"android"}] },
+
+        { "path":"jobs/handset_smoke",
+          "tags":["SMOKE","ANDROID"],
+          "banner": "Handset smoke tests suite",
+          "profiles":[
+            {"type":"workspace"},
+            {"type":"handset", "platform":"android"}] },
+
+        { "path": "jobs/misc_android_unit",
+          "tags": ["MISC","ANDROID","UNIT"],
+          "profiles":[
+            {"type":"workspace"},
+            {"type":"handset", "platform":"android"}] },
+
+        { "path":"jobs/misc_android_accept",
+          "tags":["MISC","ANDROID","ACCEPTANCE","DUST"],
+          "profiles":[
+            {"type":"workspace"},
+            {"type":"handset", "platform":"android"}] },
+
+        { "path":"jobs/adb_unit",
+          "tags":["ADB","ANDROID","UNIT"],
+          "profiles":[
+            {"type":"workspace"},
+            {"type":"handset", "platform":"android"}] },
+
+        { "path":"jobs/adb_accept",
+          "tags":["ADB","ANDROID","ACCEPTANCE","DUST"],
+          "profiles":[
+            {"type":"workspace"},
+            {"type":"handset", "platform":"android"}] },
+
+        { "path":"jobs/gtest_unit",
+          "tags":["GTEST","ANDROID","UNIT"],
+          "profiles":[
+            {"type":"workspace"},
+            {"type":"handset", "platform":"android"}] },
+
+        { "path":"jobs/gtest_accept",
+          "tags":["GTEST","ANDROID","ACCEPTANCE","DUST"],
+          "profiles":[
+            {"type":"workspace"},
+            {"type":"handset", "platform":"android"}] },
+
+        { "path":"jobs/junit_unit",
+          "tags":["JUNIT","ANDROID","UNIT"],
+          "profiles":[
+            {"type":"workspace"},
+            {"type":"handset", "platform":"android"}] },
+
+        { "path":"jobs/junit_accept",
+          "tags":["JUNIT","ANDROID","ACCEPTANCE","DUST"],
+          "profiles":[
+            {"type":"workspace"},
+            {"type":"handset", "platform":"android"}] },
+
+        { "path":"jobs/popup_unit",
+          "tags":["POPUP","ANDROID","UNIT"],
+          "profiles":[
+            {"type":"workspace"},
+            {"type":"handset", "platform":"android"}] },
+
+        { "path":"jobs/popup_accept",
+          "tags":["POPUP","ANDROID","ACCEPTANCE","DUST"],
+          "profiles":[
+            {"type":"workspace"},
+            {"type":"handset", "platform":"android"}] },
+
+        { "path":"jobs/hprof_unit",
+          "tags":["HPROF","ANDROID","UNIT"],
+          "profiles":[
+            {"type":"workspace"},
+            {"type":"handset", "platform":"android"}] },
+
+        { "path":"jobs/hprof_accept",
+          "tags":["HPROF","ANDROID","ACCEPTANCE","DUST"],
+          "profiles":[
+            {"type":"workspace"},
+            {"type":"handset", "platform":"android"}] },
+
+        { "path":"jobs/forwarding_unit",
+          "tags":["ADB", "FORWARDING", "UNIT"],
+          "profiles":[{"type":"handset"}] },
+
+        { "path":"jobs/forwarding_accept",
+          "tags":["ADB", "FORWARDING", "ACCEPTANCE"],
+          "profiles":[{"type":"handset"}] },
+
+        { "path":"jobs/adb_server_unit",
+          "tags":["ADB","SERVER","UNIT"] },
+
+        { "path":"jobs/adb_server_accept",
+          "tags":["ADB","SERVER","ACCEPTANCE"] }
+  ]
+}

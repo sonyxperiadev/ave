@@ -1,0 +1,9 @@
+{
+  "executables": [
+    { "path": "jobs/smoke",          "tags": ["SMOKE"] },
+    { "path": "jobs/events_unit",    "tags": ["EVENTS","UNIT"] },
+    { "path": "jobs/events_accept",  "tags": ["EVENTS","ACCEPTANCE"] },
+    { "path": "jobs/review_unit",    "tags": ["REVIEW","UNIT"] },
+    { "path": "jobs/review_accept",  "tags": ["REVIEW","ACCEPTANCE"] }
+  ]
+}

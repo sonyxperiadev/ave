@@ -1,0 +1,218 @@
+#! /usr/bin/python2
+
+# Copyright (C) 2013 Sony Mobile Communications AB.
+# All rights, including trade secret rights, reserved.
+
+import os
+import sys
+import getopt
+import traceback
+
+import ave.config
+import ave.persona
+
+from ave.broker        import Broker
+from ave.broker.daemon import BrokerDaemon, PID_PATH
+
+usage = '''
+Syntax: ave-broker <action> [options]
+
+Actions:
+    --help             Display this message
+    --start [--force]  Start the broker
+    --restart          Restart the broker
+    --stop             Stop the broker
+    --hickup           Dump stack traces in .ave/hickup
+    --list             List available equipemnt
+    --list-all         List all equipment, allocated or not
+
+Options:
+    --admin=<authkey>  Combine with --restart or --stop to force authentication
+                       of the "admin" account with a known authentication key
+
+ave-broker reads all other options from <home>/.ave/config/broker.json, where
+the value of <home> is read from /etc/ave/user.
+'''
+
+# extract the admin authkey (if any) from the configuration files found in
+# ~/.ave/config/authkeys.json
+def get_admin_authkey():
+    try:
+        home = ave.config.load_etc()['home']
+        return ave.config.load_authkeys(home)['admin']
+    except:
+        return None
+
+def get_user_name():
+    try:
+        return ave.config.load_etc()['name']
+    except:
+        return None
+
+def print_handset(e):
+    print 'Handset %s' % e['sysfs_path']
+    if 'pretty' in e:
+        print '  pretty       : %s' % e['pretty']
+    print '  serial       : %s' % e['serial']
+    print '  power_state  : %s' % e['power_state']
+    if 'platform' in e:
+        print '  platform     : %s' % e['platform']
+    if 'sw.label' in e:
+        print '  sw.label     : %s' % e['sw.label']
+    if 'gsm.operator' in e:
+        print '  gsm.operator : %s' % e['gsm.operator']
+    if 'product.model' in e:
+        print '  product.model: %s' % e['product.model']
+    if 'product.name' in e:
+        print '  product.name : %s' % e['product.name']
+    if 'sdk.version' in e:
+        print '  sdk.version  : %s' % e['sdk.version']
+    if 'slid' in e:
+        print '  slid         : %d' % e['slid']
+    if 'workstation' in e:
+        print '  workstation  : %s' % e['workstation']
+
+def print_powermeter(e):
+    print 'Powermeter %s' % e['sysfs_path']
+    print '  product    : %s' % e['product']
+    print '  vendor     : %s' % e['vendor']
+    print '  uid        : %s' % e['uid']
+    print '  power_state: %s' % e['power_state']
+    print '  device_node: %s' % e['device_node']
+
+def print_relay(e):
+    print 'Relay %s' % e['uid']
+    print '  circuits   : %s' % ', '.join(e['circuits'])
+    print '  power_state: %s' % e['power_state']
+
+def list_all():
+    home    = ave.config.load_etc()['home']
+    authkey = ave.config.load_authkeys(home)['admin']
+    broker  = Broker(authkey=authkey)
+    equip   = broker.list_equipment()
+    for e in equip:
+        if e['type'] == 'handset':
+            print_handset(e)
+        if e['type'] == 'powermeter':
+            print_powermeter(e)
+        if e['type'] == 'relay':
+            print_relay(e)
+
+def list_available():
+    home    = ave.config.load_etc()['home']
+    authkey = ave.config.load_authkeys(home)['admin']
+    broker  = Broker(authkey=authkey)
+    equip   = broker.list_available()
+    for e in equip:
+        if e['type'] == 'handset':
+            print_handset(e)
+        if e['type'] == 'powermeter':
+            print_powermeter(e)
+        if e['type'] == 'relay':
+            print 'Relay %s' % e['uid']
+            print '  circuits   : %s' % ', '.join(e['circuits'])
+            print '  power_state: %s' % e['power_state']
+
+def main(argv):
+    action  = None
+    authkey = None
+    force   = False
+
+    try:
+        (opts, args) = getopt.getopt(
+            argv[1:], 'h', [
+                'help', 'start', 'restart', 'stop', 'hickup', 'force', 'admin=',
+                'list', 'list-all'
+            ]
+        )
+    except Exception, e:
+        print(usage)
+        return 1
+
+    for o in opts:
+        if   o[0] in ['-h', '--help']:
+            print(usage)
+            return 0
+        elif o[0] in [
+            '--start', '--restart', '--stop', '--hickup', '--list', '--list-all'
+        ]:
+            if action:
+                print(usage)
+                print('ERROR: cannot combine %s and %s' % (o[0], action))
+                return 2
+            action = o[0]
+        elif o[0] == '--admin':
+            authkey = o[1].encode('utf-8')
+        elif o[0] == '--force':
+            force = True
+
+    if not action:
+        print(usage)
+        print('ERROR: no action specified')
+        return 3
+
+    # do this as early as possible as the other options may be affected by
+    # contents of files found in <home>/.ave
+    try:
+        ave.persona.become_user(get_user_name())
+    except Exception, e:
+        print('ERROR: %s' % str(e))
+        return 1
+    # sanity: are we still running with effective user ID as root? bad!
+    if os.geteuid() == 0:
+        print('ERROR: cannot execute as root. set /etc/ave/user properly')
+        return 2
+
+    # start and daemonize
+    daemon = BrokerDaemon()
+    try:
+        if os.path.exists(PID_PATH) and action in ['--start', '--stop', '--hickup']:
+            if os.path.getsize(PID_PATH) == 0:
+                if action == '--start':
+                    print('ERROR: The pid file(%s) size is zero. '
+                          'Please manually kill the ave-broker process(if exists), '
+                          'delete the pid file and then try again.') % PID_PATH
+                elif action == '--stop':
+                    print('ERROR: The pid file(%s) size is zero. '
+                          'Please manually kill the ave-broker process(if exists), '
+                          'delete the pid file.') % PID_PATH
+                else:
+                    print('ERROR: The pid file(%s) size is zero. Can not hickup. '
+                          'Please manually kill the ave-broker process(if exists), '
+                          'delete the pid file.') % PID_PATH
+                return 5
+        if action == '--start':
+            if force and os.path.exists(PID_PATH):
+                daemon.stop()
+            if os.path.exists(PID_PATH):
+                raise Exception('pid file %s exists' % PID_PATH)
+            daemon.start()
+        elif action == '--restart':
+            if not os.path.exists(PID_PATH):
+                raise Exception('pid file %s does not exist' % PID_PATH)
+            # use admin authkey in interactions with previously running broker
+            daemon.restart(get_admin_authkey())
+        elif action == '--stop':
+            daemon.stop()
+        elif action == '--hickup':
+            daemon.hickup()
+        elif action == '--list':
+            list_available()
+        elif action == '--list-all':
+            list_all()
+        else:
+            print('ERROR: unknown action: %s' % action)
+            return 5
+    except Exception, e:
+        print('ERROR: could not %s: %s' % (action[2:], e))
+
+if __name__ == '__main__':
+    # FG3 behaves really weird in console mode if $DISPLAY is set and its
+    # configuration files are missing. unset $DISPLAY to work around.
+    if 'DISPLAY' in os.environ:
+        del(os.environ['DISPLAY'])
+
+    try:
+        main(sys.argv)
+    except KeyboardInterrupt:
+        pass

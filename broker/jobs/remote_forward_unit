@@ -1,0 +1,16 @@
+#! /usr/bin/python2
+
+# Copyright (C) 2013 Sony Mobile Communications AB.
+# All rights, including trade secret rights, reserved.
+
+import os
+import sys
+
+if __name__ == '__main__':
+    # make sure the test module can find its imports
+    path = os.path.dirname(os.path.dirname(__file__))
+    path = os.path.join(path, 'src')
+    sys.path.insert(0, path)
+
+    import runners
+    runners.all_remote_forward()

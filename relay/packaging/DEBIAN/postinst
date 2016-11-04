@@ -1,0 +1,56 @@
+#! /usr/bin/python2
+
+# Copyright (C) 2013-2014 Sony Mobile Communications AB.
+# All rights, including trade secret rights, reserved.
+
+import os
+import sys
+import time
+import shutil
+import psutil
+
+import ave.cmd
+import ave.config
+import ave.relay.config
+
+from ave.relay.daemon import PID_PATH
+
+def is_running():
+    if not os.path.exists(PID_PATH):
+        return False
+    try:
+        pid  = int(open(PID_PATH).read())
+        proc = psutil.Process(pid)
+    except:
+        return False
+    return True
+
+def write_default_config():
+    etc = ave.config.load_etc()
+    try:
+        path = ave.relay.config.write_devantech_config(etc['home'])
+    except Exception, e:
+        if 'will not overwrite' in str(e):
+            return
+        raise
+    os.chown(path, etc['uid'], -1)
+
+def main():
+    if len(sys.argv) > 1:
+        if sys.argv[1] in ['configure']:
+
+            try:
+                write_default_config()
+            except Exception, e:
+                print('WARNING: could not write default config file: %s' % e)
+
+            # start or restart the service
+            if is_running():
+                ave.cmd.run(['/usr/bin/ave-relay', '--restart'])
+            else:
+                ave.cmd.run(['/usr/bin/ave-relay', '--start', '--force'])
+
+    return 0
+
+if __name__ == '__main__':
+    sys.exit(main())

@@ -1,0 +1,58 @@
+{
+    "executables": [
+        { "path":"jobs/config_unit",       "tags":["CONFIG","UNIT"] },
+        { "path":"jobs/config_accept",     "tags":["CONFIG","ACCEPTANCE"] },
+        { "path":"jobs/session_unit",      "tags":["SESSION","UNIT"] },
+        { "path":"jobs/session_accept",    "tags":["SESSION","ACCEPTANCE"] },
+        { "path":"jobs/broker_unit",       "tags":["BROKER","UNIT"] },
+        { "path":"jobs/broker_accept",     "tags":["BROKER","ACCEPTANCE"] },
+        { "path":"jobs/stacks_unit",       "tags":["STACKS", "BASIC", "UNIT"] },
+        { "path":"jobs/stacks_accept",     "tags":["STACKS", "BASIC", "ACCEPTANCE"] },
+        {
+            "path":"jobs/remote_forward_unit",
+            "tags":["REMOTE", "FORWARD", "UNIT"]
+        },
+        {
+            "path":"jobs/remote_forward_accept",
+            "tags":["REMOTE", "FORWARD", "ACCEPTANCE"]
+        },
+        {
+            "path":"jobs/remote_share_basic_unit",
+            "tags":["REMOTE", "SHARE", "BASIC", "UNIT"]
+        },
+        {
+            "path":"jobs/remote_share_basic_accept",
+            "tags":["REMOTE", "SHARE", "BASIC", "ACCEPTANCE"]
+        },
+        {
+            "path":"jobs/remote_share_stacks_unit",
+            "tags":["REMOTE", "SHARE", "STACKS", "UNIT"]
+        },
+        {
+            "path":"jobs/remote_share_stacks_accept",
+            "tags":["REMOTE", "SHARE", "STACKS", "ACCEPTANCE"]
+        },
+        {
+            "path":"jobs/remote_share_workspace_unit",
+            "tags":["REMOTE", "SHARE", "WORKSPACE", "UNIT"]
+        },
+        {
+            "path":"jobs/remote_share_workspace_accept",
+            "tags":["REMOTE", "SHARE", "WORKSPACE", "ACCEPTANCE"]
+        },
+        { "path":"jobs/handover_unit",         "tags":["HANDOVER", "UNIT"] },
+        { "path":"jobs/handset_lister_unit",   "tags":["HANDSET_LISTER", "UNIT"] },
+        { "path":"jobs/handset_lister_accept", "tags":["HANDSET_LISTER", "ACCEPTANCE"] },
+        { "path":"jobs/spirent_unit",          "tags":["SPIRENT", "UNIT"] },
+        { "path":"jobs/spirent_accept",        "tags":["SPIRENT", "ACCEPTANCE"] },
+        {
+            "path":"jobs/hickup_unit",
+            "tags":["UNIT","HICKUP"]
+        },
+        {
+            "path":"jobs/hickup_accept",
+            "tags":["ACCEPTANCE","HICKUP"]
+        }
+    ]
+}
+

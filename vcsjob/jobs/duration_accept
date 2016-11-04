@@ -1,0 +1,5 @@
+#! /usr/bin/python2
+import runners
+
+if __name__ == "__main__":
+    runners.all_duration()

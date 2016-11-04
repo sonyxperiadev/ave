@@ -1,0 +1,16 @@
+# Include the data files
+recursive-include common/src *
+recursive-include common/bin *
+recursive-include broker/bin *
+recursive-include broker/etc *
+recursive-include handset/etc *
+recursive-include handset/bin *
+recursive-include handset/usr *
+recursive-include relay/etc *
+recursive-include relay/bin *
+recursive-include vcsjob/bin *
+recursive-include workspace/usr *
+include galatea/latest/galatea.apk
+
+global-exclude *.pyc
+global-exclude .git

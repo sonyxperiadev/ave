@@ -1,0 +1,89 @@
+#! /usr/bin/python2
+
+# Copyright (C) 2013-2014 Sony Mobile Communications AB.
+# All rights, including trade secret rights, reserved.
+
+import os
+import sys
+import shutil
+import re
+import subprocess
+import glob
+
+def run(cmd):
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = proc.communicate()
+    if proc.returncode:
+        print(out)
+        print(err)
+        sys.exit(1)
+
+if __name__ == '__main__':
+    root = os.path.dirname(os.path.realpath(__file__))
+
+    # clean out old staging material
+    for entry in os.listdir(root + '/packaging'):
+        if entry == 'DEBIAN':
+            continue
+        dst = root + '/packaging/' + entry
+        if os.path.isfile(dst):
+            os.unlink(dst)
+        else:
+            shutil.rmtree(dst)
+
+    # copy upstart integration files to /etc/init
+    src = root + '/etc/init/ave-relay.conf'
+    dst = root + '/packaging/etc/init'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    shutil.copy(src, dst)
+
+    # copy udev rules to /etc
+    src = glob.glob(root + '/etc/udev/rules.d/*.rules')
+    dst = root + '/packaging/etc/udev/rules.d'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    for s in src:
+        shutil.copy(s, dst)
+
+    # copy executables to /usr/bin
+    src = glob.glob(root + '/bin/*')
+    dst = root + '/packaging/usr/bin'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    for s in src:
+        shutil.copy(s, dst)
+
+    # copy all modules to /usr/lib/pymodules/python2.*/ave/relay
+    src = glob.glob(root + '/src/ave/relay/*.py')
+    # ... except __init__.py which has special content in the local tree
+    src = [s for s in src if os.path.basename(s) != '__init__.py']
+    for dst in [
+        root + '/packaging/usr/lib/pymodules/python2.6/ave/relay',
+        root + '/packaging/usr/lib/pymodules/python2.7/ave/relay'
+    ]:
+        if not os.path.exists(dst):
+            os.makedirs(dst)
+        for s in src:
+            shutil.copy(s, dst)
+        # create the empty __init__.py
+        f = open(os.path.join(dst, '__init__.py'), 'w')
+        f.close()
+
+    # extract version information from the package control file
+    f = open(root + '/packaging/DEBIAN/control')
+    version = None
+    for line in f.readlines():
+        m = re.match('Version:\s*(?P<version>.*)', line)
+        if m:
+            version = m.group('version')
+            break
+    if not version:
+        print('ERROR: Could not find the version field in DEBIAN/control file')
+        sys.exit(1)
+
+    # generate the Debian package
+    src = root + '/packaging'
+    run(['fakeroot', 'dpkg-deb', '--build', src,
+         '%s/ave-relay-%s.deb' % (root, version)])
+    print('created %s/ave-relay-%s.deb' % (root, version))

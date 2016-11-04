@@ -1,0 +1,35 @@
+Package:      ave-workspace
+Version:      115.0
+Architecture: all
+Depends:      python-coverage (>=2.85),
+              git (>=1:1.7),
+              perl,
+              util-linux,
+              wget
+Pre-depends:  ave-common (>=86.1),
+              python (>=2.6.5),
+              python-psutil
+Suggests:     vcsjob
+Maintainer:   Klas Lindberg <klas.lindberg@sonyericsson.com>
+Description:  Programmatic workspace control for test jobs
+ ave.workspace has two primary objectives:
+ * Provide an API used to query properties about the machine that holds
+   the workspace. Such properties may include the SSID of the local WLAN
+   or whether a particular tool is installed on the machine. This should
+   be used whenever a test job would otherwise use hard coded values
+   which may not be valid when the test job is executed on a different
+   machine. Test jobs can use get_profile() to get a dictionary with all
+   such properties of a workspace. Most of the properties are set in the
+   file $HOME/.ave/config/workspace.json which is read each time a new
+   workspace is created.
+ * Give the test job writer a bit of easily controlled file system space
+   to use when downloading artifacts, creating flashable images, etc.
+   All class functions check that parameters with destination paths are
+   within the base directory of the workspace. A test job can delete the
+   whole workspace by calling delete(). It can also re-use an existing
+   one by initializing the Workspace object with the same 'uid' as the
+   existing workspace. The download functions try to avoid downloading
+   artifacts by looking for existing content in the workspace directory.
+   This way, a test job developer can avoid re-running costly download
+   passes during development of the job by re-using the same workspace
+   uid.

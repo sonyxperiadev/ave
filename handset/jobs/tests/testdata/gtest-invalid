@@ -1,0 +1,1 @@
+'CANNOT LINK EXECUTABLE: cannot locate symbol "_ZN8SkBitmap9setConfigENS_6ConfigEiij" referenced by "/data/local/tmp/gtest-non-link"...'

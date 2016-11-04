@@ -1,0 +1,12 @@
+#! /usr/bin/python2
+
+# Copyright (C) 2013 Sony Mobile Communications AB.
+# All rights, including trade secret rights, reserved.
+
+import os
+import sys
+
+import runners
+
+if __name__ == '__main__':
+    runners.all_logging()

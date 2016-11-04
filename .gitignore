@@ -1,0 +1,14 @@
+*~
+*.deb
+*.pyc
+*packaging/usr
+*packaging/etc
+build
+.gradle
+.idea
+galatea.iml
+*.cmd
+*.ko
+*.so
+*.o
+*.a

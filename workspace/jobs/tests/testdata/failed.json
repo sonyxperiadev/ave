@@ -1,0 +1,14 @@
+{
+ "end": "2013-09-06 14:35:36.676993",
+ "failed": 1,
+ "failures": [
+  {
+   "diag": "didn't expect 1, but got it",
+   "name": "9df68f21-611e-4693-91a5-cc2b32a83c31"
+  }
+ ],
+ "passed": 0, 
+ "start": "2013-09-06 14:35:36.677018",
+ "test_name": "t02",
+ "url": "chrome://browser/content/shell.xul"
+}

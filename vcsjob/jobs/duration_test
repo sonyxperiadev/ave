@@ -1,0 +1,13 @@
+#! /usr/bin/python2
+import time
+
+if __name__ == '__main__':
+    limit = time.time() + 12
+    while True:
+        if time.time() > limit:
+            break
+
+        time.sleep(2)
+        print 'job is running'
+
+    print 'job exits normally'

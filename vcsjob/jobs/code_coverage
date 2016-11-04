@@ -1,0 +1,44 @@
+#! /usr/bin/env python
+
+# Copyright (C) 2013 Sony Mobile Communications AB.
+# All rights, including trade secret rights, reserved.
+
+import os
+import sys
+
+try:
+    import coverage
+except:
+    print(
+        'ERROR: module "coverage" not found. please install the package '
+        '"python-coverage". (The exact name depends on the distribution '
+        'you use.)'
+    )
+    sys.exit(1)
+
+if __name__ == '__main__':
+    # make sure the test module can find its imports
+    path = os.path.dirname(os.path.dirname(__file__))
+    sources = os.path.join(path, 'src')
+    sys.path.insert(0, sources)
+
+    coverage.use_cache(False)
+    coverage.start()
+
+    import vcsjob
+    import runners
+    runners.all_fetch()
+    runners.all_execute()
+    runners.all_list_jobs()
+    runners.all_logging()
+    runners.all_profiles()
+    executable = os.path.join(path, 'bin', 'vcsjob')
+    runners.all_cli(executable, [sources])
+
+    coverage.stop()
+    coverage.report(
+        [vcsjob, vcsjob.vcs, vcsjob.job, vcsjob.tree, vcsjob.profiles],
+        file=None
+    )
+    sys.exit(0)
+

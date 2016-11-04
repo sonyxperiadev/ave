@@ -1,0 +1,32 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.1"
+
+    sourceSets {
+        main.setRoot('src/androidTest')
+    }
+
+    defaultConfig {
+        applicationId "com.sonymobile.galatea"
+        minSdkVersion 19
+        targetSdkVersion 24
+ }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+
+    packagingOptions {
+        exclude 'LICENSE.txt'
+    }
+}
+
+dependencies {
+    compile fileTree('libs').include('*.jar')
+    compile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
+}
