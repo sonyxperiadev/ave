@@ -12,26 +12,22 @@ Requirements
 
 Installation
 ------------
-AVE is published to the Python Package Index. To install it one must have administrator
-privileges on the target machine.
+To install it one must have administrator privileges on the target machine.
 
 .. rubric:: Installation
 
-To install from the Python Package Index, run::
+To install from source code, run::
 
-    sudo pip install ave
-
-Also it is possible to install ave from source code, run::
-
-    sudo make clean
-    sudo make install-all
+    make clean
+    make install-all
 
 Alternatively, you can make a debian pakage and install it, run::
 
     make clean
     make debian
-    sudo dpkg -i install ave
+    sudo dpkg -i install ave-[ver].deb
     sudo apt-get install -f
+    sudo dpkg -i install ave-[ver].deb (try to install again if needed)
 
 Be prepared to enter your login user names, whatever that may be.
 

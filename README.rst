@@ -22,6 +22,27 @@ The documentation can also be built locally by running `make html` from the
 'documentation' directory (which does require sphinx), or read in their original
 reST format.
 
+Installation
+------------
+To install it one must have administrator privileges on the target machine.
+
+.. rubric:: Installation
+
+To install from source code, run::
+
+    make clean
+    make install-all
+
+Alternatively, you can make a debian pakage and install it, run::
+
+    make clean
+    make debian
+    sudo dpkg -i install ave-[ver].deb
+    sudo apt-get install -f
+    sudo dpkg -i install ave-[ver].deb (try to install again if needed)
+
+Be prepared to enter your login user names, whatever that may be.
+
 Acknowledgement
 ---------------
 
