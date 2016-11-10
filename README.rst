@@ -25,14 +25,18 @@ reST format.
 Acknowledgement
 ---------------
 
-AVE project was initiated by Fredrik Åkerblom and Klas Lindberg in 2012 when
-they worked for Sony Mobile Communications. Since then, many joined in the
-project to maintain and help grow the project. Although several of them
-have left the organization and we have development footprint internally
-available but not at GitHub,we would like to express our gratitude to them
-for contribution to make this project publicly available:
+In 2012 Klas Lindberg, then working for Sony Mobile, designed the architecture
+of AVE, building on a set of crucial principles that would enforce a way of working
+with test automation that proved to be very successful. He continued to be the
+projects main contributor, followed by Fredrik Åkerlund as he joined the team.
+Since then, many joined in the project to maintain and help grow the project.
+Although several of them have left the organization and we have development
+footprint internally available but not at GitHub,we would like to express our
+gratitude to them for contribution to make this project publicly available:
 
 **Major Contributors (@GitHubAccount)**
+
+
 
 Klas Lindberg (`@Mysingen <https://github.com/Mysingen>`_),
 Fredrik Åkerblom
@@ -40,23 +44,23 @@ Fredrik Åkerblom
 **Contributors**
 
 Johan Müllern-Aspegren (`@johanaspegren <https://github.com/johanaspegren>`_),
-Wang Qiang,
+Wang Qiang (`@WangQiang3 <https://github.com/WangQiang3>`_),
 Xu Quanhao (`@xu-quanhao <https://github.com/xu-quanhao>`_),
 Johan Svegne (`@sejosg <https://github.com/sejosg>`_),
-Martin Berg,
+Martin Berg (`@jamtse <https://github.com/jamtse>`_),
 Emil Billing,
 Nima Davoudi-Kia,
 Fredrik Lindell,
 Martin Lindblom,
-Li Baojian,
-Zhang Xiaoming,
-Duan Jianjie,
+Li Baojian (`@li-baojian <https://github.com/li-baojian>`_),
+Zhang Xiaoming (`@zxmsony <https://github.com/zxmsony>`_),
+Duan Jianjie (`@JianjieDuan <https://github.com/JianjieDuan>`_),
 Wang Chuang,
 Huaming Lin,
 Anders Hedlund,
-Snild Dolkow(`@Snild-Sony <https://github.com/Snild-Sony>`_),
+Snild Dolkow (`@Snild-Sony <https://github.com/Snild-Sony>`_),
 David Pursehouse (`@dpursehouse <https://github.com/dpursehouse>`_),
 Toshiaki Tanaka,
 Junji Shimagaki (`@yiu31802 <https://github.com/yiu31802>`_),
-Ma Lina and
+Ma Lina (`@LinaMAS <https://github.com/LinaMAS>`_) and
 many other minor contributors
