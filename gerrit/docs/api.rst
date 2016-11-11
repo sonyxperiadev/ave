@@ -50,7 +50,7 @@ ave.gerrit.review
     Set scores on one or more labels for a change in Gerrit.
 
     :arg project: A string holding the project identity. E.g.
-        ``"semctools/ave/gerrit"``.
+        ``"ave/gerrit"``.
     :arg change: A character string holding the change number. I.e.
         the ``"456785"`` part of the following git refspec:
         ``"refs/changes/85/456785/2"``.
@@ -68,7 +68,7 @@ ave.gerrit.review
     Set the score on a label for a change in Gerrit.
 
     :arg project: A string holding the project identity. E.g.
-        ``"semctools/ave/gerrit"``.
+        ``"ave/gerrit"``.
     :arg change: A character string holding the change number. I.e.
         the ``"456785"`` part of the following git refspec:
         ``"refs/changes/85/456785/2"``.
@@ -85,7 +85,7 @@ ave.gerrit.review
     Set the verified status for a change in Gerrit.
 
     :arg project: A string holding the project identity. E.g.
-        ``"semctools/ave/gerrit"``.
+        ``"ave/gerrit"``.
     :arg change: A character string holding the change number. I.e.
         the ``"456785"`` part of the following git refspec:
         ``"refs/changes/85/456785/2"``.
@@ -106,7 +106,7 @@ ave.gerrit.review
     Set the code review status for a change in Gerrit.
 
     :arg project: A string holding the project identity. E.g.
-        ``"semctools/ave/gerrit"``.
+        ``"ave/gerrit"``.
     :arg change: A character string holding the change number. I.e.
         the ``"456785"`` part of the following git refspec:
         ``"refs/changes/85/456785/2"``.
@@ -129,7 +129,7 @@ ave.gerrit.review
     Set the qualified status for a change in Gerrit.
 
     :arg project: A string holding the project identity. E.g.
-        ``"semctools/ave/gerrit"``.
+        ``"ave/gerrit"``.
     :arg change: A character string holding the change number. I.e.
         the ``"456785"`` part of the following git refspec:
         ``"refs/changes/85/456785/2"``.
@@ -149,7 +149,7 @@ ave.gerrit.review
     Make a comment in a Gerrit project.
 
     :arg project: A string holding the project identity. E.g.
-        ``"semctools/ave/gerrit"``.
+        ``"ave/gerrit"``.
     :arg change: A character string holding the change number. I.e.
         the ``"456785"`` part of the following git refspec:
         ``"refs/changes/85/456785/2"``.

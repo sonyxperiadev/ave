@@ -8,5 +8,4 @@ Depends:      python (>=2.6.5),
               alsa-utils (>=1.0.25)
 Pre-Depends:  ave-galatea (>=13.0),
               ave-common (>=86.1)
-Maintainer:   SWD Tools SEMC <swdtoolssemc@sonymobile.com>
 Description:  APIs for handling communication with handsets

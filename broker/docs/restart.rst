@@ -76,7 +76,7 @@ Implementation Details
 
 ``Broker`` class
 ^^^^^^^^^^^^^^^^
-:git: semctools/ave/broker
+:module: ave/broker
 
 * ``make_tempdir()``: The handover and takeover need a safe place to create
   the UNIX domain socket used to transfer file descriptors.
@@ -109,7 +109,7 @@ Implementation Details
 
 ``Restarting`` class
 ^^^^^^^^^^^^^^^^^^^^
-:git: semctools/ave/broker
+:module: ave/broker
 
 This exception is thrown at clients that have made at least one allocation
 against the original broker and then tries to make more allocations after a
@@ -123,13 +123,13 @@ rerun the test job.
 
 ``Allocator`` class
 ^^^^^^^^^^^^^^^^^^^
-:git: semctools/ave/broker
+:module: ave/broker
 
 * ``serialize()``: Used by ``Broker.serialize()``.
 
 ``AdoptedSession`` class
 ^^^^^^^^^^^^^^^^^^^^^^^^
-:git: semctools/ave/broker
+:module: ave/broker
 
 This class is used by a takeover to track lingering sessions in a handover. The
 takeover indexes these sessions exactly like it indexes "real" sessions. This
@@ -144,16 +144,16 @@ is needed to keep sessions alive over multiple broker restarts.
   takeover cannot call ``os.wait()`` on the PID and must assume that the
   handover does so (to avoid creating zombies).
 
-Debian Package
-^^^^^^^^^^^^^^
-:git: semctools/ave/broker
+``BrokerDaemon`` class
+^^^^^^^^^^^^^^^^^^^^^^
+:module: ave/broker
 
 * ``postinst``: Run ``ave-broker --restart`` if a broker was already running
   during package installation. Otherwise run ``ave-broker --start``.
 
 ``Control`` class
 ^^^^^^^^^^^^^^^^^
-:git: semctools/ave/common
+:module: ave/common
 
 * ``stop_listening()``: Close the listening socket so that new clients cannot
   be admitted.
@@ -164,7 +164,7 @@ Debian Package
 
 ``FdTx`` class
 ^^^^^^^^^^^^^^
-:git: semctools/ave/common
+:module: ave/common
 
 This class is used to transfer file descriptors from one process to another. It
 is built on a special feature of UNIX domain sockets that allows the sender to

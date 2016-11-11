@@ -422,6 +422,6 @@ Known Limitations
   public...
 
 * The RPC ``__async__`` flag has limited effect if the underlying connection
-  has not been created yet. This should be fixed in ``semctools/ave/common``,
+  has not been created yet. This should be fixed in ``ave/common``,
   the broker implementation must be careful to always initiate outgoing client
   connections in time limited manners.

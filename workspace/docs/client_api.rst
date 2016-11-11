@@ -279,8 +279,7 @@ File Manipulation
 -----------------
 Generic file manipulation and AVE's golden cage model do not mix easily. The
 methods listed here are designed to satisfy specific needs that many test jobs
-do have and that do not break the model. To request new methods, please send an
-email to the AVE governance board or to SWD Tools SEMC.
+do have and that do not break the model.
 
     .. method:: get_checksum(path)
 
