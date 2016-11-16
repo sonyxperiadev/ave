@@ -60,37 +60,28 @@
 <span id="lab-owners-guide"></span><h1>Lab Owner&#8217;s Guide<a class="headerlink" href="#lab-owner-s-guide" title="Permalink to this headline">¶</a></h1>
 <p>This document collects information that may be useful to all AVE lab owners,
 from single workstations to large centralized labs.</p>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="https://developer.android.com/studio/command-line/adb.html">ADB</a> properly set up</li>
+</ul>
+</div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>AVE is published to SoMC&#8217;s internal Debian repository for Ubuntu workstations
-and servers. To install it one must have administrator privileges on the target
-machine.</p>
-<p class="rubric">Privileges</p>
-<p>First try to become owner and admin according to the normal IT process. Run:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">makemeowner</span>
-</pre></div>
-</div>
-<p>and type <tt class="docutils literal"><span class="pre">ADMIN</span></tt> when prompted.</p>
-<p>If this does not work because someone else already owns the machine, you can
-still become administrator with some help from the current administrator. <em>That</em>
-person should run:</p>
-<div class="highlight-python"><pre>sudo usermod -a -G admin &lt;your user name&gt;</pre>
-</div>
+<p>To install it one must have administrator privileges on the target machine.</p>
 <p class="rubric">Installation</p>
-<p>To install from the default repository, run:</p>
-<div class="highlight-python"><pre>sudo apt-get update
-sudo apt-get install ave</pre>
+<p>To install from source code, run:</p>
+<div class="highlight-python"><pre>make clean
+make install-all</pre>
 </div>
-<p>Alternatively, you can open <tt class="docutils literal"><span class="pre">synaptic</span></tt> or another Debian package manager to
-check what the latest available version is before actually installing anything.</p>
-<p>Be prepared to enter your 23-number when prompted. Users at external partners&#8217;
-should enter their login user names, whatever that may be.</p>
-<p class="rubric">Uninstallation</p>
-<p>Open the Debian package manager of your choice (<tt class="docutils literal"><span class="pre">synaptic</span></tt> is recommended),
-search for &#8220;ave-&#8221; packages and mark all of them for complete removal. Then
-apply the change.</p>
-<p class="rubric">Beta Testing</p>
-<p>Instructions for beta testing are found <a class="reference internal" href="../governance/beta_testing.html#beta-testing"><em>here</em></a>.</p>
+<p>Alternatively, you can make a debian pakage and install it, run:</p>
+<div class="highlight-python"><pre>make clean
+make debian
+sudo dpkg -i install ave-[ver].deb
+sudo apt-get install -f
+sudo dpkg -i install ave-[ver].deb (try to install again if needed)</pre>
+</div>
+<p>Be prepared to enter your login user names, whatever that may be.</p>
 <div class="section" id="default-configuration-files">
 <h3>Default Configuration Files<a class="headerlink" href="#default-configuration-files" title="Permalink to this headline">¶</a></h3>
 <p>The installation creates the file <tt class="docutils literal"><span class="pre">/etc/ave/user</span></tt> which contains two items:</p>
@@ -221,9 +212,6 @@ split single boards into multiple logical units. Otherwise one would have to
 use a whole board with every single handset, which would be quite wasteful.
 <a class="reference internal" href="../relay/docs/api.html#relay-config-files"><em>Configuration details</em></a>.</p>
 </li>
-<li><p class="first"><strong>Image server</strong>: Provides a caching mechanism and concurrent access to ye
-good olde <tt class="docutils literal"><span class="pre">semcpkgtoimg</span></tt>. <em class="xref std std-ref">Configuration details</em>.</p>
-</li>
 <li><p class="first"><strong>Equipment listers</strong>: There is one for every kind of equipment: Handsets,
 relays, power meters and WLAN dongles. A lister&#8217;s job is to report unique
 equipment profiles to the local broker. To see what the listers add to the
@@ -237,14 +225,6 @@ local broker, please run:</p>
 reliability of the ADB server. This is the only AVE component that runs with
 elevated privileges. <a class="reference internal" href="../handset/docs/adb_server_api.html#adb-server-config"><em>Configuration details</em></a> and
 <a class="reference internal" href="../faq/adb.html#adb-server-behavior"><em>potential configuration problems</em></a>.</p>
-</li>
-<li><p class="first"><strong>FG3 Daemon</strong>: This service is not part of AVE. It is used to flash handsets.
-Unfortunately FG3 offers few automation controls and it is easier for the lab
-owner to manage it manually than for AVE to do it programmatically. Its
-configuration is updated by starting it:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">fg3console</span> <span class="o">-</span><span class="n">dm</span>
-</pre></div>
-</div>
 <p>Sometimes the daemon will exit fairly soon afterwards (within a minute or so).
 In this case simply start it again.</p>
 </li>
@@ -270,12 +250,9 @@ circumstances require manual restarts:</p>
 <li><p class="first">Restarts after configuration changes have already been covered above, or are
 covered by separate documentation for various supplemental services.</p>
 </li>
-<li><p class="first">A broker restart is needed after upgrading a non-service package. Normally a
-full stable release of AVE will trigger all necessary restarts, but during
-debugging or develoment a lab owner may want to install a changed version of
-e.g. <tt class="docutils literal"><span class="pre">ave-handset</span></tt> separately:</p>
-<div class="highlight-python"><pre>sudo dpkg -i ave-handset-999.deb
-sudo ave-broker --restart</pre>
+<li><p class="first">A broker restart is needed after changing any config in [home]/.ave/config/<a href="#id1"><span class="problematic" id="id2">*</span></a>.json:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ave</span><span class="o">-</span><span class="n">broker</span> <span class="o">--</span><span class="n">restart</span>
+</pre></div>
 </div>
 </li>
 <li><p class="first">ADB server is never restarted automatically, not even by a full AVE release.
@@ -331,23 +308,12 @@ tar -czf logs.tar.gz /var/tmp/ave-*</pre>
 </li>
 </ul>
 </div>
-<div class="section" id="usb-power-flashing">
-<h2>USB, Power &amp; Flashing<a class="headerlink" href="#usb-power-flashing" title="Permalink to this headline">¶</a></h2>
-<p>Flashing can fail without any explanation if the host computer does not provide
-enough power over USB. Always use separately powered USB hubs to avoid this. It
-is recommended to use hubs that guarantee 0.5-1.0 ampere per port.</p>
+<div class="section" id="usb-power">
+<h2>USB, Power<a class="headerlink" href="#usb-power" title="Permalink to this headline">¶</a></h2>
 <p>With adequate power supply it should be possible to connect a large number of
 handsets to a single host. However, a large number of concurrent flash jobs may
 tax the IO capacity of the host so much that client RPC connections start to
 time out. The practical limits to concurrent flashing are not known.</p>
-<p>Even more demanding than flashing is the composition of flashable images. This
-is done by <tt class="docutils literal"><span class="pre">ave-imager</span></tt>, a cache &amp; concurrency wrapper for <tt class="docutils literal"><span class="pre">semcpkgtoimg</span></tt>.
-AVE sets the IO priority for this work to the lowest possible, but making more
-than very few images concurrently may still make the host unresponsive. In a
-DUST lab this situation can be avoided by only connecting handsets of the same
-model to any single host. Future versions of AVE will address this by queueing
-composition work jobs and by taking ready-made compositions from a centralized
-server.</p>
 </div>
 <div class="section" id="one-host-multiple-users">
 <h2>One Host, Multiple Users<a class="headerlink" href="#one-host-multiple-users" title="Permalink to this headline">¶</a></h2>
@@ -369,8 +335,6 @@ access to additional files from the original user&#8217;s home directory:</p>
 <li><tt class="docutils literal"><span class="pre">~/.gitconfig</span></tt>: To be able to use Git related workspace functions.</li>
 <li><tt class="docutils literal"><span class="pre">~/.ssh</span></tt>: Because the global Git configuration rewrites some host accesses
 to use SSH.</li>
-<li><tt class="docutils literal"><span class="pre">~/.c2d</span></tt>: If a non-default C2D configuration is used, typically a protected
-server.</li>
 </ul>
 <p>Especially the SSH configuration is tricky to move. If at all possible, avoid
 using a non-default home directory until AVE provides better debugging support
@@ -408,6 +372,7 @@ to make it fully owned and controlled by the Jenkins user account.</li>
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Lab Owner&#8217;s Guide</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
 <li><a class="reference internal" href="#installation">Installation</a><ul>
 <li><a class="reference internal" href="#default-configuration-files">Default Configuration Files</a></li>
 </ul>
@@ -423,7 +388,7 @@ to make it fully owned and controlled by the Jenkins user account.</li>
 <li><a class="reference internal" href="#listing-equipment">Listing Equipment</a></li>
 <li><a class="reference internal" href="#when-to-restart-services">When to Restart Services</a></li>
 <li><a class="reference internal" href="#debugging-techniques">Debugging Techniques</a></li>
-<li><a class="reference internal" href="#usb-power-flashing">USB, Power &amp; Flashing</a></li>
+<li><a class="reference internal" href="#usb-power">USB, Power</a></li>
 <li><a class="reference internal" href="#one-host-multiple-users">One Host, Multiple Users</a></li>
 <li><a class="reference internal" href="#running-ave-as-jenkins">Running AVE as Jenkins</a></li>
 </ul>

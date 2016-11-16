@@ -270,23 +270,11 @@ if __name__ == '__main__':
             shutil.copy(s, dst)
 
 #galatea-------------------------------------------------------------------
-    def make_apk(root, branch):
-        cwd = os.getcwd()
-        os.chdir(root+'/galatea')
-
-        run(['sdkdownload', '-b', branch])
-        os.environ['ANDROID_HOME'] = os.getenv('HOME') + '/sdk/' + branch
-
-        run(['./gradlew', 'clean', 'assemble'])
-
-        src = root+'/galatea/galatea-main/build/outputs/apk/galatea-main-release.apk'
-        dst = root+'/packaging/usr/share/ave/galatea/galatea.apk'
-        if not os.path.exists(os.path.dirname(dst)):
-            os.makedirs(os.path.dirname(dst))
-        shutil.copy(src, dst)
-
-        os.chdir(cwd)
-    make_apk(root, 'm-kitakami')
+    src = root + '/galatea/latest/galatea.apk'
+    dst = root + '/packaging/usr/share/ave/galatea'
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    shutil.copy(src, dst)
 
 #relay-------------------------------------------------------------------
     # copy upstart integration files to /etc/init
@@ -345,6 +333,6 @@ if __name__ == '__main__':
     # generate the Debian package
     src = root + '/packaging'
     run(['fakeroot', 'dpkg-deb', '--build', src,
-         '%s/ave-oss-%s.deb' % (root, version)])
-    print('created %s/ave-oss-%s.deb' % (root, version))
+         '%s/ave-%s.deb' % (root, version)])
+    print('created %s/ave-%s.deb' % (root, version))
 

@@ -14,23 +14,23 @@ Steps to Create report
 In this phase, we need to get instrumented APK and class coverage metadata
 files.
 
-a) Compile the APK with semc-build.
+a) Compile the APK with ant.
 
- * Build using *Execute SEMC build-script* jenkins plugin, There is an input
-   field in this plugin *Additional semc-build parameters*, if it not shown,
+ * Build using *Execute ant build-script* jenkins plugin, There is an input
+   field in this plugin *Additional ant parameters*, if it not shown,
    click the button *Advanced...* to show it, then input the text
    `-Demma-coverage-on=true` into it.
- * Build using *Execute shell* jenkins plugin, it should execute *semc-build*
+ * Build using *Execute shell* jenkins plugin, it should execute *ant*
    command like this::
 
-       semc-build ... -Demma-coverage-on=true ...
+       ant ... -Demma-coverage-on=true ...
 
 b) Archive the APK and coverage metadata files.
 
    Add the *Archive the artifacts* post-build action, in the *Files to archive*
    field, input something like this::
 
-       reports/coverage/coverage.em, semc-build-output/Foobar/bin/Foobar.apk
+       reports/coverage/coverage.em, ant-output/Foobar/bin/Foobar.apk
 
 2. Run test cases to get runtime coverage data
 ++++++++++++++++++++++++++++++++++++++++++++++

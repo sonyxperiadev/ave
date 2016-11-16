@@ -1,4 +1,4 @@
-Package:      ave-oss
+Package:      ave
 Version:      1.0
 Architecture: all
 Depends:      python-profiler,

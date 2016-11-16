@@ -1,8 +1,8 @@
 *~
 *.deb
 *.pyc
-*/packaging/usr
-*/packaging/etc
+*packaging/usr
+*packaging/etc
 build
 .gradle
 .idea

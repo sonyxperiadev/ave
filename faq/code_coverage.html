@@ -27,7 +27,7 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="top" title="AVE User&#39;s Guide  documentation" href="../index.html" />
     <link rel="up" title="Frequently Asked Questions" href="index.html" />
-    <link rel="next" title="Verifying Customized Products" href="customized_sw.html" />
+    <link rel="next" title="Scheduling" href="schedulers.html" />
     <link rel="prev" title="ADB Behavior" href="adb.html" /> 
   </head>
   <body>
@@ -41,7 +41,7 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="customized_sw.html" title="Verifying Customized Products"
+          <a href="schedulers.html" title="Scheduling"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="adb.html" title="ADB Behavior"
@@ -70,18 +70,18 @@ will guide you how to create coverage report for your apk package testing.</p>
 <p>In this phase, we need to get instrumented APK and class coverage metadata
 files.</p>
 <ol class="loweralpha simple">
-<li>Compile the APK with semc-build.</li>
+<li>Compile the APK with ant.</li>
 </ol>
 <blockquote>
 <div><ul>
-<li><p class="first">Build using <em>Execute SEMC build-script</em> jenkins plugin, There is an input
-field in this plugin <em>Additional semc-build parameters</em>, if it not shown,
+<li><p class="first">Build using <em>Execute ant build-script</em> jenkins plugin, There is an input
+field in this plugin <em>Additional ant parameters</em>, if it not shown,
 click the button <em>Advanced...</em> to show it, then input the text
 <cite>-Demma-coverage-on=true</cite> into it.</p>
 </li>
-<li><p class="first">Build using <em>Execute shell</em> jenkins plugin, it should execute <em>semc-build</em>
+<li><p class="first">Build using <em>Execute shell</em> jenkins plugin, it should execute <em>ant</em>
 command like this:</p>
-<div class="highlight-python"><pre>semc-build ... -Demma-coverage-on=true ...</pre>
+<div class="highlight-python"><pre>ant ... -Demma-coverage-on=true ...</pre>
 </div>
 </li>
 </ul>
@@ -90,7 +90,7 @@ command like this:</p>
 <li><p class="first">Archive the APK and coverage metadata files.</p>
 <p>Add the <em>Archive the artifacts</em> post-build action, in the <em>Files to archive</em>
 field, input something like this:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">reports</span><span class="o">/</span><span class="n">coverage</span><span class="o">/</span><span class="n">coverage</span><span class="o">.</span><span class="n">em</span><span class="p">,</span> <span class="n">semc</span><span class="o">-</span><span class="n">build</span><span class="o">-</span><span class="n">output</span><span class="o">/</span><span class="n">Foobar</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">Foobar</span><span class="o">.</span><span class="n">apk</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">reports</span><span class="o">/</span><span class="n">coverage</span><span class="o">/</span><span class="n">coverage</span><span class="o">.</span><span class="n">em</span><span class="p">,</span> <span class="n">ant</span><span class="o">-</span><span class="n">output</span><span class="o">/</span><span class="n">Foobar</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">Foobar</span><span class="o">.</span><span class="n">apk</span>
 </pre></div>
 </div>
 </li>
@@ -177,8 +177,8 @@ do not need the line by line analysis, you can skip this step (set
   <p class="topless"><a href="adb.html"
                         title="previous chapter">ADB Behavior</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="customized_sw.html"
-                        title="next chapter">Verifying Customized Products</a></p>
+  <p class="topless"><a href="schedulers.html"
+                        title="next chapter">Scheduling</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/faq/code_coverage.txt"
@@ -211,7 +211,7 @@ do not need the line by line analysis, you can skip this step (set
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="customized_sw.html" title="Verifying Customized Products"
+          <a href="schedulers.html" title="Scheduling"
              >next</a> |</li>
         <li class="right" >
           <a href="adb.html" title="ADB Behavior"

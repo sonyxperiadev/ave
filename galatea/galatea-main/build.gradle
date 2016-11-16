@@ -1,8 +1,8 @@
-apply plugin: 'sonyandroid'
+apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.1"
 
     sourceSets {
         main.setRoot('src/androidTest')
@@ -11,7 +11,7 @@ android {
     defaultConfig {
         applicationId "com.sonymobile.galatea"
         minSdkVersion 19
-        targetSdkVersion 23
+        targetSdkVersion 24
  }
 
     buildTypes {

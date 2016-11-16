@@ -6,48 +6,31 @@ Lab Owner's Guide
 This document collects information that may be useful to all AVE lab owners,
 from single workstations to large centralized labs.
 
+Requirements
+------------
+- `ADB <https://developer.android.com/studio/command-line/adb.html>`_ properly set up
+
 Installation
 ------------
-AVE is published to SoMC's internal Debian repository for Ubuntu workstations
-and servers. To install it one must have administrator privileges on the target
-machine.
-
-.. rubric:: Privileges
-
-First try to become owner and admin according to the normal IT process. Run::
-
-    makemeowner
-
-and type ``ADMIN`` when prompted.
-
-If this does not work because someone else already owns the machine, you can
-still become administrator with some help from the current administrator. *That*
-person should run::
-
-    sudo usermod -a -G admin <your user name>
+To install it one must have administrator privileges on the target machine.
 
 .. rubric:: Installation
 
-To install from the default repository, run::
+To install from source code, run::
 
-    sudo apt-get update
-    sudo apt-get install ave
+    make clean
+    make install-all
 
-Alternatively, you can open ``synaptic`` or another Debian package manager to
-check what the latest available version is before actually installing anything.
+Alternatively, you can make a debian pakage and install it, run::
 
-Be prepared to enter your 23-number when prompted. Users at external partners'
-should enter their login user names, whatever that may be.
+    make clean
+    make debian
+    sudo dpkg -i install ave-[ver].deb
+    sudo apt-get install -f
+    sudo dpkg -i install ave-[ver].deb (try to install again if needed)
 
-.. rubric:: Uninstallation
+Be prepared to enter your login user names, whatever that may be.
 
-Open the Debian package manager of your choice (``synaptic`` is recommended),
-search for "ave-" packages and mark all of them for complete removal. Then
-apply the change.
-
-.. rubric:: Beta Testing
-
-Instructions for beta testing are found :ref:`here <beta-testing>`.
 
 Default Configuration Files
 +++++++++++++++++++++++++++
@@ -165,8 +148,6 @@ not detailed here. Please refer to the links given here:
   split single boards into multiple logical units. Otherwise one would have to
   use a whole board with every single handset, which would be quite wasteful.
   :ref:`Configuration details <relay-config-files>`.
-* **Image server**: Provides a caching mechanism and concurrent access to ye
-  good olde ``semcpkgtoimg``. :ref:`Configuration details <imager-config>`.
 * **Equipment listers**: There is one for every kind of equipment: Handsets,
   relays, power meters and WLAN dongles. A lister's job is to report unique
   equipment profiles to the local broker. To see what the listers add to the
@@ -180,13 +161,6 @@ not detailed here. Please refer to the links given here:
   reliability of the ADB server. This is the only AVE component that runs with
   elevated privileges. :ref:`Configuration details <adb-server-config>` and
   :ref:`potential configuration problems <adb-server-behavior>`.
-
-* **FG3 Daemon**: This service is not part of AVE. It is used to flash handsets.
-  Unfortunately FG3 offers few automation controls and it is easier for the lab
-  owner to manage it manually than for AVE to do it programmatically. Its
-  configuration is updated by starting it::
-
-    fg3console -dm
 
   Sometimes the daemon will exit fairly soon afterwards (within a minute or so).
   In this case simply start it again.
@@ -210,13 +184,9 @@ circumstances require manual restarts:
 
 * Restarts after configuration changes have already been covered above, or are
   covered by separate documentation for various supplemental services.
-* A broker restart is needed after upgrading a non-service package. Normally a
-  full stable release of AVE will trigger all necessary restarts, but during
-  debugging or develoment a lab owner may want to install a changed version of
-  e.g. ``ave-handset`` separately::
+* A broker restart is needed after changing any config in [home]/.ave/config/*.json::
 
-    sudo dpkg -i ave-handset-999.deb
-    sudo ave-broker --restart
+    ave-broker --restart
 
 * ADB server is never restarted automatically, not even by a full AVE release.
   The reason is that doing so would interfere with all currently running test
@@ -264,25 +234,13 @@ Debugging Techniques
 
   SWD Tools may want to have the archives for analysis.
 
-USB, Power & Flashing
+USB, Power
 ---------------------
-Flashing can fail without any explanation if the host computer does not provide
-enough power over USB. Always use separately powered USB hubs to avoid this. It
-is recommended to use hubs that guarantee 0.5-1.0 ampere per port.
-
 With adequate power supply it should be possible to connect a large number of
 handsets to a single host. However, a large number of concurrent flash jobs may
 tax the IO capacity of the host so much that client RPC connections start to
 time out. The practical limits to concurrent flashing are not known.
 
-Even more demanding than flashing is the composition of flashable images. This
-is done by ``ave-imager``, a cache & concurrency wrapper for ``semcpkgtoimg``.
-AVE sets the IO priority for this work to the lowest possible, but making more
-than very few images concurrently may still make the host unresponsive. In a
-DUST lab this situation can be avoided by only connecting handsets of the same
-model to any single host. Future versions of AVE will address this by queueing
-composition work jobs and by taking ready-made compositions from a centralized
-server.
 
 One Host, Multiple Users
 ------------------------
@@ -305,8 +263,6 @@ access to additional files from the original user's home directory:
 * ``~/.gitconfig``: To be able to use Git related workspace functions.
 * ``~/.ssh``: Because the global Git configuration rewrites some host accesses
   to use SSH.
-* ``~/.c2d``: If a non-default C2D configuration is used, typically a protected
-  server.
 
 Especially the SSH configuration is tricky to move. If at all possible, avoid
 using a non-default home directory until AVE provides better debugging support

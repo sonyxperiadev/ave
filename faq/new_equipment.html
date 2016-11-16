@@ -416,7 +416,7 @@ an existing implementation will have to do as example:</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">git:</th><td class="field-body">review.sonyericsson.net/semctools/ave/handset</td>
+<tr class="field-odd field"><th class="field-name">module:</th><td class="field-body">ave/handset</td>
 </tr>
 <tr class="field-even field"><th class="field-name">file:</th><td class="field-body">src/ave/handset/lister.py</td>
 </tr>
@@ -555,12 +555,10 @@ functions on the equipment class&#8217; public API).</li>
 </div>
 <div class="section" id="development-shortcuts">
 <h2>Development Shortcuts<a class="headerlink" href="#development-shortcuts" title="Permalink to this headline">¶</a></h2>
-<p>All AVE modules must generate their own Debian packages but it is a hassle to
-have to make and install these and restart the broker every time a change is
-made to the equipment class. The developer can avoid all of this by replacing
-an RPC handle from <tt class="docutils literal"><span class="pre">Broker.get()</span></tt> with the real equipment class in the test
-cases. This trick is used in all of AVE&#8217;s equipment support modules. Consider
-this simplified handset example:</p>
+<p>It is a hassle to have to make and install AVE and restart the broker if needed
+The developer can avoid all of this by replacing an RPC handle from <tt class="docutils literal"><span class="pre">Broker.get()</span></tt>
+with the real equipment class in the test cases. This trick is used in all of AVE&#8217;s
+equipment support modules. Consider this simplified handset example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># runners.py</span>
 
 <span class="kn">from</span> <span class="nn">ave.broker</span> <span class="kn">import</span> <span class="n">Broker</span>
@@ -621,12 +619,11 @@ to complete this setup.</p>
 </div>
 <div class="section" id="api-documentation">
 <h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
-<p>API&#8217;s must be documented in dedicated files under the Git tree&#8217;s <tt class="docutils literal"><span class="pre">docs/</span></tt>
+<p>API&#8217;s must be documented in dedicated files under the module tree&#8217;s <tt class="docutils literal"><span class="pre">docs/</span></tt>
 folder and must be written in reStructuredText. Do <em>not</em> generate doc strings
 from source code comments. There are several examples to download and take
 guidance from.</p>
-<p>To include the new documents in the user&#8217;s guide, download and patch the Git
-<tt class="docutils literal"><span class="pre">semctools/ave/documentation</span></tt>:</p>
+<p>To include the new documents in the user&#8217;s guide, patch the module <tt class="docutils literal"><span class="pre">ave/documentation</span></tt>:</p>
 <ul>
 <li><p class="first">Create a symlink that points to the new module&#8217;s root directory (which must
 be &#8220;neighbours&#8221; with the documentation tree in a common superdirectory).</p>

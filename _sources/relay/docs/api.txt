@@ -15,9 +15,6 @@ lab owner is responsible for setting up actual wiring of the equipment and to
 create configuration files that match the wiring. See the *Configuration Files*
 section for details on lab maintenance.
 
-The list of circuit names is a governed name space. Contact the `AVE governance
-board <mailto:DL-WW-AVE-GB>`_ to request additions to the name space.
-
 Handset Circuits
 ^^^^^^^^^^^^^^^^
 The following circuits can be used if the lab owner has augmented corresponding

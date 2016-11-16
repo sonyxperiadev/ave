@@ -365,7 +365,7 @@ Common requirements on listers:
 There is no common base class for listers. There *should* be one, but for now
 an existing implementation will have to do as example:
 
-:git: review.sonyericsson.net/semctools/ave/handset
+:module: ave/handset
 :file: src/ave/handset/lister.py
 
 ``__init__(self, port, authkey, paths=None)``
@@ -499,12 +499,10 @@ Automated tests:
 
 Development Shortcuts
 ---------------------
-All AVE modules must generate their own Debian packages but it is a hassle to
-have to make and install these and restart the broker every time a change is
-made to the equipment class. The developer can avoid all of this by replacing
-an RPC handle from ``Broker.get()`` with the real equipment class in the test
-cases. This trick is used in all of AVE's equipment support modules. Consider
-this simplified handset example::
+It is a hassle to have to make and install AVE and restart the broker if needed
+The developer can avoid all of this by replacing an RPC handle from ``Broker.get()``
+with the real equipment class in the test cases. This trick is used in all of AVE's
+equipment support modules. Consider this simplified handset example::
 
     # runners.py
 
@@ -565,13 +563,12 @@ to complete this setup.
 
 API Documentation
 -----------------
-API's must be documented in dedicated files under the Git tree's ``docs/``
+API's must be documented in dedicated files under the module tree's ``docs/``
 folder and must be written in reStructuredText. Do *not* generate doc strings
 from source code comments. There are several examples to download and take
 guidance from.
 
-To include the new documents in the user's guide, download and patch the Git
-``semctools/ave/documentation``:
+To include the new documents in the user's guide, patch the module ``ave/documentation``:
 
 * Create a symlink that points to the new module's root directory (which must
   be "neighbours" with the documentation tree in a common superdirectory).
