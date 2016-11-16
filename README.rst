@@ -43,6 +43,55 @@ Alternatively, you can make a debian pakage and install it, run::
 
 Be prepared to enter your login user names, whatever that may be.
 
+Sample
+------
+
+.. rublic:: Basic handset control
+
+Make sure that ``ave-broker`` is running in your system checked by
+``ps aux | grep ave-broker``. Then you can try to allocate a device and
+do whatever available in the
+`API document <https://sonyxperiadev.github.io/ave/handset/docs/android_api.html>`_.
+For example::
+
+    >>> import ave.broker as b
+    >>> B = b.Broker()
+    >>> handset = B.get_resource({"type": "handset"})
+    >>> handset.ls(".")[0:3]
+    [u'acct', u'bt_firmware', u'cache']
+    >>> handset.profile
+    {u'workstation': u'machine.s', u'power_state': u'boot_completed',
+     u'product.model': u'so-03h', u'platform': u'android',
+     u'sysfs_path': u'/sys/devices/pci0000:00/0000:00:14.0/usb3/3-7',
+     u'pretty': None, u'serial': u'CB5A26YQV5', u'type': u'handset'}
+    >>> # You can update your .ave/config/handset.json to define pretty.
+    >>> # You have to restart ave-broker by `ave-broker --restart` to reload the config file.
+
+.. rublic:: Remote handset control
+
+One of the major features AVE has is to control handsets over network via
+RPC proxy. You can configure your server and client machines as in the
+diagram below:
+
+.. image:: https://github.com/sonyxperiadev/ave/blob/master/obj/device_sharing.png?raw=true
+    :width: 100%
+    :align: center
+
+Note that those config files are located under ``$HOME/.ave/config``.
+**Again, please restart ``ave-broker`` by ``ave-broker --restart`` on both
+of the machines who are communicating.**
+Then you can use the handset from a remote machine::
+
+    ssh machine.c
+    adb devices # It does not show any device.
+    ave-broker --list # But this shows a device name
+    python
+    >>> import ave.broker as b
+    >>> B = b.Broker()
+    >>> handset = B.get_resource({"type": "handset"}) # Handset is available
+    >>> handset.profile
+    {u'workstation': u',machine.s', u'power_state': u'boot_completed',
+
 Acknowledgement
 ---------------
 
